@@ -73,7 +73,22 @@ Rectangle {
         height: 500
         anchors.centerIn: parent
         modal: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        closePolicy: Popup.CloseOnEscape
+
+        onOpened: {
+            capturedImage.visible = false
+            videoOutput.visible = true
+            capturedImage.source = ""
+            
+            nameInput.text = ""
+            workIdInput.text = ""
+            maleRadio.checked = true
+            normalRadio.checked = true
+            avatarPathInput.text = ""
+            avatarPathInput.filePath = ""
+            
+            camera.start()
+        }
 
         background: Rectangle {
             color: "#333333"
@@ -285,20 +300,7 @@ Rectangle {
                         Row {
                             width: parent.width - 90
                             height: parent.height
-                            spacing: 20
-
-                            RadioButton {
-                                id: adminRadio
-                                text: "管理员"
-                                contentItem: Text {
-                                    text: adminRadio.text
-                                    font.family: "阿里妈妈数黑体"
-                                    font.pixelSize: 16
-                                    color: "white"
-                                    verticalAlignment: Text.AlignVCenter
-                                    leftPadding: adminRadio.indicator.width + 4
-                                }
-                            }
+                            spacing: 2
 
                             RadioButton {
                                 id: normalRadio
@@ -311,6 +313,19 @@ Rectangle {
                                     color: "white"
                                     verticalAlignment: Text.AlignVCenter
                                     leftPadding: normalRadio.indicator.width + 4
+                                }
+                            }
+                            
+                            RadioButton {
+                                id: adminRadio
+                                text: "管理员"
+                                contentItem: Text {
+                                    text: adminRadio.text
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    verticalAlignment: Text.AlignVCenter
+                                    leftPadding: adminRadio.indicator.width + 4
                                 }
                             }
                         }

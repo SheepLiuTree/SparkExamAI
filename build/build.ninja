@@ -193,7 +193,7 @@ build SparkExamAI_autogen/EWIEGA46WW/qrc_qml.cpp | ${cmake_ninja_workdir}SparkEx
 #############################################
 # Phony custom command for CMakeFiles\SparkExamAI_autogen_timestamp_deps
 
-build CMakeFiles/SparkExamAI_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles/SparkExamAI_autogen_timestamp_deps: phony C$:/Qt/5.15.2/mingw81_64/bin/moc.exe C$:/Qt/5.15.2/mingw81_64/lib/libQt5Core.a C$:/Qt/5.15.2/mingw81_64/lib/libQt5Quick.a
+build CMakeFiles/SparkExamAI_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles/SparkExamAI_autogen_timestamp_deps: phony C$:/Qt/5.15.2/mingw81_64/lib/libQt5Core.a C$:/Qt/5.15.2/mingw81_64/bin/moc.exe C$:/Qt/5.15.2/mingw81_64/lib/libQt5Quick.a
 
 
 #############################################
