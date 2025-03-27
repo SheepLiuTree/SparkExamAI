@@ -1,4 +1,5 @@
-SparkExamAI_autogen/timestamp: \
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/EWIEGA46WW/moc_DatabaseManager.cpp: E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.h \
+  E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/moc_predefs.h \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/QDateTime \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/QDebug \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/QObject \
@@ -70,79 +71,6 @@ SparkExamAI_autogen/timestamp: \
   C:/Qt/5.15.2/mingw81_64/include/QtSql/qsqlquery.h \
   C:/Qt/5.15.2/mingw81_64/include/QtSql/qtsql-config.h \
   C:/Qt/5.15.2/mingw81_64/include/QtSql/qtsqlglobal.h \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5/Qt5Config.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5/Qt5ConfigVersion.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5/Qt5ModuleLocation.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Core/Qt5CoreConfig.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Core/Qt5CoreConfigExtras.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Core/Qt5CoreConfigVersion.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Core/Qt5CoreMacros.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5GuiConfigExtras.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5GuiConfigVersion.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QICNSPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QICOPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QJpegPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QSvgIconPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QSvgPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QTgaPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QTiffPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QWbmpPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QWebGLIntegrationPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QWebpPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QWindowsDirect2DIntegrationPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QWindowsIntegrationPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Network/Qt5NetworkConfig.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Network/Qt5NetworkConfigVersion.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Network/Qt5Network_QGenericEnginePlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5QmlConfig.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5QmlConfigExtras.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5QmlConfigVersion.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5Qml_QDebugMessageServiceFactory.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5Qml_QLocalClientConnectionFactory.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5Qml_QQmlDebugServerFactory.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5Qml_QQmlDebuggerServiceFactory.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5Qml_QQmlInspectorServiceFactory.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5Qml_QQmlNativeDebugConnectorFactory.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5Qml_QQmlNativeDebugServiceFactory.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5Qml_QQmlPreviewServiceFactory.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5Qml_QQmlProfilerServiceFactory.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5Qml_QQuickProfilerAdapterFactory.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Qml/Qt5Qml_QTcpServerConnectionFactory.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5QmlModels/Qt5QmlModelsConfig.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5QmlModels/Qt5QmlModelsConfigVersion.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Quick/Qt5QuickConfig.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Quick/Qt5QuickConfigVersion.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5SqlConfig.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5SqlConfigVersion.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5Sql_QODBCDriverPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5Sql_QPSQLDriverPlugin.cmake \
-  C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5Sql_QSQLiteDriverPlugin.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeCXXInformation.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeCommonLanguageInclude.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeGenericSystem.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeInitializeConfigs.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeLanguageInformation.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeParseArguments.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeRCInformation.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeSystemSpecificInformation.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeSystemSpecificInitialize.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/Compiler/CMakeCommonCompilerMacros.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/Compiler/GNU-CXX.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/Compiler/GNU.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/GNUInstallDirs.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/Platform/Windows-GNU-CXX-ABI.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/Platform/Windows-GNU-CXX.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/Platform/Windows-GNU.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/Platform/Windows-windres.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/Platform/Windows.cmake \
-  C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/Platform/WindowsPaths.cmake \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed/limits.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed/syslimits.h \
   C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/algorithm \
@@ -336,16 +264,4 @@ SparkExamAI_autogen/timestamp: \
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/time.h \
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/vadefs.h \
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wchar.h \
-  C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wctype.h \
-  E:/SparkExamAI/SparkExamAI/SparkExamAI/CMakeLists.txt \
-  E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.cpp \
-  E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.h \
-  E:/SparkExamAI/SparkExamAI/SparkExamAI/FileManager.cpp \
-  E:/SparkExamAI/SparkExamAI/SparkExamAI/FileManager.h \
-  CMakeFiles/3.24.2/CMakeCXXCompiler.cmake \
-  CMakeFiles/3.24.2/CMakeRCCompiler.cmake \
-  CMakeFiles/3.24.2/CMakeSystem.cmake \
-  SparkExamAI_autogen/moc_predefs.h \
-  E:/SparkExamAI/SparkExamAI/SparkExamAI/main.cpp \
-  E:/SparkExamAI/SparkExamAI/SparkExamAI/qml.qrc \
-  C:/Qt/Tools/CMake_64/bin/cmake.exe
+  C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wctype.h

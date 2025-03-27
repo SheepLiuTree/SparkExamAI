@@ -7,7 +7,7 @@
 				{
 					"build" : ".",
 					"hasInstallRule" : true,
-					"jsonFile" : "directory-.-Debug-fe6fbfb2ae65ad7b575d.json",
+					"jsonFile" : "directory-.-Debug-c2dd482e9e2c0f5c02ea.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.14"
@@ -44,7 +44,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "SparkExamAI::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-SparkExamAI-Debug-e4cea5766cc9f9a5bbb6.json",
+					"jsonFile" : "target-SparkExamAI-Debug-94526187d38f2bade150.json",
 					"name" : "SparkExamAI",
 					"projectIndex" : 0
 				},

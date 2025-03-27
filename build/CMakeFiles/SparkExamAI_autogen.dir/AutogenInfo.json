@@ -79,13 +79,32 @@
 		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QWindowsIntegrationPlugin.cmake",
 		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake",
 		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Gui/Qt5GuiConfigExtras.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5SqlConfigVersion.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5SqlConfig.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5Sql_QODBCDriverPlugin.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5Sql_QPSQLDriverPlugin.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5Sql_QSQLiteDriverPlugin.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/GNUInstallDirs.cmake",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/qml.qrc"
 	],
 	"CMAKE_SOURCE_DIR" : "E:/SparkExamAI/SparkExamAI/SparkExamAI",
 	"DEP_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "SparkExamAI_autogen/timestamp",
-	"HEADERS" : [],
+	"HEADERS" : 
+	[
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.h",
+			"MU",
+			"EWIEGA46WW/moc_DatabaseManager.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/FileManager.h",
+			"MU",
+			"EWIEGA46WW/moc_FileManager.cpp",
+			null
+		]
+	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
 	"INCLUDE_DIR" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/include",
 	"MOC_COMPILATION_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/mocs_compilation.cpp",
@@ -96,7 +115,8 @@
 		"QT_NETWORK_LIB",
 		"QT_QMLMODELS_LIB",
 		"QT_QML_LIB",
-		"QT_QUICK_LIB"
+		"QT_QUICK_LIB",
+		"QT_SQL_LIB"
 	],
 	"MOC_DEPEND_FILTERS" : 
 	[
@@ -116,6 +136,7 @@
 		"C:/Qt/5.15.2/mingw81_64/include/QtNetwork",
 		"C:/Qt/5.15.2/mingw81_64/include/QtGui",
 		"C:/Qt/5.15.2/mingw81_64/include/QtANGLE",
+		"C:/Qt/5.15.2/mingw81_64/include/QtSql",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward",
@@ -147,6 +168,12 @@
 	"SETTINGS_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/SparkExamAI_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.cpp",
+			"MU",
+			null
+		],
+		[ "E:/SparkExamAI/SparkExamAI/SparkExamAI/FileManager.cpp", "MU", null ],
 		[ "E:/SparkExamAI/SparkExamAI/SparkExamAI/main.cpp", "MU", null ]
 	],
 	"UIC_OPTIONS" : [],

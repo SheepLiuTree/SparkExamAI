@@ -1,21 +1,41 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 import QtMultimedia 5.15
 import QtQuick.Dialogs 1.3
 
 Rectangle {
-    color: "transparent"
+    color: "transparent" 
 
     // 创建一个ListModel来存储采集的人脸数据
     ListModel {
         id: faceCollectionModel
-        // 示例数据
-        ListElement {
-            name: "张三"
-            gender: "男"
-            workId: "001"
-            faceImage: ""
-            avatarPath: ""
+    }
+
+    // 组件加载完成后，从数据库加载数据
+    Component.onCompleted: {
+        loadFaceDataFromDatabase();
+    }
+
+    // 从数据库加载人脸数据的函数
+    function loadFaceDataFromDatabase() {
+        // 清空现有模型
+        faceCollectionModel.clear();
+        
+        // 从数据库获取所有人脸数据
+        var faceList = dbManager.getAllFaceData();
+        
+        // 将数据添加到模型中
+        for (var i = 0; i < faceList.length; i++) {
+            var face = faceList[i];
+            faceCollectionModel.append({
+                "name": face.name,
+                "gender": face.gender,
+                "workId": face.workId,
+                "faceImage": face.faceImage,
+                "avatarPath": face.avatarPath,
+                "isAdmin": face.isAdmin
+            });
         }
     }
 
@@ -67,6 +87,14 @@ Rectangle {
         }
     }
 
+    // 添加Canvas元素用于截取图像
+    Canvas {
+        id: captureCanvas
+        width: videoOutput.width
+        height: videoOutput.height
+        visible: false
+    }
+
     Popup {
         id: cameraPopup
         width: 900
@@ -111,8 +139,18 @@ Rectangle {
 
                 Camera {
                     id: camera
-                    deviceId: QtMultimedia.defaultCamera.deviceId
-
+                    // 设置摄像头为摄像头2
+                    deviceId: {
+                        // 获取可用摄像头列表
+                        var cameras = QtMultimedia.availableCameras
+                        // 如果有多个摄像头，选择第二个（索引为1）
+                        if (cameras.length > 1) {
+                            return cameras[2].deviceId
+                        } else {
+                            // 如果只有一个摄像头，使用默认摄像头
+                            return QtMultimedia.defaultCamera.deviceId
+                        }
+                    }
                     imageCapture {
                         onImageCaptured: {
                             console.log("Image captured with id: " + requestId)
@@ -120,6 +158,7 @@ Rectangle {
                         }
                         onImageSaved: {
                             console.log("Image saved as: " + path)
+                            fileManager.moveFile(path, "faceimages/" + nameInput.text + ".jpg")
                         }
                     }
                 }
@@ -138,6 +177,7 @@ Rectangle {
                     fillMode: Image.PreserveAspectFit
                     visible: false
                 }
+
             }
 
             // 个人信息表单
@@ -437,8 +477,10 @@ Rectangle {
                             capturedImage.visible = false
                             videoOutput.visible = true
                         } else {
-                            // 拍照逻辑
-                            camera.imageCapture.capture()
+                            // 拍照逻辑                           
+                            videoOutput.grabToImage(function(result) {
+                                capturedImage.source = result.url; // 仅预览
+                            });
                             capturedImage.visible = true
                             videoOutput.visible = false
                         }
@@ -501,24 +543,58 @@ Rectangle {
                             return
                         }
 
+                        // 检查工号是否已存在
+                        if (dbManager.userExists(workIdInput.text)) {
+                            messageText.text = "该工号已存在，请使用其他工号"
+                            messagePopup.open()
+                            return
+                        }
+
                         // 如果所有信息都已填写，则保存数据
-                        console.log("保存人脸和个人信息")
-                        console.log("姓名: " + nameInput.text)
-                        console.log("性别: " + (maleRadio.checked ? "男" : "女"))
-                        console.log("工号: " + workIdInput.text)
-                        console.log("权限: " + (adminRadio.checked ? "管理员" : "普通"))
-                        console.log("头像路径: " + avatarPathInput.filePath)
+                        captureCanvas.getContext("2d").drawImage(capturedImage, 0, 0, capturedImage.width, capturedImage.height);
+                        capturedImage.source = captureCanvas.toDataURL("image/jpeg");
+                        
+                        // 保存Canvas图像到文件
+                        var faceImagePath = fileManager.getApplicationDir() + "/faceimages/" + nameInput.text + ".jpg";
+                        captureCanvas.save(faceImagePath);
+                        
+                        // 复制头像图片
+                        var avatarImagePath = fileManager.getApplicationDir() + "/avatarimages/" + nameInput.text + ".jpg";
+                        fileManager.copyFile(avatarPathInput.filePath, "avatarimages/" + nameInput.text + ".jpg");
+                        
+                        // 保存到数据库
+                        var isAdmin = adminRadio.checked;
+                        var result = dbManager.addFaceData(
+                            nameInput.text,
+                            maleRadio.checked ? "男" : "女",
+                            workIdInput.text,
+                            faceImagePath,
+                            avatarImagePath,
+                            isAdmin
+                        );
+                        
+                        if (!result) {
+                            messageText.text = "保存到数据库失败！";
+                            messagePopup.open();
+                            return;
+                        }
+                        
+                        console.log("保存人脸和个人信息");
+                        console.log("姓名: " + nameInput.text);
+                        console.log("性别: " + (maleRadio.checked ? "男" : "女"));
+                        console.log("工号: " + workIdInput.text);
+                        console.log("权限: " + (adminRadio.checked ? "管理员" : "普通"));
+                        console.log("头像路径: " + avatarImagePath);
+                        console.log("人脸图像已保存至: " + faceImagePath);
 
-                        // 添加新数据到模型
-                        faceCollectionModel.append({
-                            "name": nameInput.text,
-                            "gender": maleRadio.checked ? "男" : "女",
-                            "workId": workIdInput.text,
-                            "faceImage": capturedImage.source.toString(),
-                            "avatarPath": avatarPathInput.filePath
-                        })
+                        // 重新从数据库加载数据到模型
+                        loadFaceDataFromDatabase();
 
-                        cameraPopup.close()
+                        // 显示成功消息
+                        messageText.text = "人脸数据采集成功！";
+                        messagePopup.open();
+                        
+                        cameraPopup.close();
                     }
                 }
             }
@@ -656,8 +732,18 @@ Rectangle {
                                     verticalAlignment: Text.AlignVCenter
                                 }
                                 onClicked: {
-                                    // 删除该行数据
-                                    faceCollectionModel.remove(index)
+                                    // 从数据库中删除数据
+                                    var workId = faceCollectionModel.get(index).workId;
+                                    var result = dbManager.deleteFaceData(workId);
+                                    
+                                    if (result) {
+                                        // 从模型中删除数据
+                                        faceCollectionModel.remove(index);
+                                        messageText.text = "数据已成功删除！";
+                                    } else {
+                                        messageText.text = "删除数据失败！";
+                                    }
+                                    messagePopup.open();
                                 }
                             }
                         }
@@ -702,7 +788,7 @@ Rectangle {
                                 anchors.centerIn: parent
                                 width: 40
                                 height: 40
-                                source: faceImage ? faceImage : ""
+                                source: faceImage ? "file:///" + faceImage : ""
                                 fillMode: Image.PreserveAspectFit
                             }
                         }

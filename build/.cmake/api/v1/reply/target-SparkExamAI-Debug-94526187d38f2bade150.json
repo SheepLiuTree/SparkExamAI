@@ -40,19 +40,19 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 37,
+				"line" : 41,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 61,
+				"line" : 65,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 43,
+				"line" : 47,
 				"parent" : 0
 			},
 			{
@@ -184,6 +184,10 @@
 				{
 					"backtrace" : 3,
 					"define" : "QT_QUICK_LIB"
+				},
+				{
+					"backtrace" : 3,
+					"define" : "QT_SQL_LIB"
 				}
 			],
 			"includes" : 
@@ -236,6 +240,11 @@
 					"backtrace" : 3,
 					"isSystem" : true,
 					"path" : "C:/Qt/5.15.2/mingw81_64/include/QtANGLE"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "C:/Qt/5.15.2/mingw81_64/include/QtSql"
 				}
 			],
 			"language" : "CXX",
@@ -251,7 +260,9 @@
 			[
 				0,
 				1,
-				4
+				3,
+				5,
+				8
 			]
 		}
 	],
@@ -295,6 +306,11 @@
 			{
 				"backtrace" : 3,
 				"fragment" : "C:\\Qt\\5.15.2\\mingw81_64\\lib\\libQt5Quick.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\Qt\\5.15.2\\mingw81_64\\lib\\libQt5Sql.a",
 				"role" : "libraries"
 			},
 			{
@@ -349,7 +365,9 @@
 			[
 				0,
 				1,
-				4
+				3,
+				5,
+				8
 			]
 		},
 		{
@@ -357,15 +375,23 @@
 			"sourceIndexes" : 
 			[
 				2,
-				3
+				7
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				4,
+				6
 			]
 		},
 		{
 			"name" : "CMake Rules",
 			"sourceIndexes" : 
 			[
-				5,
-				6
+				9,
+				10
 			]
 		}
 	],
@@ -390,6 +416,28 @@
 			"sourceGroupIndex" : 1
 		},
 		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "FileManager.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "FileManager.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "DatabaseManager.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "DatabaseManager.h",
+			"sourceGroupIndex" : 2
+		},
+		{
 			"backtrace" : 0,
 			"isGenerated" : true,
 			"path" : "build/SparkExamAI_autogen/timestamp",
@@ -406,13 +454,13 @@
 			"backtrace" : 0,
 			"isGenerated" : true,
 			"path" : "build/SparkExamAI_autogen/timestamp.rule",
-			"sourceGroupIndex" : 2
+			"sourceGroupIndex" : 3
 		},
 		{
 			"backtrace" : 0,
 			"isGenerated" : true,
 			"path" : "build/SparkExamAI_autogen/EWIEGA46WW/qrc_qml.cpp.rule",
-			"sourceGroupIndex" : 2
+			"sourceGroupIndex" : 3
 		}
 	],
 	"type" : "EXECUTABLE"

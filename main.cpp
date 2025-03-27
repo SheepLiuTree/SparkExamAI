@@ -1,6 +1,8 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-
+#include <QQmlContext>
+#include "FileManager.h"
+#include "DatabaseManager.h"
 
 int main(int argc, char *argv[])
 {
@@ -10,6 +12,15 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
+    
+    // 创建FileManager实例并注册到QML上下文
+    FileManager fileManager;
+    engine.rootContext()->setContextProperty("fileManager", &fileManager);
+    
+    // 创建DatabaseManager实例并注册到QML上下文
+    DatabaseManager dbManager;
+    engine.rootContext()->setContextProperty("dbManager", &dbManager);
+    
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
         &app, [url](QObject *obj, const QUrl &objUrl) {
