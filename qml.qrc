@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>FaceCollectionPage.qml</file>
+        <file>images/064.png</file>
+        <file>images/106.png</file>
+        <file>images/125.png</file>
+        <file>images/background.png</file>
+        <file>images/button_bg.png</file>
+        <file>images/face_icon.png</file>
+        <file>images/headline.png</file>
+        <file>images/menu.png</file>
+        <file>images/personal_button_bg.png</file>
+    </qresource>
+</RCC>
