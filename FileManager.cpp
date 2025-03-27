@@ -59,3 +59,18 @@ QString FileManager::getApplicationDir()
 {
     return QCoreApplication::applicationDirPath();
 }
+
+bool FileManager::createDirectory(const QString &dirPath)
+{
+    QDir dir;
+    if (!dir.exists(dirPath)) {
+        return dir.mkpath(dirPath);
+    }
+    return true; // Directory already exists
+}
+
+bool FileManager::directoryExists(const QString &dirPath)
+{
+    QDir dir(dirPath);
+    return dir.exists();
+}

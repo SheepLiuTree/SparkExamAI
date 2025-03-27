@@ -14,6 +14,25 @@ Rectangle {
 
     // 组件加载完成后，从数据库加载数据
     Component.onCompleted: {
+        // 打印数据库路径
+        console.log("正在从数据库加载数据...");
+        
+        // 确保人脸和头像存储目录存在
+        var appDir = fileManager.getApplicationDir();
+        var facesDir = appDir + "/faceimages";
+        var avatarsDir = appDir + "/avatarimages";
+        
+        if (!fileManager.directoryExists(facesDir)) {
+            fileManager.createDirectory(facesDir);
+            console.log("创建人脸图像目录: " + facesDir);
+        }
+        
+        if (!fileManager.directoryExists(avatarsDir)) {
+            fileManager.createDirectory(avatarsDir);
+            console.log("创建头像目录: " + avatarsDir);
+        }
+        
+        // 从数据库加载数据
         loadFaceDataFromDatabase();
     }
 
@@ -554,13 +573,27 @@ Rectangle {
                         captureCanvas.getContext("2d").drawImage(capturedImage, 0, 0, capturedImage.width, capturedImage.height);
                         capturedImage.source = captureCanvas.toDataURL("image/jpeg");
                         
+                        // 确保目录存在
+                        var appDir = fileManager.getApplicationDir();
+                        var facesDir = appDir + "/faceimages";
+                        var avatarsDir = appDir + "/avatarimages";
+                        
+                        // 创建目录（如果不存在）
+                        if (!fileManager.directoryExists(facesDir)) {
+                            fileManager.createDirectory(facesDir);
+                        }
+                        
+                        if (!fileManager.directoryExists(avatarsDir)) {
+                            fileManager.createDirectory(avatarsDir);
+                        }
+                        
                         // 保存Canvas图像到文件
-                        var faceImagePath = fileManager.getApplicationDir() + "/faceimages/" + nameInput.text + ".jpg";
+                        var faceImagePath = facesDir + "/" + nameInput.text + "_" + workIdInput.text + ".jpg";
                         captureCanvas.save(faceImagePath);
                         
                         // 复制头像图片
-                        var avatarImagePath = fileManager.getApplicationDir() + "/avatarimages/" + nameInput.text + ".jpg";
-                        fileManager.copyFile(avatarPathInput.filePath, "avatarimages/" + nameInput.text + ".jpg");
+                        var avatarImagePath = avatarsDir + "/" + nameInput.text + "_" + workIdInput.text + ".jpg";
+                        fileManager.copyFile(avatarPathInput.filePath, avatarImagePath);
                         
                         // 保存到数据库
                         var isAdmin = adminRadio.checked;

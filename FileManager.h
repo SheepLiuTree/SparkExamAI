@@ -18,7 +18,13 @@ public:
     Q_INVOKABLE bool moveFile(const QString &sourcePath, const QString &destinationPath);
     
     // 获取应用程序目录
-    Q_INVOKABLE QString getApplicationDir() ;
+    Q_INVOKABLE QString getApplicationDir();
+    
+    // 创建目录
+    Q_INVOKABLE bool createDirectory(const QString &dirPath);
+    
+    // 检查目录是否存在
+    Q_INVOKABLE bool directoryExists(const QString &dirPath);
 
 private:
   

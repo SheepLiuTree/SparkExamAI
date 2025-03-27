@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_DatabaseManager_t {
-    QByteArrayData data[16];
-    char stringdata0[181];
+    QByteArrayData data[29];
+    char stringdata0[328];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -47,14 +47,32 @@ QT_MOC_LITERAL(11, 109, 14), // "getAllFaceData"
 QT_MOC_LITERAL(12, 124, 19), // "getFaceDataByWorkId"
 QT_MOC_LITERAL(13, 144, 10), // "verifyFace"
 QT_MOC_LITERAL(14, 155, 10), // "userExists"
-QT_MOC_LITERAL(15, 166, 14) // "updateFaceData"
+QT_MOC_LITERAL(15, 166, 14), // "updateFaceData"
+QT_MOC_LITERAL(16, 181, 10), // "setSetting"
+QT_MOC_LITERAL(17, 192, 3), // "key"
+QT_MOC_LITERAL(18, 196, 5), // "value"
+QT_MOC_LITERAL(19, 202, 10), // "getSetting"
+QT_MOC_LITERAL(20, 213, 12), // "defaultValue"
+QT_MOC_LITERAL(21, 226, 13), // "deleteSetting"
+QT_MOC_LITERAL(22, 240, 14), // "getAllSettings"
+QT_MOC_LITERAL(23, 255, 13), // "getAccessLogs"
+QT_MOC_LITERAL(24, 269, 5), // "limit"
+QT_MOC_LITERAL(25, 275, 6), // "offset"
+QT_MOC_LITERAL(26, 282, 19), // "getAccessLogsByUser"
+QT_MOC_LITERAL(27, 302, 14), // "cleanupOldLogs"
+QT_MOC_LITERAL(28, 317, 10) // "daysToKeep"
 
     },
     "DatabaseManager\0initDatabase\0\0addFaceData\0"
     "name\0gender\0workId\0faceImagePath\0"
     "avatarPath\0isAdmin\0deleteFaceData\0"
     "getAllFaceData\0getFaceDataByWorkId\0"
-    "verifyFace\0userExists\0updateFaceData"
+    "verifyFace\0userExists\0updateFaceData\0"
+    "setSetting\0key\0value\0getSetting\0"
+    "defaultValue\0deleteSetting\0getAllSettings\0"
+    "getAccessLogs\0limit\0offset\0"
+    "getAccessLogsByUser\0cleanupOldLogs\0"
+    "daysToKeep"
 };
 #undef QT_MOC_LITERAL
 
@@ -64,7 +82,7 @@ static const uint qt_meta_data_DatabaseManager[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      23,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -72,16 +90,29 @@ static const uint qt_meta_data_DatabaseManager[] = {
        0,       // signalCount
 
  // methods: name, argc, parameters, tag, flags
-       1,    0,   64,    2, 0x02 /* Public */,
-       3,    6,   65,    2, 0x02 /* Public */,
-       3,    5,   78,    2, 0x22 /* Public | MethodCloned */,
-      10,    1,   89,    2, 0x02 /* Public */,
-      11,    0,   92,    2, 0x02 /* Public */,
-      12,    1,   93,    2, 0x02 /* Public */,
-      13,    2,   96,    2, 0x02 /* Public */,
-      14,    1,  101,    2, 0x02 /* Public */,
-      15,    6,  104,    2, 0x02 /* Public */,
-      15,    5,  117,    2, 0x22 /* Public | MethodCloned */,
+       1,    0,  129,    2, 0x02 /* Public */,
+       3,    6,  130,    2, 0x02 /* Public */,
+       3,    5,  143,    2, 0x22 /* Public | MethodCloned */,
+      10,    1,  154,    2, 0x02 /* Public */,
+      11,    0,  157,    2, 0x02 /* Public */,
+      12,    1,  158,    2, 0x02 /* Public */,
+      13,    2,  161,    2, 0x02 /* Public */,
+      14,    1,  166,    2, 0x02 /* Public */,
+      15,    6,  169,    2, 0x02 /* Public */,
+      15,    5,  182,    2, 0x22 /* Public | MethodCloned */,
+      16,    2,  193,    2, 0x02 /* Public */,
+      19,    2,  198,    2, 0x02 /* Public */,
+      19,    1,  203,    2, 0x22 /* Public | MethodCloned */,
+      21,    1,  206,    2, 0x02 /* Public */,
+      22,    0,  209,    2, 0x02 /* Public */,
+      23,    2,  210,    2, 0x02 /* Public */,
+      23,    1,  215,    2, 0x22 /* Public | MethodCloned */,
+      23,    0,  218,    2, 0x22 /* Public | MethodCloned */,
+      26,    3,  219,    2, 0x02 /* Public */,
+      26,    2,  226,    2, 0x22 /* Public | MethodCloned */,
+      26,    1,  231,    2, 0x22 /* Public | MethodCloned */,
+      27,    1,  234,    2, 0x02 /* Public */,
+      27,    0,  237,    2, 0x22 /* Public | MethodCloned */,
 
  // methods: parameters
     QMetaType::Bool,
@@ -94,6 +125,19 @@ static const uint qt_meta_data_DatabaseManager[] = {
     QMetaType::Bool, QMetaType::QString,    6,
     QMetaType::Bool, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::Bool,    6,    4,    5,    7,    8,    9,
     QMetaType::Bool, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::QString,    6,    4,    5,    7,    8,
+    QMetaType::Bool, QMetaType::QString, QMetaType::QString,   17,   18,
+    QMetaType::QString, QMetaType::QString, QMetaType::QString,   17,   20,
+    QMetaType::QString, QMetaType::QString,   17,
+    QMetaType::Bool, QMetaType::QString,   17,
+    QMetaType::QVariantMap,
+    QMetaType::QVariantList, QMetaType::Int, QMetaType::Int,   24,   25,
+    QMetaType::QVariantList, QMetaType::Int,   24,
+    QMetaType::QVariantList,
+    QMetaType::QVariantList, QMetaType::QString, QMetaType::Int, QMetaType::Int,    6,   24,   25,
+    QMetaType::QVariantList, QMetaType::QString, QMetaType::Int,    6,   24,
+    QMetaType::QVariantList, QMetaType::QString,    6,
+    QMetaType::Bool, QMetaType::Int,   28,
+    QMetaType::Bool,
 
        0        // eod
 };
@@ -123,6 +167,32 @@ void DatabaseManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
         case 8: { bool _r = _t->updateFaceData((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< const QString(*)>(_a[4])),(*reinterpret_cast< const QString(*)>(_a[5])),(*reinterpret_cast< bool(*)>(_a[6])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
         case 9: { bool _r = _t->updateFaceData((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< const QString(*)>(_a[4])),(*reinterpret_cast< const QString(*)>(_a[5])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 10: { bool _r = _t->setSetting((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 11: { QString _r = _t->getSetting((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 12: { QString _r = _t->getSetting((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 13: { bool _r = _t->deleteSetting((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 14: { QVariantMap _r = _t->getAllSettings();
+            if (_a[0]) *reinterpret_cast< QVariantMap*>(_a[0]) = std::move(_r); }  break;
+        case 15: { QVariantList _r = _t->getAccessLogs((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 16: { QVariantList _r = _t->getAccessLogs((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 17: { QVariantList _r = _t->getAccessLogs();
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 18: { QVariantList _r = _t->getAccessLogsByUser((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 19: { QVariantList _r = _t->getAccessLogsByUser((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 20: { QVariantList _r = _t->getAccessLogsByUser((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 21: { bool _r = _t->cleanupOldLogs((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 22: { bool _r = _t->cleanupOldLogs();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
@@ -158,13 +228,13 @@ int DatabaseManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 10)
+        if (_id < 23)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 23;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 10)
+        if (_id < 23)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 10;
+        _id -= 23;
     }
     return _id;
 }

@@ -10,6 +10,11 @@
 #include <QString>
 #include <QDateTime>
 
+/**
+ * @brief 数据库管理类
+ * 
+ * 管理SparkExam应用的SQLite数据库，包括用户数据、访问日志和应用设置。
+ */
 class DatabaseManager : public QObject
 {
     Q_OBJECT
@@ -21,6 +26,8 @@ public:
     // 初始化数据库连接
     Q_INVOKABLE bool initDatabase();
 
+    // 用户管理相关方法
+    
     // 添加人脸数据
     Q_INVOKABLE bool addFaceData(const QString &name, 
                                 const QString &gender, 
@@ -51,6 +58,31 @@ public:
                                    const QString &faceImagePath, 
                                    const QString &avatarPath, 
                                    bool isAdmin = false);
+                                   
+    // 设置相关方法
+    
+    // 设置值
+    Q_INVOKABLE bool setSetting(const QString &key, const QString &value);
+    
+    // 获取设置值
+    Q_INVOKABLE QString getSetting(const QString &key, const QString &defaultValue = "");
+    
+    // 删除设置
+    Q_INVOKABLE bool deleteSetting(const QString &key);
+    
+    // 获取所有设置
+    Q_INVOKABLE QVariantMap getAllSettings();
+
+    // 访问日志相关方法
+    
+    // 获取访问日志
+    Q_INVOKABLE QVariantList getAccessLogs(int limit = 100, int offset = 0);
+    
+    // 获取特定用户的访问日志
+    Q_INVOKABLE QVariantList getAccessLogsByUser(const QString &workId, int limit = 100, int offset = 0);
+    
+    // 清除旧的访问日志（保留最近N天）
+    Q_INVOKABLE bool cleanupOldLogs(int daysToKeep = 30);
 
 private:
     QSqlDatabase m_database;
@@ -58,6 +90,9 @@ private:
 
     // 创建表结构
     bool createTables();
+    
+    // 初始化默认设置
+    void initDefaultSettings();
 };
 
 #endif // DATABASEMANAGER_H 
