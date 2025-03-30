@@ -6,6 +6,10 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QCoreApplication>
+#include <QDebug>
+#include "FaceRecognizer.h"
+#include <QFile>
+#include <QVariantMap>
 
 DatabaseManager::DatabaseManager(QObject *parent) : QObject(parent)
 {
@@ -201,6 +205,15 @@ QVariantMap DatabaseManager::getFaceDataByWorkId(const QString &workId)
 
 bool DatabaseManager::verifyFace(const QString &workId, const QString &faceImagePath)
 {
+    qDebug() << "Verifying face for work ID:" << workId << "using image:" << faceImagePath;
+    
+    // 检查图像文件是否存在
+    QFileInfo imageFile(faceImagePath);
+    if (!imageFile.exists() || !imageFile.isFile()) {
+        qDebug() << "Face image file does not exist or is not a file:" << faceImagePath;
+        return false;
+    }
+    
     // 记录验证结果
     QSqlQuery logQuery;
     logQuery.prepare(
@@ -211,6 +224,7 @@ bool DatabaseManager::verifyFace(const QString &workId, const QString &faceImage
     // 检查用户是否存在
     QVariantMap userData = getFaceDataByWorkId(workId);
     if (userData.isEmpty()) {
+        qDebug() << "User with work ID" << workId << "not found in database";
         // 用户不存在，记录失败
         logQuery.bindValue(":work_id", workId);
         logQuery.bindValue(":access_result", 0);
@@ -218,14 +232,47 @@ bool DatabaseManager::verifyFace(const QString &workId, const QString &faceImage
         return false;
     }
     
-    // 在实际应用中，这里应该进行人脸比对
-    // 这里简化处理，仅检查用户是否存在
-    bool result = !userData.isEmpty();
+    // 获取用户注册的人脸图像
+    QString registeredFaceImage = userData["faceImage"].toString();
+    qDebug() << "Registered face image path:" << registeredFaceImage;
+    
+    // 检查注册的人脸图像是否存在
+    QFileInfo registeredImageFile(registeredFaceImage);
+    if (!registeredImageFile.exists() || !registeredImageFile.isFile()) {
+        qDebug() << "Registered face image file does not exist or is not a file:" << registeredFaceImage;
+        logQuery.bindValue(":work_id", workId);
+        logQuery.bindValue(":access_result", 0);
+        logQuery.exec();
+        return false;
+    }
+    
+    // 创建人脸识别器
+    static FaceRecognizer faceRecognizer;
+    
+    // 初始化人脸识别器
+    if (!faceRecognizer.initialize()) {
+        qDebug() << "Failed to initialize face recognizer.";
+        logQuery.bindValue(":work_id", workId);
+        logQuery.bindValue(":access_result", 0);
+        logQuery.exec();
+        return false;
+    }
+    
+    // 比较两张人脸图像
+    float similarity = faceRecognizer.compareFaces(registeredFaceImage, faceImagePath);
+    
+    // 获取相似度阈值
+    float threshold = getSetting("face_recognition_threshold", "0.6").toFloat();
+    
+    // 判断是否通过验证
+    bool result = similarity >= threshold;
     
     // 记录验证结果
     logQuery.bindValue(":work_id", workId);
     logQuery.bindValue(":access_result", result ? 1 : 0);
     logQuery.exec();
+    
+    qDebug() << "Face verification result:" << result << "Similarity:" << similarity << "Threshold:" << threshold;
     
     return result;
 }
@@ -375,7 +422,7 @@ void DatabaseManager::initDefaultSettings()
         setSetting("app_name", "SparkExam AI");
         
         // 人脸识别阈值
-        setSetting("face_recognition_threshold", "0.8");
+        setSetting("face_recognition_threshold", "0.6");
         
         // 默认管理员工号
         setSetting("default_admin_id", "admin001");
@@ -483,4 +530,26 @@ bool DatabaseManager::cleanupOldLogs(int daysToKeep)
     qDebug() << "Cleaned up" << affectedRows << "old access logs";
     
     return true;
+}
+
+// 根据工号获取用户头像路径
+QString DatabaseManager::getUserAvatarPath(const QString &workId)
+{
+    QSqlQuery query(m_database);
+    query.prepare("SELECT avatar_path FROM users WHERE work_id = :work_id");
+    query.bindValue(":work_id", workId);
+    
+    if (!query.exec()) {
+        qDebug() << "获取用户头像路径失败: " << query.lastError().text();
+        return "";
+    }
+    
+    if (query.next()) {
+        QString avatarPath = query.value(0).toString();
+        qDebug() << "成功获取用户头像路径: " << avatarPath;
+        return avatarPath;
+    }
+    
+    qDebug() << "未找到用户头像路径, 工号: " << workId;
+    return "";
 } 

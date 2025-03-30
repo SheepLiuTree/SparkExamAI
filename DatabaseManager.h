@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QString>
 #include <QDateTime>
+#include <QVariantList>
 
 /**
  * @brief 数据库管理类
@@ -83,6 +84,8 @@ public:
     
     // 清除旧的访问日志（保留最近N天）
     Q_INVOKABLE bool cleanupOldLogs(int daysToKeep = 30);
+
+    Q_INVOKABLE QString getUserAvatarPath(const QString &workId);
 
 private:
     QSqlDatabase m_database;

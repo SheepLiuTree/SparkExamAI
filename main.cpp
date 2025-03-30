@@ -3,6 +3,7 @@
 #include <QQmlContext>
 #include "FileManager.h"
 #include "DatabaseManager.h"
+#include "FaceRecognizer.h"
 
 int main(int argc, char *argv[])
 {
@@ -19,7 +20,17 @@ int main(int argc, char *argv[])
     
     // 创建DatabaseManager实例并注册到QML上下文
     DatabaseManager dbManager;
+    if (!dbManager.initDatabase()) {
+        qDebug() << "数据库初始化失败";
+    }
     engine.rootContext()->setContextProperty("dbManager", &dbManager);
+    
+    // 创建FaceRecognizer实例并注册到QML上下文
+    FaceRecognizer faceRecognizer;
+    if (!faceRecognizer.initialize()) {
+        qDebug() << "人脸识别器初始化失败";
+    }
+    engine.rootContext()->setContextProperty("faceRecognizer", &faceRecognizer);
     
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

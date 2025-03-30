@@ -94,6 +94,7 @@
 #define __FLT_EPSILON__ 1.19209289550781250000000000000000000e-7F
 #define __GXX_WEAK__ 1
 #define __SHRT_WIDTH__ 16
+#define QT_MULTIMEDIAWIDGETS_LIB 1
 #define __FLT32_IS_IEC_60559__ 2
 #define __LDBL_MIN__ 3.36210314311209350626267781732175260e-4932L
 #define __DBL_IS_IEC_60559__ 2
@@ -145,6 +146,7 @@
 #define __MMX_WITH_SSE__ 1
 #define _fastcall __attribute__((__fastcall__))
 #define __LDBL_HAS_DENORM__ 1
+#define QT_WIDGETS_LIB 1
 #define __cplusplus 201703L
 #define __cpp_ref_qualifiers 200710L
 #define __DEC32_MIN__ 1E-95DF
@@ -240,6 +242,7 @@
 #define __LDBL_EPSILON__ 1.08420217248550443400745280086994171e-19L
 #define __UINTMAX_C(c) c ## ULL
 #define __GLIBCXX_BITSIZE_INT_N_0 128
+#define QT_MULTIMEDIA_LIB 1
 #define __FLT32X_MIN__ 2.22507385850720138309023271733240406e-308F32x
 #define __SIG_ATOMIC_MAX__ 0x7fffffff
 #define __GCC_ATOMIC_WCHAR_T_LOCK_FREE 2

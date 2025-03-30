@@ -27,6 +27,12 @@
 		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/Platform/Windows-windres.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/Platform/Windows-GNU-CXX-ABI.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeCommonLanguageInclude.cmake",
+		"C:/OpenCV4.5.2/x64/mingw/lib/OpenCVConfig-version.cmake",
+		"C:/OpenCV4.5.2/x64/mingw/lib/OpenCVConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/FindPackageMessage.cmake",
+		"C:/OpenCV4.5.2/x64/mingw/lib/OpenCVModules.cmake",
+		"C:/OpenCV4.5.2/x64/mingw/lib/OpenCVModules-release.cmake",
 		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5/Qt5ConfigVersion.cmake",
 		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5/Qt5Config.cmake",
 		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5/Qt5ConfigVersion.cmake",
@@ -84,6 +90,20 @@
 		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5Sql_QODBCDriverPlugin.cmake",
 		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5Sql_QPSQLDriverPlugin.cmake",
 		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Sql/Qt5Sql_QSQLiteDriverPlugin.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Multimedia/Qt5MultimediaConfigVersion.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Multimedia/Qt5MultimediaConfig.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Multimedia/Qt5Multimedia_AudioCaptureServicePlugin.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Multimedia/Qt5Multimedia_DSServicePlugin.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Multimedia/Qt5Multimedia_QM3uPlaylistPlugin.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Multimedia/Qt5Multimedia_QWindowsAudioPlugin.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5MultimediaWidgets/Qt5MultimediaWidgetsConfigVersion.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5MultimediaWidgets/Qt5MultimediaWidgetsConfig.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Widgets/Qt5Widgets_QWindowsVistaStylePlugin.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Widgets/Qt5WidgetsConfigExtras.cmake",
+		"C:/Qt/5.15.2/mingw81_64/lib/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeParseArguments.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/GNUInstallDirs.cmake",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/qml.qrc"
 	],
@@ -96,6 +116,12 @@
 			"E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.h",
 			"MU",
 			"EWIEGA46WW/moc_DatabaseManager.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/FaceRecognizer.h",
+			"MU",
+			"EWIEGA46WW/moc_FaceRecognizer.cpp",
 			null
 		],
 		[
@@ -112,11 +138,14 @@
 	[
 		"QT_CORE_LIB",
 		"QT_GUI_LIB",
+		"QT_MULTIMEDIAWIDGETS_LIB",
+		"QT_MULTIMEDIA_LIB",
 		"QT_NETWORK_LIB",
 		"QT_QMLMODELS_LIB",
 		"QT_QML_LIB",
 		"QT_QUICK_LIB",
-		"QT_SQL_LIB"
+		"QT_SQL_LIB",
+		"QT_WIDGETS_LIB"
 	],
 	"MOC_DEPEND_FILTERS" : 
 	[
@@ -127,6 +156,8 @@
 	],
 	"MOC_INCLUDES" : 
 	[
+		"C:/SeetaFace2/include",
+		"C:/OpenCV4.5.2/include",
 		"C:/Qt/5.15.2/mingw81_64/include",
 		"C:/Qt/5.15.2/mingw81_64/include/QtCore",
 		"C:/Qt/5.15.2/mingw81_64/mkspecs/win32-g++",
@@ -137,6 +168,9 @@
 		"C:/Qt/5.15.2/mingw81_64/include/QtGui",
 		"C:/Qt/5.15.2/mingw81_64/include/QtANGLE",
 		"C:/Qt/5.15.2/mingw81_64/include/QtSql",
+		"C:/Qt/5.15.2/mingw81_64/include/QtMultimedia",
+		"C:/Qt/5.15.2/mingw81_64/include/QtMultimediaWidgets",
+		"C:/Qt/5.15.2/mingw81_64/include/QtWidgets",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward",
@@ -162,7 +196,7 @@
 	"PARALLEL" : 4,
 	"PARSE_CACHE_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/SparkExamAI_autogen.dir/ParseCache.txt",
 	"QT_MOC_EXECUTABLE" : "C:/Qt/5.15.2/mingw81_64/bin/moc.exe",
-	"QT_UIC_EXECUTABLE" : "",
+	"QT_UIC_EXECUTABLE" : "C:/Qt/5.15.2/mingw81_64/bin/uic.exe",
 	"QT_VERSION_MAJOR" : 5,
 	"QT_VERSION_MINOR" : 15,
 	"SETTINGS_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/SparkExamAI_autogen.dir/AutogenUsed.txt",
@@ -170,6 +204,11 @@
 	[
 		[
 			"E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/FaceRecognizer.cpp",
 			"MU",
 			null
 		],

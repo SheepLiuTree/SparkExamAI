@@ -158,15 +158,18 @@ Rectangle {
 
                 Camera {
                     id: camera
-                    // 设置摄像头为摄像头2
+                    // 设置摄像头为摄像头3
                     deviceId: {
                         // 获取可用摄像头列表
                         var cameras = QtMultimedia.availableCameras
-                        // 如果有多个摄像头，选择第二个（索引为1）
-                        if (cameras.length > 1) {
+                        // 如果有足够多的摄像头，选择第三个（索引为2）
+                        if (cameras.length > 2) {
                             return cameras[2].deviceId
+                        } else if (cameras.length > 0) {
+                            // 如果没有那么多摄像头，但至少有一个，则使用可用的最后一个
+                            return cameras[cameras.length - 1].deviceId
                         } else {
-                            // 如果只有一个摄像头，使用默认摄像头
+                            // 如果没有摄像头，使用默认摄像头
                             return QtMultimedia.defaultCamera.deviceId
                         }
                     }
@@ -672,7 +675,7 @@ Rectangle {
                     }
 
                     Text {
-                        width: parent.width * 0.2
+                        width: parent.width * 0.15
                         height: parent.height
                         text: "姓名"
                         font.family: "阿里妈妈数黑体"
@@ -694,9 +697,20 @@ Rectangle {
                     }
 
                     Text {
-                        width: parent.width * 0.2
+                        width: parent.width * 0.15
                         height: parent.height
                         text: "工号"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 20
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    Text {
+                        width: parent.width * 0.1
+                        height: parent.height
+                        text: "权限"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 20
                         color: "white"
@@ -781,7 +795,7 @@ Rectangle {
                             }
                         }
                         Text {
-                            width: parent.width * 0.2
+                            width: parent.width * 0.15
                             height: parent.height
                             text: name
                             font.family: "阿里妈妈数黑体"
@@ -803,7 +817,7 @@ Rectangle {
                         }
 
                         Text {
-                            width: parent.width * 0.2
+                            width: parent.width * 0.15
                             height: parent.height
                             text: workId
                             font.family: "阿里妈妈数黑体"
@@ -811,6 +825,21 @@ Rectangle {
                             color: "white"
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
+                        }
+                        Rectangle {
+                            width: parent.width * 0.1
+                            height: parent.height
+                            color: "transparent"
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: isAdmin ? "管理员" : "普通"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
                         }
                         Rectangle {
                             width: parent.width * 0.2

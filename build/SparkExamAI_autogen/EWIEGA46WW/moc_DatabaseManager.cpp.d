@@ -5,6 +5,7 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/EWIEGA46WW/moc_
   C:/Qt/5.15.2/mingw81_64/include/QtCore/QObject \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/QString \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/QVariant \
+  C:/Qt/5.15.2/mingw81_64/include/QtCore/QVariantList \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/qalgorithms.h \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/qarraydata.h \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/qatomic.h \
