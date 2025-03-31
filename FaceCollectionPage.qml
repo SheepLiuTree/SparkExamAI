@@ -14,26 +14,21 @@ Rectangle {
 
     // 组件加载完成后，从数据库加载数据
     Component.onCompleted: {
-        // 打印数据库路径
-        console.log("正在从数据库加载数据...");
+        // 加载面部数据列表
+        loadFaceData()
         
-        // 确保人脸和头像存储目录存在
-        var appDir = fileManager.getApplicationDir();
-        var facesDir = appDir + "/faceimages";
-        var avatarsDir = appDir + "/avatarimages";
-        
-        if (!fileManager.directoryExists(facesDir)) {
-            fileManager.createDirectory(facesDir);
-            console.log("创建人脸图像目录: " + facesDir);
+        // 获取当前摄像头设置并应用
+        var savedCameraId = dbManager.getSetting("camera_device", "")
+        if (savedCameraId !== "") {
+            camera.deviceId = savedCameraId
+            console.log("使用设置的摄像头ID:", savedCameraId)
+        } else {
+            camera.deviceId = QtMultimedia.defaultCamera.deviceId
+            console.log("使用默认摄像头")
         }
         
-        if (!fileManager.directoryExists(avatarsDir)) {
-            fileManager.createDirectory(avatarsDir);
-            console.log("创建头像目录: " + avatarsDir);
-        }
-        
-        // 从数据库加载数据
-        loadFaceDataFromDatabase();
+        // 启动摄像头
+        camera.start()
     }
 
     // 从数据库加载人脸数据的函数
@@ -158,21 +153,7 @@ Rectangle {
 
                 Camera {
                     id: camera
-                    // 设置摄像头为摄像头3
-                    deviceId: {
-                        // 获取可用摄像头列表
-                        var cameras = QtMultimedia.availableCameras
-                        // 如果有足够多的摄像头，选择第三个（索引为2）
-                        if (cameras.length > 2) {
-                            return cameras[2].deviceId
-                        } else if (cameras.length > 0) {
-                            // 如果没有那么多摄像头，但至少有一个，则使用可用的最后一个
-                            return cameras[cameras.length - 1].deviceId
-                        } else {
-                            // 如果没有摄像头，使用默认摄像头
-                            return QtMultimedia.defaultCamera.deviceId
-                        }
-                    }
+                    // 摄像头将在Component.onCompleted中设置deviceId
                     imageCapture {
                         onImageCaptured: {
                             console.log("Image captured with id: " + requestId)
@@ -572,65 +553,17 @@ Rectangle {
                             return
                         }
 
-                        // 如果所有信息都已填写，则保存数据
-                        captureCanvas.getContext("2d").drawImage(capturedImage, 0, 0, capturedImage.width, capturedImage.height);
-                        capturedImage.source = captureCanvas.toDataURL("image/jpeg");
-                        
-                        // 确保目录存在
-                        var appDir = fileManager.getApplicationDir();
-                        var facesDir = appDir + "/faceimages";
-                        var avatarsDir = appDir + "/avatarimages";
-                        
-                        // 创建目录（如果不存在）
-                        if (!fileManager.directoryExists(facesDir)) {
-                            fileManager.createDirectory(facesDir);
+                        // 检查是否是管理员账户，如果是则需要密码验证
+                        if (adminRadio.checked) {
+                            adminPasswordPopup.onPasswordVerified = function() {
+                                // 密码验证成功后保存数据
+                                saveFaceData()
+                            }
+                            adminPasswordPopup.open()
+                        } else {
+                            // 非管理员账户直接保存
+                            saveFaceData()
                         }
-                        
-                        if (!fileManager.directoryExists(avatarsDir)) {
-                            fileManager.createDirectory(avatarsDir);
-                        }
-                        
-                        // 保存Canvas图像到文件
-                        var faceImagePath = facesDir + "/" + nameInput.text + "_" + workIdInput.text + ".jpg";
-                        captureCanvas.save(faceImagePath);
-                        
-                        // 复制头像图片
-                        var avatarImagePath = avatarsDir + "/" + nameInput.text + "_" + workIdInput.text + ".jpg";
-                        fileManager.copyFile(avatarPathInput.filePath, avatarImagePath);
-                        
-                        // 保存到数据库
-                        var isAdmin = adminRadio.checked;
-                        var result = dbManager.addFaceData(
-                            nameInput.text,
-                            maleRadio.checked ? "男" : "女",
-                            workIdInput.text,
-                            faceImagePath,
-                            avatarImagePath,
-                            isAdmin
-                        );
-                        
-                        if (!result) {
-                            messageText.text = "保存到数据库失败！";
-                            messagePopup.open();
-                            return;
-                        }
-                        
-                        console.log("保存人脸和个人信息");
-                        console.log("姓名: " + nameInput.text);
-                        console.log("性别: " + (maleRadio.checked ? "男" : "女"));
-                        console.log("工号: " + workIdInput.text);
-                        console.log("权限: " + (adminRadio.checked ? "管理员" : "普通"));
-                        console.log("头像路径: " + avatarImagePath);
-                        console.log("人脸图像已保存至: " + faceImagePath);
-
-                        // 重新从数据库加载数据到模型
-                        loadFaceDataFromDatabase();
-
-                        // 显示成功消息
-                        messageText.text = "人脸数据采集成功！";
-                        messagePopup.open();
-                        
-                        cameraPopup.close();
                     }
                 }
             }
@@ -926,5 +859,219 @@ Rectangle {
                 }
             }
         }
+    }
+
+    // 添加管理员密码验证弹窗
+    Popup {
+        id: adminPasswordPopup
+        width: 400
+        height: 250
+        anchors.centerIn: parent
+        modal: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        property var onPasswordVerified: null
+
+        background: Rectangle {
+            color: "#333333"
+            border.color: "#666666"
+            border.width: 2
+            radius: 10
+        }
+
+        contentItem: Item {
+            anchors.fill: parent
+
+            Text {
+                id: adminPasswordTitle
+                anchors.top: parent.top
+                anchors.topMargin: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "管理员身份验证"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 22
+                color: "white"
+            }
+            
+            Text {
+                anchors.top: adminPasswordTitle.bottom
+                anchors.topMargin: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "请输入管理员密码："
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 16
+                color: "white"
+            }
+
+            Rectangle {
+                anchors.centerIn: parent
+                width: parent.width - 80
+                height: 40
+                color: "#44ffffff"
+                radius: 5
+
+                TextField {
+                    id: adminPasswordField
+                    anchors.fill: parent
+                    anchors.margins: 5
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 16
+                    color: "white"
+                    placeholderText: "请输入管理员密码"
+                    placeholderTextColor: "#cccccc"
+                    echoMode: TextInput.Password
+                    
+                    background: Rectangle {
+                        color: "transparent"
+                    }
+                    
+                    onAccepted: {
+                        adminPasswordPopup.verifyAdminPassword()
+                    }
+                }
+            }
+            
+            Text {
+                id: passwordErrorText
+                anchors.top: parent.verticalCenter
+                anchors.topMargin: 30
+                anchors.horizontalCenter: parent.horizontalCenter
+                color: "#ff6666"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 14
+                visible: false
+            }
+
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
+                spacing: 30
+
+                Button {
+                    width: 120
+                    height: 40
+                    background: Image {
+                        source: "qrc:/images/button_bg.png"
+                        fillMode: Image.Stretch
+                    }
+                    contentItem: Text {
+                        text: "取消"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 18
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        adminPasswordPopup.close()
+                    }
+                }
+
+                Button {
+                    width: 120
+                    height: 40
+                    background: Image {
+                        source: "qrc:/images/button_bg.png"
+                        fillMode: Image.Stretch
+                    }
+                    contentItem: Text {
+                        text: "确定"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 18
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        adminPasswordPopup.verifyAdminPassword()
+                    }
+                }
+            }
+        }
+        
+        function verifyAdminPassword() {
+            // 从数据库获取管理员密码
+            var adminPassword = dbManager.getSetting("admin_password", "123456")
+            
+            if (adminPasswordField.text === adminPassword) {
+                // 密码验证成功，关闭弹窗并执行回调
+                adminPasswordPopup.close()
+                if (adminPasswordPopup.onPasswordVerified) {
+                    adminPasswordPopup.onPasswordVerified()
+                }
+            } else {
+                // 密码验证失败，显示错误信息
+                passwordErrorText.text = "密码错误，请重新输入"
+                passwordErrorText.visible = true
+            }
+        }
+        
+        onOpened: {
+            adminPasswordField.text = ""
+            passwordErrorText.visible = false
+        }
+    }
+
+    // 添加保存人脸数据的函数
+    function saveFaceData() {
+        // 如果所有信息都已填写，则保存数据
+        captureCanvas.getContext("2d").drawImage(capturedImage, 0, 0, capturedImage.width, capturedImage.height);
+        capturedImage.source = captureCanvas.toDataURL("image/jpeg");
+        
+        // 确保目录存在
+        var appDir = fileManager.getApplicationDir();
+        var facesDir = appDir + "/faceimages";
+        var avatarsDir = appDir + "/avatarimages";
+        
+        if (!fileManager.directoryExists(facesDir)) {
+            fileManager.createDirectory(facesDir);
+        }
+        
+        if (!fileManager.directoryExists(avatarsDir)) {
+            fileManager.createDirectory(avatarsDir);
+        }
+        
+        // 保存Canvas图像到文件
+        var faceImagePath = facesDir + "/" + nameInput.text + "_" + workIdInput.text + ".jpg";
+        captureCanvas.save(faceImagePath);
+        
+        // 复制头像图片
+        var avatarImagePath = avatarsDir + "/" + nameInput.text + "_" + workIdInput.text + ".jpg";
+        fileManager.copyFile(avatarPathInput.filePath, avatarImagePath);
+        
+        // 保存到数据库
+        var isAdmin = adminRadio.checked;
+        var result = dbManager.addFaceData(
+            nameInput.text,
+            maleRadio.checked ? "男" : "女",
+            workIdInput.text,
+            faceImagePath,
+            avatarImagePath,
+            isAdmin
+        );
+        
+        if (!result) {
+            messageText.text = "保存到数据库失败！";
+            messagePopup.open();
+            return;
+        }
+        
+        console.log("保存人脸和个人信息");
+        console.log("姓名: " + nameInput.text);
+        console.log("性别: " + (maleRadio.checked ? "男" : "女"));
+        console.log("工号: " + workIdInput.text);
+        console.log("权限: " + (adminRadio.checked ? "管理员" : "普通"));
+        console.log("头像路径: " + avatarImagePath);
+        console.log("人脸图像已保存至: " + faceImagePath);
+
+        // 重新从数据库加载数据到模型
+        loadFaceDataFromDatabase();
+
+        // 显示成功消息
+        messageText.text = "人脸数据采集成功！";
+        messagePopup.open();
+        
+        cameraPopup.close();
     }
 }

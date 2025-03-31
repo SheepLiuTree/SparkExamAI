@@ -566,16 +566,12 @@ Window {
                     Camera {
                         id: camera
                         deviceId: {
-                            // 获取可用摄像头列表
-                            var cameras = QtMultimedia.availableCameras
-                            // 选择第三个摄像头（如果有）
-                            if (cameras.length > 2) {
-                                return cameras[2].deviceId
-                            } else if (cameras.length > 0) {
-                                // 没有那么多摄像头，使用最后一个
-                                return cameras[cameras.length - 1].deviceId
+                            // 使用通用设置中选择的摄像头
+                            var savedCameraId = dbManager.getSetting("camera_device", "")
+                            if (savedCameraId !== "") {
+                                return savedCameraId
                             } else {
-                                // 没有摄像头，使用默认
+                                // 如果没有保存的摄像头设置，使用默认摄像头
                                 return QtMultimedia.defaultCamera.deviceId
                             }
                         }
