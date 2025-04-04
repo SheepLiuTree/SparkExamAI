@@ -185,6 +185,40 @@ Rectangle {
                     fillMode: VideoOutput.PreserveAspectFit
                     focus: visible
                     visible: true
+                    
+                    // 添加水平镜像变换
+                    transform: Scale {
+                        xScale: -1
+                        origin.x: videoOutput.width / 2
+                    }
+                    
+                    // 计算实际视频内容区域
+                    property rect contentRect: {
+                        if (sourceRect.width <= 0 || sourceRect.height <= 0) {
+                            return Qt.rect(0, 0, width, height)
+                        }
+                        
+                        var srcRatio = sourceRect.width / sourceRect.height
+                        var destRatio = width / height
+                        
+                        var resultWidth, resultHeight, resultX, resultY
+                        
+                        if (srcRatio > destRatio) {
+                            // 视频比例更宽，上下留黑边
+                            resultWidth = width
+                            resultHeight = width / srcRatio
+                            resultX = 0
+                            resultY = (height - resultHeight) / 2
+                        } else {
+                            // 视频比例更窄，左右留黑边
+                            resultHeight = height
+                            resultWidth = height * srcRatio
+                            resultX = (width - resultWidth) / 2
+                            resultY = 0
+                        }
+                        
+                        return Qt.rect(resultX, resultY, resultWidth, resultHeight)
+                    }
                 }
 
                 Image {
@@ -192,8 +226,79 @@ Rectangle {
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectFit
                     visible: false
+                    
+                    // 添加水平镜像变换，与视频输出保持一致
+                    transform: Scale {
+                        xScale: -1
+                        origin.x: capturedImage.width / 2
+                    }
                 }
-
+                
+                // 顶部指导文字
+                Rectangle {
+                    anchors.top: parent.top
+                    anchors.topMargin: 10
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: guideText.width + 20
+                    height: guideText.height + 10
+                    color: "#AA000000"
+                    radius: 5
+                    
+                    Text {
+                        id: guideText
+                        anchors.centerIn: parent
+                        text: "请将脸部对准绿色框内"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 15  // 增大字体
+                        color: "white"
+                        style: Text.Outline  // 添加轮廓
+                        styleColor: "black"  // 轮廓颜色
+                    }
+                }
+                // 人脸引导遮罩 - 仅在视频输出可见时显示
+                Item {
+                    id: faceGuide
+                    anchors.fill: parent
+                    visible: videoOutput.visible && !capturedImage.visible                
+                    
+                    // 椭圆形引导框 - 旋转90度垂直放置
+                    Rectangle {
+                        id: clearArea
+                        color: "transparent"
+                        border.width: 2  // 增加边框宽度，提高清晰度
+                        border.color: "#4AFF4A"  // 更亮的绿色，提高对比度
+                        anchors.centerIn: parent
+                        // 交换宽高以旋转90度
+                        width: videoOutput.contentRect.height
+                        height: videoOutput.contentRect.width * 0.5
+                        radius: Math.min(width, height) / 2
+                        
+                        // 添加旋转变换
+                        transform: Rotation {
+                            angle: 90
+                            origin.x: clearArea.width / 2
+                            origin.y: clearArea.height / 2
+                        }
+                    }
+                    
+                    // 添加鼻子位置的十字标记 - 增加宽度提高可见性
+                    Rectangle {
+                        id: noseCrossHorizontal
+                        anchors.centerIn: parent
+                        width: 20
+                        height: 2
+                        color: "#AAffff00"  // 使用黄色以增加可见度
+                    }
+                    
+                    Rectangle {
+                        id: noseCrossVertical
+                        anchors.centerIn: parent
+                        width: 2
+                        height: 20
+                        color: "#AAffff00"  // 使用黄色以增加可见度
+                    }
+                                        
+                }
             }
 
             // 个人信息表单
@@ -496,9 +601,9 @@ Rectangle {
                             // 拍照逻辑                           
                             videoOutput.grabToImage(function(result) {
                                 capturedImage.source = result.url; // 仅预览
+                                capturedImage.visible = true
+                                videoOutput.visible = false
                             });
-                            capturedImage.visible = true
-                            videoOutput.visible = false
                         }
                     }
                 }
@@ -1029,7 +1134,9 @@ Rectangle {
     // 添加保存人脸数据的函数
     function saveFaceData() {
         // 如果所有信息都已填写，则保存数据
-        captureCanvas.getContext("2d").drawImage(capturedImage, 0, 0, capturedImage.width, capturedImage.height);
+        captureCanvas.width = capturedImage.paintedWidth
+        captureCanvas.height = capturedImage.paintedHeight
+        captureCanvas.getContext("2d").drawImage(capturedImage, 0, 0, captureCanvas.width, captureCanvas.height);
         capturedImage.source = captureCanvas.toDataURL("image/jpeg");
         
         // 确保目录存在

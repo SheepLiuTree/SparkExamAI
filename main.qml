@@ -503,7 +503,8 @@ Window {
                 
                 // 将人脸坐标从图像坐标系转换到视频区域坐标系
                 var normalizedRect = Qt.rect(
-                    actualVideoRect.x + (faceInfo.x / faceInfo.imageWidth) * actualVideoRect.width,
+                    // 镜像显示时，需要翻转X坐标
+                    actualVideoRect.x + (1.0 - (faceInfo.x + faceInfo.width) / faceInfo.imageWidth) * actualVideoRect.width,
                     actualVideoRect.y + (faceInfo.y / faceInfo.imageHeight) * actualVideoRect.height,
                     (faceInfo.width / faceInfo.imageWidth) * actualVideoRect.width,
                     (faceInfo.height / faceInfo.imageHeight) * actualVideoRect.height
@@ -598,12 +599,18 @@ Window {
                         focus: visible
                         visible: true
                         
+                        // 添加水平镜像变换
+                        transform: Scale {
+                            xScale: -1
+                            origin.x: videoOutput.width / 2
+                        }
+                        
                         property rect contentRect: {
                             if (camera.viewfinder.resolution.width <= 0 || camera.viewfinder.resolution.height <= 0) {
                                 return Qt.rect(0, 0, width, height)
                             }
                             
-                            var srcRatio = 16 / 9  // 采用标准的16:9宽高比
+                            var srcRatio = sourceRect.width / sourceRect.height
                             var destRatio = width / height
                             
                             var resultWidth, resultHeight, resultX, resultY
@@ -631,6 +638,12 @@ Window {
                         anchors.fill: parent
                         fillMode: Image.PreserveAspectFit
                         visible: false
+                        
+                        // 添加水平镜像变换，与视频输出保持一致
+                        transform: Scale {
+                            xScale: -1
+                            origin.x: capturedImage.width / 2
+                        }
                     }
                     
                     // 人脸框辅助线 - 根据检测到的位置动态调整
