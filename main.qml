@@ -364,6 +364,16 @@ Window {
                 console.log("创建临时目录: " + tempDir)
             }
             
+            // 获取当前摄像头设置并应用
+            var savedCameraId = dbManager.getSetting("camera_device", "")
+            if (savedCameraId !== "") {
+                camera.deviceId = savedCameraId
+                console.log("使用设置的摄像头ID:", savedCameraId)
+            } else {
+                camera.deviceId = QtMultimedia.defaultCamera.deviceId
+                console.log("使用默认摄像头")
+            }
+            
             // 启动摄像头
             camera.start()
             console.log("启动摄像头，状态:", camera.cameraState)
@@ -559,22 +569,14 @@ Window {
                 // 摄像头预览区域
                 Rectangle {
                     width: 640
-                    height: 320
+                    height: 360
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     
                     Camera {
                         id: camera
-                        deviceId: {
-                            // 使用通用设置中选择的摄像头
-                            var savedCameraId = dbManager.getSetting("camera_device", "")
-                            if (savedCameraId !== "") {
-                                return savedCameraId
-                            } else {
-                                // 如果没有保存的摄像头设置，使用默认摄像头
-                                return QtMultimedia.defaultCamera.deviceId
-                            }
-                        }
+                        
+                        viewfinder.resolution: Qt.size(640, 360)
                         
                         imageCapture {
                             onImageSaved: {
@@ -593,15 +595,15 @@ Window {
                         source: camera
                         anchors.fill: parent
                         fillMode: VideoOutput.PreserveAspectFit
+                        focus: visible
                         visible: true
                         
-                        // 定义视频实际显示的矩形区域（考虑高宽比）
                         property rect contentRect: {
                             if (camera.viewfinder.resolution.width <= 0 || camera.viewfinder.resolution.height <= 0) {
                                 return Qt.rect(0, 0, width, height)
                             }
                             
-                            var srcRatio = camera.viewfinder.resolution.width / camera.viewfinder.resolution.height
+                            var srcRatio = 16 / 9  // 采用标准的16:9宽高比
                             var destRatio = width / height
                             
                             var resultWidth, resultHeight, resultX, resultY

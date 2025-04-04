@@ -15,7 +15,7 @@ Rectangle {
     // 组件加载完成后，从数据库加载数据
     Component.onCompleted: {
         // 加载面部数据列表
-        loadFaceData()
+        loadFaceDataFromDatabase()
         
         // 获取当前摄像头设置并应用
         var savedCameraId = dbManager.getSetting("camera_device", "")
@@ -129,6 +129,16 @@ Rectangle {
             avatarPathInput.text = ""
             avatarPathInput.filePath = ""
             
+            // 获取当前摄像头设置并应用
+            var savedCameraId = dbManager.getSetting("camera_device", "")
+            if (savedCameraId !== "") {
+                camera.deviceId = savedCameraId
+                console.log("使用设置的摄像头ID:", savedCameraId)
+            } else {
+                camera.deviceId = QtMultimedia.defaultCamera.deviceId
+                console.log("使用默认摄像头")
+            }
+            
             camera.start()
         }
 
@@ -153,7 +163,9 @@ Rectangle {
 
                 Camera {
                     id: camera
-                    // 摄像头将在Component.onCompleted中设置deviceId
+                    
+                    viewfinder.resolution: Qt.size(640, 360)
+                    
                     imageCapture {
                         onImageCaptured: {
                             console.log("Image captured with id: " + requestId)
@@ -170,8 +182,9 @@ Rectangle {
                     id: videoOutput
                     source: camera
                     anchors.fill: parent
+                    fillMode: VideoOutput.PreserveAspectFit
                     focus: visible
-                    autoOrientation: true
+                    visible: true
                 }
 
                 Image {
