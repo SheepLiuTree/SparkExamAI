@@ -3,6 +3,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
+#include <QApplication>
 
 FaceRecognizer::FaceRecognizer(QObject *parent) : QObject(parent),
     m_faceDetector(nullptr),
@@ -10,8 +11,8 @@ FaceRecognizer::FaceRecognizer(QObject *parent) : QObject(parent),
     m_faceRecognizer(nullptr),
     m_initialized(false)
 {
-    // 设置模型路径
-    m_modelPath = "C:/SeetaFace2/bin/model";
+    // 设置模型路径为当前应用程序目录下的model文件夹
+    m_modelPath = QApplication::applicationDirPath() + "/model";
     qDebug() << "SeetaFace2 model path:" << m_modelPath;
 }
 
