@@ -2,8 +2,6 @@
 <RCC version="1.0">
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>LoginPage.qml</file>
-        <file>MainPage.qml</file>
         <file>FaceCollectionPage.qml</file>
         <file>DailyCourseContent.qml</file>
         <file>QuestionEnginePage.qml</file>

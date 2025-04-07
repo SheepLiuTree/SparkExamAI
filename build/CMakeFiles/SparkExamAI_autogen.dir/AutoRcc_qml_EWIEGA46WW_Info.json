@@ -8,8 +8,6 @@
 	"INPUTS" : 
 	[
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/FaceCollectionPage.qml",
-		"E:/SparkExamAI/SparkExamAI/SparkExamAI/MainPage.qml",
-		"E:/SparkExamAI/SparkExamAI/SparkExamAI/LoginPage.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/DailyCourseContent.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QuestionEnginePage.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/main.qml",
