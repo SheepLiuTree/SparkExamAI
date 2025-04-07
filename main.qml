@@ -178,6 +178,18 @@ Window {
                     }
                     onClicked: {
                         stackView.push("FaceCollectionPage.qml")
+                        
+                        // 连接新页面的用户列表更新信号
+                        stackView.currentItem.userListUpdated.connect(function() {
+                            console.log("收到用户列表更新信号")
+                            personal_page_column.loadUserListFromDatabase()
+                        })
+                        
+                        // 在页面关闭时断开信号连接
+                        stackView.currentItem.Component.onDestruction.connect(function() {
+                            console.log("面容采集页面关闭，断开信号连接")
+                            stackView.currentItem.userListUpdated.disconnect()
+                        })
                     }
                 }
 
@@ -294,31 +306,69 @@ Window {
                 Column {
                     id: personal_page_column
                     anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 10
+                    spacing: 0
                     width: 200
 
+                    // 组件加载完成后，从数据库加载数据
+                    Component.onCompleted: {
+                        loadUserListFromDatabase()
+                    }
+
+                    // 从数据库加载用户列表的函数
+                    function loadUserListFromDatabase() {
+                        console.log("开始加载用户列表...");
+                        console.log("当前用户列表项数: " + userButtonModel.count);
+                        
+                        // 从数据库获取所有人脸数据
+                        var userList = dbManager.getAllFaceData();
+                        console.log("从数据库获取到 " + userList.length + " 个用户");
+                        
+                        // 清空现有模型
+                        userButtonModel.clear();
+                        console.log("已清空用户列表模型");
+                        
+                        // 将数据添加到模型中
+                        for (var j = 0; j < userList.length; j++) {
+                            userButtonModel.append({
+                                "name": userList[j].name,
+                                "workId": userList[j].workId,
+                                "avatarPath": userList[j].avatarPath
+                            });
+                            console.log("添加用户: " + userList[j].name + " (工号: " + userList[j].workId + ")");
+                        }
+                        
+                        console.log("用户列表更新完成，共加载 " + userList.length + " 个用户");
+                    }
+
+                    // 创建一个ListModel来存储用户数据
+                    ListModel {
+                        id: userButtonModel
+                    }
+
+                    // 使用Repeater显示数据
                     Repeater {
-                        model: ["杨柳", "王林浩", "邵海波", "董楠", "包君钰","薄小钰","陈兆琮","陈子豪","崔文博","丁子轩","董楠","冯子豪","高子豪","郭子豪","韩子豪","何子豪","胡子豪","贾子豪","康子豪","李子豪","刘子豪","马子豪","孟子豪","宁子豪","裴子豪","秦子豪","任子豪","邵子豪","孙子豪","唐子豪","王子豪","徐子豪","杨子豪","于子豪","张子豪","赵子豪","郑子豪","周子豪","朱子豪"]
+                        id: userButtonRepeater
+                        model: userButtonModel
 
                         Button {
                             width: 200
-                            height: 70
+                            height: 60
                             background: Image {
                                 source: "qrc:/images/personal_button_bg.png"
                                 fillMode: Image.Stretch
                             }
                             contentItem: Text {
-                                text: modelData
+                                text: model.name
                                 font.family: "阿里妈妈数黑体"
                                 font.pixelSize: 30
                                 color: "white"
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                                 anchors.verticalCenter: parent.verticalCenter
-                                anchors.verticalCenterOffset: -8
+                                anchors.verticalCenterOffset: -6
                             }
                             onClicked: {
-                                console.log(modelData + " clicked")
+                                console.log(model.name + " clicked, workId: " + model.workId)
                             }
                         }
                     }

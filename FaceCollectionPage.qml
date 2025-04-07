@@ -7,6 +7,9 @@ import QtQuick.Dialogs 1.3
 Rectangle {
     color: "transparent" 
 
+    // 添加信号，用于通知主窗口用户列表已更新
+    signal userListUpdated()
+
     // 创建一个ListModel来存储采集的人脸数据
     ListModel {
         id: faceCollectionModel
@@ -832,14 +835,20 @@ Rectangle {
                                 onClicked: {
                                     // 从数据库中删除数据
                                     var workId = faceCollectionModel.get(index).workId;
+                                    console.log("尝试删除用户: " + workId);
                                     var result = dbManager.deleteFaceData(workId);
                                     
                                     if (result) {
                                         // 从模型中删除数据
                                         faceCollectionModel.remove(index);
                                         messageText.text = "数据已成功删除！";
+                                        
+                                        // 通知主窗口用户列表已更新
+                                        console.log("删除成功，发出用户列表更新信号");
+                                        userListUpdated();
                                     } else {
                                         messageText.text = "删除数据失败！";
+                                        console.log("删除失败");
                                     }
                                     messagePopup.open();
                                 }
@@ -1193,5 +1202,9 @@ Rectangle {
         messagePopup.open();
         
         cameraPopup.close();
+
+        // 通知主窗口用户列表已更新
+        console.log("发出用户列表更新信号");
+        userListUpdated();
     }
 }
