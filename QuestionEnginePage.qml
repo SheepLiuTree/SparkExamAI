@@ -9,8 +9,6 @@ Rectangle {
     
     property var settingCategories: [
         { id: "general", name: "通用设置", icon: "qrc:/images/button_bg.png", component: "QuestionEngineSettings/GeneralSettings.qml" },
-        { id: "banks", name: "题库管理", icon: "qrc:/images/personal_button_bg.png", component: "QuestionEngineSettings/QuestionBankSettings.qml" },
-        { id: "types", name: "题型设置", icon: "qrc:/images/face_icon.png", component: "QuestionEngineSettings/QuestionTypeSettings.qml" },
         { id: "strategies", name: "出题策略", icon: "qrc:/images/menu.png", component: "QuestionEngineSettings/StrategiesSettings.qml" }
     ]
     
@@ -243,10 +241,6 @@ Rectangle {
         switch(id) {
         case "general":
             return "⚙️"
-        case "banks":
-            return "📚"
-        case "types":
-            return "📝"
         case "strategies":
             return "🎯"
         default:

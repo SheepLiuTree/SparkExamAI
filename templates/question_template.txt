@@ -1,0 +1,5 @@
+学科,题型,难度,知识点,题目内容,答案,解析
+语文,单选题,简单,文学常识,下列哪位作家是"朦胧诗"代表人物？A.北岛 B.莫言 C.余华 D.王安忆,A,北岛是"朦胧诗"的代表诗人之一，其作品《回答》等影响深远。
+数学,填空题,中等,函数与导数,设函数f(x)=x²+ax+b在点(1,2)处取得极值，则a+b=____,3,由f'(x)=2x+a，f'(1)=0得a=-2，代入f(1)=2得b=3，所以a+b=1。
+英语,多选题,困难,动词时态,Which of the following sentences use the present perfect tense? A.I have lived here for 5 years. B.I am living here now. C.She has just arrived.,A/C,A和C使用了现在完成时，表示过去发生且与现在有关的动作。
+物理,解答题,挑战,力学与运动,一个质量为m的物体从高度为h的斜面上滑下，若斜面倾角为θ，摩擦系数为μ，求物体到达斜面底部时的速度。,v=√(2gh(sinθ-μcosθ)),根据能量守恒定律，物体的重力势能转化为动能和克服摩擦阻力做功，mgh=1/2mv²+μmgcosθ·h/sinθ，解得v=√(2gh(sinθ-μcosθ))。 

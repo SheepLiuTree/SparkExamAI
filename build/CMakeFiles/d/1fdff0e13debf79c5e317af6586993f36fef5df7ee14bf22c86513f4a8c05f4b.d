@@ -103,6 +103,7 @@ SparkExamAI_autogen/timestamp: \
   C:/OpenCV4.5.2/x64/mingw/lib/OpenCVModules.cmake \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/QDateTime \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/QDebug \
+  C:/Qt/5.15.2/mingw81_64/include/QtCore/QList \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/QObject \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/QString \
   C:/Qt/5.15.2/mingw81_64/include/QtCore/QVariant \

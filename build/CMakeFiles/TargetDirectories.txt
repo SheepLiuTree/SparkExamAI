@@ -1,4 +1,6 @@
 E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/SparkExamAI.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/package.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/package_source.dir
 E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/edit_cache.dir
 E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/rebuild_cache.dir
 E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/list_install_components.dir
@@ -7,3 +9,14 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/install/local.dir
 E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/install/strip.dir
 E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/SparkExamAI_autogen_timestamp_deps.dir
 E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/SparkExamAI_autogen.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/QXlsx/CMakeFiles/QXlsx.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/QXlsx/CMakeFiles/package.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/QXlsx/CMakeFiles/package_source.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/QXlsx/CMakeFiles/edit_cache.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/QXlsx/CMakeFiles/rebuild_cache.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/QXlsx/CMakeFiles/list_install_components.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/QXlsx/CMakeFiles/install.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/QXlsx/CMakeFiles/install/local.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/QXlsx/CMakeFiles/install/strip.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/QXlsx/CMakeFiles/QXlsx_autogen_timestamp_deps.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/QXlsx/CMakeFiles/QXlsx_autogen.dir

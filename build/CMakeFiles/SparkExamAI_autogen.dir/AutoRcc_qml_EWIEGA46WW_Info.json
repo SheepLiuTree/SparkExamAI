@@ -8,13 +8,11 @@
 	"INPUTS" : 
 	[
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/FaceCollectionPage.qml",
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QuestionCollectionPage.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/DailyCourseContent.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QuestionEnginePage.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/main.qml",
-		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QuestionEngineSettings/QuestionBankSettings.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QuestionEngineSettings/GeneralSettings.qml",
-		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QuestionEngineSettings/UserPermissionsSettings.qml",
-		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QuestionEngineSettings/QuestionTypeSettings.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QuestionEngineSettings/StrategiesSettings.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QuestionEngineSettings/SettingItem.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/images/headline.png",
@@ -26,7 +24,9 @@
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/images/personal_button_bg.png",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/images/064.png",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/images/button_bg.png",
-		"E:/SparkExamAI/SparkExamAI/SparkExamAI/images/106.png"
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/images/106.png",
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/templates/question_template.txt",
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/templates/README.txt"
 	],
 	"LOCK_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/SparkExamAI_autogen.dir/AutoRcc_qml_EWIEGA46WW_Lock.lock",
 	"MULTI_CONFIG" : false,

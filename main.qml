@@ -960,10 +960,11 @@ Window {
                         onClicked: {
                             userInfoDialog.close()
                             
-                            // 检查是否是题策引擎且用户不是管理员
-                            if (userInfoDialog.titleText === "题策引擎" && !userInfoDialog.userData.isAdmin) {
-                                console.log("非管理员用户尝试访问题策引擎")
+                            // 检查是否是题策引擎或题集速录且用户不是管理员
+                            if ((userInfoDialog.titleText === "题策引擎" || userInfoDialog.titleText === "题集速录") && !userInfoDialog.userData.isAdmin) {
+                                console.log("非管理员用户尝试访问" + userInfoDialog.titleText)
                                 // 显示管理员权限提示弹窗
+                                adminRequiredPopup.titleText = userInfoDialog.titleText
                                 adminRequiredPopup.open()
                             } else {
                                 console.log("用户已确认信息，正在跳转到" + userInfoDialog.titleText + "页面...")
@@ -1006,6 +1007,8 @@ Window {
         anchors.centerIn: parent
         modal: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        property string titleText: "题策引擎" // 默认为题策引擎，可根据当前操作设置
         
         background: Rectangle {
             color: "#FFFFFF"
@@ -1064,7 +1067,7 @@ Window {
             // 说明文本
             Text {
                 id: descriptionText
-                text: "题策引擎仅对管理员开放，请联系系统管理员获取相应权限。"
+                text: adminRequiredPopup.titleText + "仅对管理员开放，请联系系统管理员获取相应权限。"
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: titleText.bottom
                 anchors.topMargin: 15

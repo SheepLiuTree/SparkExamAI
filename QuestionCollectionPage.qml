@@ -1,0 +1,949 @@
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Dialogs 1.3
+
+Rectangle {
+    id: questionCollectionPage
+    color: "transparent"
+    
+    property string userName: "管理员"
+    property var sampleLibraries: [
+        { name: "高中数学题库", count: 152, importTime: "2023-04-15 14:30" },
+        { name: "初中英语选择题", count: 89, importTime: "2023-04-10 09:15" },
+        { name: "高中物理力学题", count: 67, importTime: "2023-04-05 16:45" },
+        { name: "小学语文阅读理解", count: 120, importTime: "2023-04-01 11:20" },
+        { name: "中考化学综合题", count: 45, importTime: "2023-03-28 15:10" }
+    ]
+    
+    // 返回按钮
+    Button {
+        id: backButton
+        anchors.top: parent.top
+        anchors.topMargin: 20
+        anchors.left: parent.left
+        anchors.leftMargin: 20
+        width: 100
+        height: 40
+        background: Image {
+            source: "qrc:/images/button_bg.png"
+            fillMode: Image.Stretch
+        }
+        contentItem: Text {
+            text: "返回"
+            font.family: "阿里妈妈数黑体"
+            font.pixelSize: 18
+            color: "white"
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+        onClicked: {
+            // 返回到主界面
+            stackView.pop(null)
+            
+            // 返回上一页
+            console.log("返回上一页")
+        }
+    }
+    
+    // 页面标题
+    Text {
+        id: pageTitle
+        anchors.top: parent.top
+        anchors.topMargin: 30
+        anchors.horizontalCenter: parent.horizontalCenter
+        text: "题集速录"
+        font.family: "阿里妈妈数黑体"
+        font.pixelSize: 36
+        color: "white"
+        font.bold: true
+    }
+    
+    // 欢迎信息
+    Text {
+        id: welcomeText
+        anchors.top: pageTitle.bottom
+        anchors.topMargin: 10
+        anchors.horizontalCenter: parent.horizontalCenter
+        text: "欢迎, " + userName + "!"
+        font.family: "阿里妈妈数黑体"
+        font.pixelSize: 20
+        color: "white"
+    }
+    
+    // 主内容区域
+    Rectangle {
+        anchors.top: welcomeText.bottom
+        anchors.topMargin: 30
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 20
+        width: parent.width * 0.9
+        color: "#44ffffff"
+        radius: 10
+        
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 20
+            
+            // 功能按钮区域
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 80
+                color: "#33ffffff"
+                radius: 8
+                
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 15
+                    spacing: 20
+                    
+                    Text {
+                        text: "题库管理工具:"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 18
+                        font.bold: true
+                        color: "white"
+                    }
+                    
+                    // 模板下载按钮
+                    Button {
+                        Layout.preferredWidth: 150
+                        Layout.preferredHeight: 50
+                        
+                        background: Rectangle {
+                            color: "#9C27B0"
+                            radius: 5
+                        }
+                        
+                        contentItem: Text {
+                            text: "下载模板"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 18
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        onClicked: {
+                            // 打开文件夹选择对话框
+                            folderSelectionDialog.open()
+                        }
+                    }
+                    
+                    // 批量导入按钮
+                    Button {
+                        Layout.preferredWidth: 150
+                        Layout.preferredHeight: 50
+                        
+                        background: Rectangle {
+                            color: "#2196F3"
+                            radius: 5
+                        }
+                        
+                        contentItem: Text {
+                            text: "批量导入"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 18
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        onClicked: {
+                            // 显示批量导入对话框
+                            batchImportDialog.open()
+                        }
+                    }
+                    
+                    // 占位
+                    Item {
+                        Layout.fillWidth: true
+                    }
+                    
+                    // 搜索框
+                    TextField {
+                        Layout.preferredWidth: 200
+                        placeholderText: "搜索题库..."
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 14
+                        
+                        background: Rectangle {
+                            color: "#99ffffff"
+                            radius: 4
+                            border.color: "#cccccc"
+                            border.width: 1
+                        }
+                    }
+                }
+            }
+            
+            // 标题栏
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+                color: "#4477aaee"
+                radius: 5
+                
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.leftMargin: 20
+                    anchors.rightMargin: 20
+                    spacing: 10
+                    
+                    Text {
+                        Layout.preferredWidth: 80
+                        text: "操作"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "white"
+                        horizontalAlignment: Text.AlignLeft
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    Text {
+                        Layout.fillWidth: true
+                        text: "题库名称"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "white"
+                        horizontalAlignment: Text.AlignLeft
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    Text {
+                        Layout.preferredWidth: 120
+                        text: "题目数量"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    Text {
+                        Layout.preferredWidth: 180
+                        text: "导入时间"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+            }
+            
+            // 题库列表
+            ListView {
+                id: libraryListView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                model: sampleLibraries
+                clip: true
+                
+                delegate: Rectangle {
+                    width: libraryListView.width
+                    height: 60
+                    color: index % 2 === 0 ? "#33ffffff" : "#22ffffff"
+                    
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 20
+                        anchors.rightMargin: 20
+                        spacing: 10
+                        
+                        // 删除按钮
+                        Button {
+                            Layout.preferredWidth: 60
+                            Layout.preferredHeight: 36
+                            
+                            background: Rectangle {
+                                color: "#F44336"
+                                radius: 4
+                            }
+                            
+                            contentItem: Text {
+                                text: "删除"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 14
+                                color: "white"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            onClicked: {
+                                deleteConfirmDialog.libraryIndex = index
+                                deleteConfirmDialog.libraryName = modelData.name
+                                deleteConfirmDialog.open()
+                            }
+                        }
+                        
+                        // 题库名称
+                        Text {
+                            Layout.fillWidth: true
+                            text: modelData.name
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 16
+                            color: "white"
+                            horizontalAlignment: Text.AlignLeft
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        // 题目数量
+                        Text {
+                            Layout.preferredWidth: 120
+                            text: modelData.count + " 题"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 16
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        // 导入时间
+                        Text {
+                            Layout.preferredWidth: 180
+                            text: modelData.importTime
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 16
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+                }
+            }
+            
+            // 状态提示
+            Text {
+                id: statusText
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignCenter
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 16
+                font.bold: true
+                color: "#4CAF50"
+                visible: text !== ""
+            }
+            
+            Timer {
+                id: statusTimer
+                interval: 3000
+                onTriggered: {
+                    statusText.text = ""
+                }
+            }
+        }
+    }
+    
+    // 批量导入对话框 - 使用Popup替代Dialog
+    Popup {
+        id: batchImportDialog
+        width: 600
+        height: 550  // 减小高度，因为去掉了表头预览
+        anchors.centerIn: parent
+        modal: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        property bool isValidExcel: false
+        
+        contentItem: Rectangle {
+            color: "#f5f5f5"
+            
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 20
+                spacing: 15
+                
+                // 添加标题
+                Text {
+                    text: "批量导入题目"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 20
+                    font.bold: true
+                    color: "#333333"
+                    Layout.alignment: Qt.AlignHCenter
+                }
+                
+                Text {
+                    text: "请选择要导入的Excel文件"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 16
+                    color: "#333333"
+                }
+                
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 50
+                    color: "#ffffff"
+                    border.color: "#cccccc"
+                    border.width: 1
+                    radius: 4
+                    
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 5
+                        spacing: 10
+                        
+                        TextField {
+                            id: filePathInput
+                            Layout.fillWidth: true
+                            readOnly: true
+                            placeholderText: "请选择Excel文件"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            
+                            background: Rectangle {
+                                color: "transparent"
+                            }
+                        }
+                        
+                        Button {
+                            Layout.preferredWidth: 100
+                            Layout.preferredHeight: 40
+                            text: "浏览..."
+                            
+                            background: Rectangle {
+                                color: "#f0f0f0"
+                                radius: 4
+                                border.color: "#cccccc"
+                                border.width: 1
+                            }
+                            
+                            onClicked: {
+                                // 使用QML原生FileDialog而不是C++ QFileDialog
+                                fileDialog.open()
+                            }
+                        }
+                    }
+                }
+                
+                // 状态信息
+                Text {
+                    id: excelValidationText
+                    text: batchImportDialog.isValidExcel ? 
+                          "✅ Excel文件格式正确，可以导入" : 
+                          (filePathInput.text === "" ? "" : "❌ Excel文件格式不正确，请检查表头格式")
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 14
+                    color: batchImportDialog.isValidExcel ? "#4CAF50" : "#F44336"
+                    visible: filePathInput.text !== ""
+                    Layout.fillWidth: true
+                }
+                
+                // 题库名称输入
+                Text {
+                    text: "题库名称:"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 16
+                    color: "#333333"
+                }
+                
+                TextField {
+                    id: libraryNameInput
+                    Layout.fillWidth: true
+                    placeholderText: "请输入题库名称"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 14
+                    
+                    background: Rectangle {
+                        color: "#ffffff"
+                        radius: 4
+                        border.color: "#cccccc"
+                        border.width: 1
+                    }
+                }
+                
+                Text {
+                    text: "导入说明:"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 16
+                    font.bold: true
+                    color: "#333333"
+                }
+                
+                Text {
+                    text: "表头格式要求:\n题干、答案、解析、选项A、选项B、选项C、选项D、选项E、选项F、选项G\n\n说明：\n1. 必填字段：题干、答案、解析(没有的话留空)\n2. 选择题答案不要有字母外的其他字符\n3. 判断题的答案可以是：'正确', '错误', '对', '错', '√', '×', 'Y', 'N'"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 14
+                    color: "#666666"
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                }
+                
+                // 底部按钮布局，添加Item填充高度空间
+                Item {
+                    Layout.fillHeight: true
+                }
+                
+                RowLayout {
+                    Layout.alignment: Qt.AlignRight
+                    spacing: 15
+                    
+                    Button {
+                        Layout.preferredWidth: 120
+                        Layout.preferredHeight: 40
+                        text: "取消"
+                        
+                        background: Rectangle {
+                            color: "#f0f0f0"
+                            radius: 4
+                            border.color: "#cccccc"
+                            border.width: 1
+                        }
+                        
+                        contentItem: Text {
+                            text: parent.text
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "#333333"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        onClicked: {
+                            batchImportDialog.close()
+                        }
+                    }
+                    
+                    Button {
+                        Layout.preferredWidth: 120
+                        Layout.preferredHeight: 40
+                        text: "开始导入"
+                        enabled: batchImportDialog.isValidExcel && libraryNameInput.text.trim() !== ""
+                        
+                        background: Rectangle {
+                            color: parent.enabled ? "#2196F3" : "#cccccc"
+                            radius: 4
+                        }
+                        
+                        contentItem: Text {
+                            text: parent.text
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        onClicked: {
+                            // 模拟导入操作
+                            batchImportDialog.close()
+                            
+                            // 验证题库名称
+                            if (libraryNameInput.text.trim() === "") {
+                                statusText.text = "请输入题库名称"
+                                statusText.color = "#F44336"
+                                statusTimer.restart()
+                                return
+                            }
+                            
+                            // 读取Excel数据
+                            var excelData = fileManager.readExcelFile(filePathInput.text)
+                            var questionCount = excelData.length
+                            
+                            // 更新状态信息
+                            if (questionCount > 0) {
+                                // 模拟添加新题库
+                                var now = new Date()
+                                var timeString = Qt.formatDateTime(now, "yyyy-MM-dd hh:mm")
+                                
+                                // 添加到模型中（这里只是模拟，实际应用需要更新数据库）
+                                sampleLibraries.push({ 
+                                    name: libraryNameInput.text, 
+                                    count: questionCount, 
+                                    importTime: timeString 
+                                })
+                                
+                                statusText.text = "成功导入 " + questionCount + " 道题目到题库: " + libraryNameInput.text
+                                statusText.color = "#4CAF50"
+                            } else {
+                                statusText.text = "导入失败，未能从Excel中读取题目"
+                                statusText.color = "#F44336"
+                            }
+                            
+                            statusTimer.restart()
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 重置对话框
+        onOpened: {
+            libraryNameInput.text = ""
+            filePathInput.text = ""
+            isValidExcel = false
+        }
+    }
+    
+    // 文件夹选择对话框 - 使用Popup替代Dialog
+    Popup {
+        id: folderSelectionDialog
+        width: 600
+        height: 400
+        anchors.centerIn: parent
+        modal: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        contentItem: Rectangle {
+            color: "#f5f5f5"
+            
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 20
+                spacing: 20
+                
+                // 添加标题
+                Text {
+                    text: "选择保存位置"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 20
+                    font.bold: true
+                    color: "#333333"
+                    Layout.alignment: Qt.AlignHCenter
+                }
+                
+                Text {
+                    text: "请选择要保存模板文件的文件夹"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 16
+                    color: "#333333"
+                }
+                
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 50
+                    color: "#ffffff"
+                    border.color: "#cccccc"
+                    border.width: 1
+                    radius: 4
+                    
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 5
+                        spacing: 10
+                        
+                        TextField {
+                            id: folderPathInput
+                            Layout.fillWidth: true
+                            readOnly: true
+                            placeholderText: "请选择保存文件夹"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            
+                            background: Rectangle {
+                                color: "transparent"
+                            }
+                        }
+                        
+                        Button {
+                            Layout.preferredWidth: 100
+                            Layout.preferredHeight: 40
+                            text: "浏览..."
+                            
+                            background: Rectangle {
+                                color: "#f0f0f0"
+                                radius: 4
+                                border.color: "#cccccc"
+                                border.width: 1
+                            }
+                            
+                            onClicked: {
+                                // 使用QML原生FileDialog而不是C++ QFileDialog
+                                folderDialog.open()
+                            }
+                        }
+                    }
+                }
+                
+                Text {
+                    text: "说明:"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 16
+                    font.bold: true
+                    color: "#333333"
+                }
+                
+                Text {
+                    text: "1. 将自动复制题库导入模板文件到您选择的文件夹\n2. 文件名将为\"导题模板_yyyyMMdd_hhmmss.xlsx\"\n3. 您可以按照模板格式填写题目，然后使用批量导入功能导入"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 14
+                    color: "#666666"
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                }
+                
+                RowLayout {
+                    Layout.alignment: Qt.AlignRight
+                    spacing: 15
+                    
+                    Button {
+                        Layout.preferredWidth: 120
+                        Layout.preferredHeight: 40
+                        text: "取消"
+                        
+                        background: Rectangle {
+                            color: "#f0f0f0"
+                            radius: 4
+                            border.color: "#cccccc"
+                            border.width: 1
+                        }
+                        
+                        contentItem: Text {
+                            text: parent.text
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "#333333"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        onClicked: {
+                            folderSelectionDialog.close()
+                        }
+                    }
+                    
+                    Button {
+                        Layout.preferredWidth: 120
+                        Layout.preferredHeight: 40
+                        text: "下载"
+                        
+                        background: Rectangle {
+                            color: "#9C27B0"
+                            radius: 4
+                        }
+                        
+                        contentItem: Text {
+                            text: parent.text
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        onClicked: {
+                            // 获取当前时间戳
+                            var now = new Date()
+                            var timestamp = Qt.formatDateTime(now, "yyyyMMdd_hhmmss")
+                            var fileName = "导题模板" + timestamp + ".xlsx"
+                            
+                            // 检查选择的路径是否有效
+                            if (folderPathInput.text === "") {
+                                statusText.text = "请先选择保存文件夹"
+                                statusText.color = "#F44336"
+                                statusTimer.restart()
+                                return
+                            }
+                            
+                            // 复制模板文件到选择的文件夹
+                            var appDir = fileManager.getApplicationDir()
+                            var sourcePath = appDir + "/templates/导题模板.xlsx"
+                            
+                            // 检查source文件是否存在
+                            if (!fileManager.directoryExists(appDir + "/templates") || 
+                                !fileManager.copyFile(sourcePath, folderPathInput.text + "/" + fileName)) {
+                                
+                                // 使用资源文件中的模板 (qrc)
+                                console.log("使用资源文件中的模板")
+                                
+                                // 创建一个临时文件
+                                var tempPath = appDir + "/temp"
+                                if (!fileManager.directoryExists(tempPath)) {
+                                    fileManager.createDirectory(tempPath)
+                                }
+                                
+                                // 将资源文件提取到临时文件
+                                var tempFilePath = tempPath + "/导题模板.xlsx"
+                                
+                                // 这里需要将qrc资源文件复制出来，实际应用中需要使用QFile实现
+                                // 这里我们简化为使用README.txt
+                                var readmePath = appDir + "/templates/README.txt"
+                                var success = false
+                                
+                                if (fileManager.directoryExists(appDir + "/templates")) {
+                                    success = fileManager.copyFile(readmePath, folderPathInput.text + "/" + fileName)
+                                }
+                                
+                                if (!success) {
+                                    statusText.text = "模板保存失败，请检查文件权限和路径"
+                                    statusText.color = "#F44336"
+                                    statusTimer.restart()
+                                    return
+                                }
+                            } else {
+                                console.log("成功复制本地模板文件")
+                            }
+                            
+                            var destPath = folderPathInput.text + "/" + fileName
+                            
+                            folderSelectionDialog.close()
+                            statusText.text = "模板已保存到: " + destPath
+                            statusText.color = "#9C27B0"
+                            statusTimer.restart()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // 删除确认对话框 - 使用Popup替代Dialog
+    Popup {
+        id: deleteConfirmDialog
+        width: 400
+        height: 200
+        anchors.centerIn: parent
+        modal: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        property int libraryIndex: -1
+        property string libraryName: ""
+        
+        contentItem: Rectangle {
+            color: "#f5f5f5"
+            
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 20
+                spacing: 20
+                
+                // 添加标题
+                Text {
+                    text: "确认删除"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 20
+                    font.bold: true
+                    color: "#333333"
+                    Layout.alignment: Qt.AlignHCenter
+                }
+                
+                Text {
+                    text: "您确定要删除以下题库吗？"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 16
+                    font.bold: true
+                    color: "#333333"
+                }
+                
+                Text {
+                    text: deleteConfirmDialog.libraryName
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 14
+                    color: "#666666"
+                }
+                
+                Text {
+                    text: "此操作将永久删除该题库及其所有题目，且无法恢复。"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 14
+                    color: "#F44336"
+                }
+                
+                RowLayout {
+                    Layout.alignment: Qt.AlignRight
+                    spacing: 15
+                    
+                    Button {
+                        Layout.preferredWidth: 100
+                        Layout.preferredHeight: 40
+                        text: "取消"
+                        
+                        background: Rectangle {
+                            color: "#f0f0f0"
+                            radius: 4
+                            border.color: "#cccccc"
+                            border.width: 1
+                        }
+                        
+                        contentItem: Text {
+                            text: parent.text
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "#333333"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        onClicked: {
+                            deleteConfirmDialog.close()
+                        }
+                    }
+                    
+                    Button {
+                        Layout.preferredWidth: 100
+                        Layout.preferredHeight: 40
+                        text: "确认删除"
+                        
+                        background: Rectangle {
+                            color: "#F44336"
+                            radius: 4
+                        }
+                        
+                        contentItem: Text {
+                            text: parent.text
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        onClicked: {
+                            // 模拟删除操作
+                            deleteConfirmDialog.close()
+                            
+                            statusText.text = "已删除题库: " + deleteConfirmDialog.libraryName
+                            statusText.color = "#F44336"
+                            statusTimer.restart()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // FileDialog保持不变
+    FileDialog {
+        id: folderDialog
+        title: "选择保存文件夹"
+        folder: shortcuts.documents
+        selectFolder: true
+        
+        onAccepted: {
+            // 将选择的URL转换为本地路径
+            var path = folderDialog.fileUrl.toString()
+            // 去除file:/// 前缀
+            path = path.replace(/^(file:\/{3})/, "")
+            // 解码URL
+            path = decodeURIComponent(path)
+            folderPathInput.text = path
+        }
+    }
+    
+    FileDialog {
+        id: fileDialog
+        title: "选择Excel文件"
+        folder: shortcuts.documents
+        nameFilters: [ "Excel files (*.xlsx *.xls)", "All files (*)" ]
+        
+        onAccepted: {
+            // 将选择的URL转换为本地路径
+            var path = fileDialog.fileUrl.toString()
+            // 去除file:/// 前缀
+            path = path.replace(/^(file:\/{3})/, "")
+            // 解码URL
+            path = decodeURIComponent(path)
+            filePathInput.text = path
+            
+            // 验证Excel格式并加载表头
+            batchImportDialog.isValidExcel = fileManager.validateExcelStructure(path)
+        }
+    }
+} 

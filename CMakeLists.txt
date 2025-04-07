@@ -80,6 +80,10 @@ target_link_libraries(SparkExamAI
   ${OpenCV_LIBS}
 )
 
+# 添加QXlsx库
+add_subdirectory(QXlsx)  #添加
+target_link_libraries(SparkExamAI PRIVATE QXlsx::QXlsx)
+
 # 直接使用 libSeetaXXX.dll.a 文件进行链接
 target_link_libraries(SparkExamAI PRIVATE
   ${SEETA_FACE_PATH}/lib/libSeetaFaceDetector.dll.a
