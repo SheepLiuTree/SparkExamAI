@@ -193,13 +193,13 @@ Rectangle {
                     spacing: 10
                     
                     Text {
-                        Layout.preferredWidth: 80
+                        Layout.preferredWidth: 150
                         text: "操作"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
                         font.bold: true
                         color: "white"
-                        horizontalAlignment: Text.AlignLeft
+                        horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
                     
@@ -280,6 +280,36 @@ Rectangle {
                                 deleteConfirmDialog.libraryIndex = index
                                 deleteConfirmDialog.libraryName = modelData.name
                                 deleteConfirmDialog.open()
+                            }
+                        }
+                        
+                        // 编辑按钮
+                        Button {
+                            Layout.preferredWidth: 60
+                            Layout.preferredHeight: 36
+                            
+                            background: Rectangle {
+                                color: "#4CAF50"
+                                radius: 4
+                            }
+                            
+                            contentItem: Text {
+                                text: "编辑"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 14
+                                color: "white"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            onClicked: {
+                                // 显示编辑状态信息
+                                statusText.text = "正在编辑题库: " + modelData.name
+                                statusText.color = "#4CAF50"
+                                statusTimer.restart()
+                                
+                                // 实际应用中这里应该跳转到题库编辑页面
+                                console.log("编辑题库：" + modelData.name)
                             }
                         }
                         
