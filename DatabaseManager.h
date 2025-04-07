@@ -86,6 +86,49 @@ public:
     Q_INVOKABLE bool cleanupOldLogs(int daysToKeep = 30);
 
     Q_INVOKABLE QString getUserAvatarPath(const QString &workId);
+    
+    // 题库管理相关方法
+    
+    // 添加题库
+    Q_INVOKABLE bool addQuestionBank(const QString &name, int questionCount);
+    
+    // 删除题库
+    Q_INVOKABLE bool deleteQuestionBank(int bankId);
+    
+    // 获取所有题库
+    Q_INVOKABLE QVariantList getAllQuestionBanks();
+    
+    // 根据ID获取题库
+    Q_INVOKABLE QVariantMap getQuestionBankById(int bankId);
+    
+    // 更新题库信息
+    Q_INVOKABLE bool updateQuestionBank(int bankId, const QString &name);
+    
+    // 添加题目到题库
+    Q_INVOKABLE bool addQuestion(int bankId, 
+                                const QString &content, 
+                                const QString &answer, 
+                                const QString &analysis,
+                                const QStringList &options = QStringList());
+    
+    // 删除题目
+    Q_INVOKABLE bool deleteQuestion(int questionId);
+    
+    // 更新题目
+    Q_INVOKABLE bool updateQuestion(int questionId,
+                                   const QString &content, 
+                                   const QString &answer, 
+                                   const QString &analysis,
+                                   const QStringList &options = QStringList());
+    
+    // 获取题库中的所有题目
+    Q_INVOKABLE QVariantList getQuestionsByBankId(int bankId);
+    
+    // 获取题目详情
+    Q_INVOKABLE QVariantMap getQuestionById(int questionId);
+    
+    // 批量导入题目
+    Q_INVOKABLE bool importQuestions(int bankId, const QVariantList &questions);
 
 private:
     QSqlDatabase m_database;

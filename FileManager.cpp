@@ -128,6 +128,8 @@ QVariantList FileManager::readExcelFile(const QString &filePath)
     int rowCount = range.rowCount();
     int colCount = range.columnCount();
     
+    qDebug() << "Excel文件行数:" << rowCount << "列数:" << colCount;
+    
     // 读取表头，以确定字段位置
     QStringList headers;
     QMap<QString, int> headerIndices;
@@ -136,24 +138,64 @@ QVariantList FileManager::readExcelFile(const QString &filePath)
         QString header = cell ? cell->value().toString() : QString("Column%1").arg(col);
         headers.append(header);
         headerIndices.insert(header, col);
+        qDebug() << "表头" << col << ":" << header;
     }
     
-    // 定义必要的字段
-    QStringList requiredFields = {"题干", "答案", "解析"};
+    // 定义必要的字段及其可能的变体
+    QMap<QString, QStringList> requiredFields;
+    requiredFields["题干"] = QStringList() << "题干" << "题目" << "题目内容" << "题目描述" << "内容";
+    requiredFields["答案"] = QStringList() << "答案" << "正确答案" << "标准答案";
+    
+    // 定义可选字段及其可能的变体
+    QMap<QString, QStringList> optionalFields;
+    optionalFields["解析"] = QStringList() << "解析" << "题目解析" << "答案解析" << "分析";
     
     // 检查是否包含所有必要字段
-    for (const QString &field : requiredFields) {
+    QMap<QString, QString> fieldMapping;
+    for (auto it = requiredFields.begin(); it != requiredFields.end(); ++it) {
+        QString mainField = it.key();
+        QStringList variants = it.value();
         bool found = false;
+        
         for (const QString &header : headers) {
-            if (header.contains(field, Qt::CaseInsensitive)) {
-                found = true;
-                break;
+            for (const QString &variant : variants) {
+                if (header.contains(variant, Qt::CaseInsensitive)) {
+                    fieldMapping[mainField] = header;
+                    found = true;
+                    qDebug() << "找到字段" << mainField << "对应表头:" << header;
+                    break;
+                }
             }
+            if (found) break;
         }
         
         if (!found) {
-            qDebug() << "Excel文件缺少必要字段:" << field;
+            qDebug() << "Excel文件缺少必要字段:" << mainField;
             return result;
+        }
+    }
+    
+    // 检查可选字段
+    for (auto it = optionalFields.begin(); it != optionalFields.end(); ++it) {
+        QString mainField = it.key();
+        QStringList variants = it.value();
+        bool found = false;
+        
+        for (const QString &header : headers) {
+            for (const QString &variant : variants) {
+                if (header.contains(variant, Qt::CaseInsensitive)) {
+                    fieldMapping[mainField] = header;
+                    found = true;
+                    qDebug() << "找到可选字段" << mainField << "对应表头:" << header;
+                    break;
+                }
+            }
+            if (found) break;
+        }
+        
+        // 可选字段不存在也不报错
+        if (!found) {
+            qDebug() << "Excel文件缺少可选字段:" << mainField << "，将使用空值";
         }
     }
     
@@ -177,7 +219,16 @@ QVariantList FileManager::readExcelFile(const QString &filePath)
             // 获取对应的列头
             QString headerText = (col <= headers.size()) ? headers[col-1] : QString("Column%1").arg(col);
             
-            rowData.insert(headerText, value);
+            // 检查是否是必要字段，如果是，使用标准字段名
+            for (auto it = fieldMapping.begin(); it != fieldMapping.end(); ++it) {
+                if (headerText == it.value()) {
+                    rowData[it.key()] = value;
+                    break;
+                }
+            }
+            
+            // 同时保留原始字段名
+            rowData[headerText] = value;
         }
         
         // 只添加非空行
@@ -186,6 +237,7 @@ QVariantList FileManager::readExcelFile(const QString &filePath)
         }
     }
     
+    qDebug() << "成功读取" << result.size() << "条记录";
     return result;
 }
 
@@ -233,7 +285,7 @@ bool FileManager::validateExcelStructure(const QString &filePath)
     QStringList headers = getExcelHeaders(filePath);
     
     // 题库导入需要的必要字段列表
-    QStringList requiredHeaders = {"题干", "答案", "解析"};
+    QStringList requiredHeaders = {"题干", "答案"};
     // 可选的选项字段
     QStringList optionHeaders = {"选项A", "选项B", "选项C", "选项D", "选项E", "选项F", "选项G"};
     

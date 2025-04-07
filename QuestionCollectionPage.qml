@@ -8,13 +8,17 @@ Rectangle {
     color: "transparent"
     
     property string userName: "管理员"
-    property var sampleLibraries: [
-        { name: "高中数学题库", count: 152, importTime: "2023-04-15 14:30" },
-        { name: "初中英语选择题", count: 89, importTime: "2023-04-10 09:15" },
-        { name: "高中物理力学题", count: 67, importTime: "2023-04-05 16:45" },
-        { name: "小学语文阅读理解", count: 120, importTime: "2023-04-01 11:20" },
-        { name: "中考化学综合题", count: 45, importTime: "2023-03-28 15:10" }
-    ]
+    property var questionBanks: []
+    
+    // 初始化时从数据库加载题库
+    Component.onCompleted: {
+        loadQuestionBanks()
+    }
+    
+    // 从数据库加载题库
+    function loadQuestionBanks() {
+        questionBanks = dbManager.getAllQuestionBanks()
+    }
     
     // 返回按钮
     Button {
@@ -193,7 +197,7 @@ Rectangle {
                     spacing: 10
                     
                     Text {
-                        Layout.preferredWidth: 150
+                        Layout.preferredWidth: 60
                         text: "操作"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
@@ -210,7 +214,7 @@ Rectangle {
                         font.pixelSize: 16
                         font.bold: true
                         color: "white"
-                        horizontalAlignment: Text.AlignLeft
+                        horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
                     
@@ -243,7 +247,7 @@ Rectangle {
                 id: libraryListView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                model: sampleLibraries
+                model: questionBanks
                 clip: true
                 
                 delegate: Rectangle {
@@ -277,39 +281,9 @@ Rectangle {
                             }
                             
                             onClicked: {
-                                deleteConfirmDialog.libraryIndex = index
+                                deleteConfirmDialog.bankId = modelData.id
                                 deleteConfirmDialog.libraryName = modelData.name
                                 deleteConfirmDialog.open()
-                            }
-                        }
-                        
-                        // 编辑按钮
-                        Button {
-                            Layout.preferredWidth: 60
-                            Layout.preferredHeight: 36
-                            
-                            background: Rectangle {
-                                color: "#4CAF50"
-                                radius: 4
-                            }
-                            
-                            contentItem: Text {
-                                text: "编辑"
-                                font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 14
-                                color: "white"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                            }
-                            
-                            onClicked: {
-                                // 显示编辑状态信息
-                                statusText.text = "正在编辑题库: " + modelData.name
-                                statusText.color = "#4CAF50"
-                                statusTimer.restart()
-                                
-                                // 实际应用中这里应该跳转到题库编辑页面
-                                console.log("编辑题库：" + modelData.name)
                             }
                         }
                         
@@ -320,7 +294,7 @@ Rectangle {
                             font.family: "阿里妈妈数黑体"
                             font.pixelSize: 16
                             color: "white"
-                            horizontalAlignment: Text.AlignLeft
+                            horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
                         
@@ -421,7 +395,7 @@ Rectangle {
                         spacing: 10
                         
                         TextField {
-                            id: filePathInput
+                            id: excelFilePath
                             Layout.fillWidth: true
                             readOnly: true
                             placeholderText: "请选择Excel文件"
@@ -458,11 +432,11 @@ Rectangle {
                     id: excelValidationText
                     text: batchImportDialog.isValidExcel ? 
                           "✅ Excel文件格式正确，可以导入" : 
-                          (filePathInput.text === "" ? "" : "❌ Excel文件格式不正确，请检查表头格式")
+                          (excelFilePath.text === "" ? "" : "❌ Excel文件格式不正确，请检查表头格式")
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 14
                     color: batchImportDialog.isValidExcel ? "#4CAF50" : "#F44336"
-                    visible: filePathInput.text !== ""
+                    visible: excelFilePath.text !== ""
                     Layout.fillWidth: true
                 }
                 
@@ -475,7 +449,7 @@ Rectangle {
                 }
                 
                 TextField {
-                    id: libraryNameInput
+                    id: questionBankName
                     Layout.fillWidth: true
                     placeholderText: "请输入题库名称"
                     font.family: "阿里妈妈数黑体"
@@ -498,7 +472,7 @@ Rectangle {
                 }
                 
                 Text {
-                    text: "表头格式要求:\n题干、答案、解析、选项A、选项B、选项C、选项D、选项E、选项F、选项G\n\n说明：\n1. 必填字段：题干、答案、解析(没有的话留空)\n2. 选择题答案不要有字母外的其他字符\n3. 判断题的答案可以是：'正确', '错误', '对', '错', '√', '×', 'Y', 'N'"
+                    text: "表头格式要求:\n题干、答案、解析、选项A、选项B、选项C、选项D、选项E、选项F、选项G\n\n说明：\n1. 必填字段：题干、答案\n2. 选择题答案不要有字母外的其他字符\n3. 判断题的答案可以是：'正确', '错误', '对', '错', '√', '×', 'Y', 'N'"
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 14
                     color: "#666666"
@@ -545,7 +519,7 @@ Rectangle {
                         Layout.preferredWidth: 120
                         Layout.preferredHeight: 40
                         text: "开始导入"
-                        enabled: batchImportDialog.isValidExcel && libraryNameInput.text.trim() !== ""
+                        enabled: batchImportDialog.isValidExcel && questionBankName.text.trim() !== ""
                         
                         background: Rectangle {
                             color: parent.enabled ? "#2196F3" : "#cccccc"
@@ -562,42 +536,82 @@ Rectangle {
                         }
                         
                         onClicked: {
-                            // 模拟导入操作
-                            batchImportDialog.close()
+                            console.log("开始导入题目...");
                             
-                            // 验证题库名称
-                            if (libraryNameInput.text.trim() === "") {
-                                statusText.text = "请输入题库名称"
-                                statusText.color = "#F44336"
-                                statusTimer.restart()
-                                return
+                            // 检查Excel文件是否有效
+                            if (!excelFilePath.text || !fileManager.validateExcelStructure(excelFilePath.text)) {
+                                statusText.text = "请选择有效的Excel文件";
+                                statusTimer.restart();
+                                return;
+                            }
+                            
+                            // 检查题库名称是否有效
+                            if (!questionBankName.text.trim()) {
+                                statusText.text = "请输入题库名称";
+                                statusTimer.restart();
+                                return;
                             }
                             
                             // 读取Excel数据
-                            var excelData = fileManager.readExcelFile(filePathInput.text)
-                            var questionCount = excelData.length
+                            console.log("读取Excel文件:", excelFilePath.text);
+                            var excelData = fileManager.readExcelFile(excelFilePath.text);
+                            console.log("读取到", excelData.length, "条记录");
                             
-                            // 更新状态信息
-                            if (questionCount > 0) {
-                                // 模拟添加新题库
-                                var now = new Date()
-                                var timeString = Qt.formatDateTime(now, "yyyy-MM-dd hh:mm")
-                                
-                                // 添加到模型中（这里只是模拟，实际应用需要更新数据库）
-                                sampleLibraries.push({ 
-                                    name: libraryNameInput.text, 
-                                    count: questionCount, 
-                                    importTime: timeString 
-                                })
-                                
-                                statusText.text = "成功导入 " + questionCount + " 道题目到题库: " + libraryNameInput.text
-                                statusText.color = "#4CAF50"
-                            } else {
-                                statusText.text = "导入失败，未能从Excel中读取题目"
-                                statusText.color = "#F44336"
+                            if (excelData.length === 0) {
+                                statusText.text = "Excel文件中没有有效数据";
+                                statusTimer.restart();
+                                return;
                             }
                             
-                            statusTimer.restart()
+                            // 创建题库
+                            console.log("创建题库:", questionBankName.text);
+                            if (!dbManager.addQuestionBank(questionBankName.text, excelData.length)) {
+                                // 检查是否是因为同名题库导致的失败
+                                var banks = dbManager.getAllQuestionBanks();
+                                var hasSameName = false;
+                                for (var i = 0; i < banks.length; i++) {
+                                    if (banks[i].name === questionBankName.text) {
+                                        hasSameName = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if (hasSameName) {
+                                    statusText.text = "题库 '" + questionBankName.text + "' 已存在，请使用其他名称";
+                                } else {
+                                    statusText.text = "创建题库失败";
+                                }
+                                statusTimer.restart();
+                                return;
+                            }
+                            
+                            // 获取新创建的题库ID
+                            var banks = dbManager.getAllQuestionBanks();
+                            var newBank = null;
+                            for (var i = 0; i < banks.length; i++) {
+                                if (banks[i].name === questionBankName.text) {
+                                    newBank = banks[i];
+                                    break;
+                                }
+                            }
+                            
+                            if (!newBank) {
+                                statusText.text = "无法获取新创建的题库ID";
+                                statusTimer.restart();
+                                return;
+                            }
+                            
+                            // 导入题目
+                            console.log("导入题目到题库:", newBank.id);
+                            if (dbManager.importQuestions(newBank.id, excelData)) {
+                                statusText.text = "成功导入" + excelData.length + "道题目";
+                                loadQuestionBanks(); // 刷新题库列表
+                            } else {
+                                statusText.text = "导入题目失败";
+                            }
+                            
+                            statusTimer.restart();
+                            batchImportDialog.close();
                         }
                     }
                 }
@@ -606,8 +620,8 @@ Rectangle {
         
         // 重置对话框
         onOpened: {
-            libraryNameInput.text = ""
-            filePathInput.text = ""
+            excelFilePath.text = ""
+            questionBankName.text = ""
             isValidExcel = false
         }
     }
@@ -828,12 +842,12 @@ Rectangle {
     Popup {
         id: deleteConfirmDialog
         width: 400
-        height: 200
+        height: 300
         anchors.centerIn: parent
         modal: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         
-        property int libraryIndex: -1
+        property int bankId: -1
         property string libraryName: ""
         
         contentItem: Rectangle {
@@ -926,11 +940,21 @@ Rectangle {
                         }
                         
                         onClicked: {
-                            // 模拟删除操作
-                            deleteConfirmDialog.close()
+                            // 从数据库删除题库
+                            var success = dbManager.deleteQuestionBank(deleteConfirmDialog.bankId)
                             
-                            statusText.text = "已删除题库: " + deleteConfirmDialog.libraryName
-                            statusText.color = "#F44336"
+                            if (success) {
+                                // 重新加载题库列表
+                                loadQuestionBanks()
+                                
+                                statusText.text = "已删除题库: " + deleteConfirmDialog.libraryName
+                                statusText.color = "#F44336"
+                            } else {
+                                statusText.text = "删除题库失败"
+                                statusText.color = "#F44336"
+                            }
+                            
+                            deleteConfirmDialog.close()
                             statusTimer.restart()
                         }
                     }
@@ -970,7 +994,7 @@ Rectangle {
             path = path.replace(/^(file:\/{3})/, "")
             // 解码URL
             path = decodeURIComponent(path)
-            filePathInput.text = path
+            excelFilePath.text = path
             
             // 验证Excel格式并加载表头
             batchImportDialog.isValidExcel = fileManager.validateExcelStructure(path)

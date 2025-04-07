@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_DatabaseManager_t {
-    QByteArrayData data[30];
-    char stringdata0[346];
+    QByteArrayData data[49];
+    char stringdata0[609];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -61,7 +61,26 @@ QT_MOC_LITERAL(25, 275, 6), // "offset"
 QT_MOC_LITERAL(26, 282, 19), // "getAccessLogsByUser"
 QT_MOC_LITERAL(27, 302, 14), // "cleanupOldLogs"
 QT_MOC_LITERAL(28, 317, 10), // "daysToKeep"
-QT_MOC_LITERAL(29, 328, 17) // "getUserAvatarPath"
+QT_MOC_LITERAL(29, 328, 17), // "getUserAvatarPath"
+QT_MOC_LITERAL(30, 346, 15), // "addQuestionBank"
+QT_MOC_LITERAL(31, 362, 13), // "questionCount"
+QT_MOC_LITERAL(32, 376, 18), // "deleteQuestionBank"
+QT_MOC_LITERAL(33, 395, 6), // "bankId"
+QT_MOC_LITERAL(34, 402, 19), // "getAllQuestionBanks"
+QT_MOC_LITERAL(35, 422, 19), // "getQuestionBankById"
+QT_MOC_LITERAL(36, 442, 18), // "updateQuestionBank"
+QT_MOC_LITERAL(37, 461, 11), // "addQuestion"
+QT_MOC_LITERAL(38, 473, 7), // "content"
+QT_MOC_LITERAL(39, 481, 6), // "answer"
+QT_MOC_LITERAL(40, 488, 8), // "analysis"
+QT_MOC_LITERAL(41, 497, 7), // "options"
+QT_MOC_LITERAL(42, 505, 14), // "deleteQuestion"
+QT_MOC_LITERAL(43, 520, 10), // "questionId"
+QT_MOC_LITERAL(44, 531, 14), // "updateQuestion"
+QT_MOC_LITERAL(45, 546, 20), // "getQuestionsByBankId"
+QT_MOC_LITERAL(46, 567, 15), // "getQuestionById"
+QT_MOC_LITERAL(47, 583, 15), // "importQuestions"
+QT_MOC_LITERAL(48, 599, 9) // "questions"
 
     },
     "DatabaseManager\0initDatabase\0\0addFaceData\0"
@@ -73,7 +92,15 @@ QT_MOC_LITERAL(29, 328, 17) // "getUserAvatarPath"
     "defaultValue\0deleteSetting\0getAllSettings\0"
     "getAccessLogs\0limit\0offset\0"
     "getAccessLogsByUser\0cleanupOldLogs\0"
-    "daysToKeep\0getUserAvatarPath"
+    "daysToKeep\0getUserAvatarPath\0"
+    "addQuestionBank\0questionCount\0"
+    "deleteQuestionBank\0bankId\0getAllQuestionBanks\0"
+    "getQuestionBankById\0updateQuestionBank\0"
+    "addQuestion\0content\0answer\0analysis\0"
+    "options\0deleteQuestion\0questionId\0"
+    "updateQuestion\0getQuestionsByBankId\0"
+    "getQuestionById\0importQuestions\0"
+    "questions"
 };
 #undef QT_MOC_LITERAL
 
@@ -83,7 +110,7 @@ static const uint qt_meta_data_DatabaseManager[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      24,   14, // methods
+      37,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -91,30 +118,43 @@ static const uint qt_meta_data_DatabaseManager[] = {
        0,       // signalCount
 
  // methods: name, argc, parameters, tag, flags
-       1,    0,  134,    2, 0x02 /* Public */,
-       3,    6,  135,    2, 0x02 /* Public */,
-       3,    5,  148,    2, 0x22 /* Public | MethodCloned */,
-      10,    1,  159,    2, 0x02 /* Public */,
-      11,    0,  162,    2, 0x02 /* Public */,
-      12,    1,  163,    2, 0x02 /* Public */,
-      13,    2,  166,    2, 0x02 /* Public */,
-      14,    1,  171,    2, 0x02 /* Public */,
-      15,    6,  174,    2, 0x02 /* Public */,
-      15,    5,  187,    2, 0x22 /* Public | MethodCloned */,
-      16,    2,  198,    2, 0x02 /* Public */,
-      19,    2,  203,    2, 0x02 /* Public */,
-      19,    1,  208,    2, 0x22 /* Public | MethodCloned */,
-      21,    1,  211,    2, 0x02 /* Public */,
-      22,    0,  214,    2, 0x02 /* Public */,
-      23,    2,  215,    2, 0x02 /* Public */,
-      23,    1,  220,    2, 0x22 /* Public | MethodCloned */,
-      23,    0,  223,    2, 0x22 /* Public | MethodCloned */,
-      26,    3,  224,    2, 0x02 /* Public */,
-      26,    2,  231,    2, 0x22 /* Public | MethodCloned */,
-      26,    1,  236,    2, 0x22 /* Public | MethodCloned */,
-      27,    1,  239,    2, 0x02 /* Public */,
-      27,    0,  242,    2, 0x22 /* Public | MethodCloned */,
-      29,    1,  243,    2, 0x02 /* Public */,
+       1,    0,  199,    2, 0x02 /* Public */,
+       3,    6,  200,    2, 0x02 /* Public */,
+       3,    5,  213,    2, 0x22 /* Public | MethodCloned */,
+      10,    1,  224,    2, 0x02 /* Public */,
+      11,    0,  227,    2, 0x02 /* Public */,
+      12,    1,  228,    2, 0x02 /* Public */,
+      13,    2,  231,    2, 0x02 /* Public */,
+      14,    1,  236,    2, 0x02 /* Public */,
+      15,    6,  239,    2, 0x02 /* Public */,
+      15,    5,  252,    2, 0x22 /* Public | MethodCloned */,
+      16,    2,  263,    2, 0x02 /* Public */,
+      19,    2,  268,    2, 0x02 /* Public */,
+      19,    1,  273,    2, 0x22 /* Public | MethodCloned */,
+      21,    1,  276,    2, 0x02 /* Public */,
+      22,    0,  279,    2, 0x02 /* Public */,
+      23,    2,  280,    2, 0x02 /* Public */,
+      23,    1,  285,    2, 0x22 /* Public | MethodCloned */,
+      23,    0,  288,    2, 0x22 /* Public | MethodCloned */,
+      26,    3,  289,    2, 0x02 /* Public */,
+      26,    2,  296,    2, 0x22 /* Public | MethodCloned */,
+      26,    1,  301,    2, 0x22 /* Public | MethodCloned */,
+      27,    1,  304,    2, 0x02 /* Public */,
+      27,    0,  307,    2, 0x22 /* Public | MethodCloned */,
+      29,    1,  308,    2, 0x02 /* Public */,
+      30,    2,  311,    2, 0x02 /* Public */,
+      32,    1,  316,    2, 0x02 /* Public */,
+      34,    0,  319,    2, 0x02 /* Public */,
+      35,    1,  320,    2, 0x02 /* Public */,
+      36,    2,  323,    2, 0x02 /* Public */,
+      37,    5,  328,    2, 0x02 /* Public */,
+      37,    4,  339,    2, 0x22 /* Public | MethodCloned */,
+      42,    1,  348,    2, 0x02 /* Public */,
+      44,    5,  351,    2, 0x02 /* Public */,
+      44,    4,  362,    2, 0x22 /* Public | MethodCloned */,
+      45,    1,  371,    2, 0x02 /* Public */,
+      46,    1,  374,    2, 0x02 /* Public */,
+      47,    2,  377,    2, 0x02 /* Public */,
 
  // methods: parameters
     QMetaType::Bool,
@@ -141,6 +181,19 @@ static const uint qt_meta_data_DatabaseManager[] = {
     QMetaType::Bool, QMetaType::Int,   28,
     QMetaType::Bool,
     QMetaType::QString, QMetaType::QString,    6,
+    QMetaType::Bool, QMetaType::QString, QMetaType::Int,    4,   31,
+    QMetaType::Bool, QMetaType::Int,   33,
+    QMetaType::QVariantList,
+    QMetaType::QVariantMap, QMetaType::Int,   33,
+    QMetaType::Bool, QMetaType::Int, QMetaType::QString,   33,    4,
+    QMetaType::Bool, QMetaType::Int, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::QStringList,   33,   38,   39,   40,   41,
+    QMetaType::Bool, QMetaType::Int, QMetaType::QString, QMetaType::QString, QMetaType::QString,   33,   38,   39,   40,
+    QMetaType::Bool, QMetaType::Int,   43,
+    QMetaType::Bool, QMetaType::Int, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::QStringList,   43,   38,   39,   40,   41,
+    QMetaType::Bool, QMetaType::Int, QMetaType::QString, QMetaType::QString, QMetaType::QString,   43,   38,   39,   40,
+    QMetaType::QVariantList, QMetaType::Int,   33,
+    QMetaType::QVariantMap, QMetaType::Int,   43,
+    QMetaType::Bool, QMetaType::Int, QMetaType::QVariantList,   33,   48,
 
        0        // eod
 };
@@ -199,6 +252,32 @@ void DatabaseManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
         case 23: { QString _r = _t->getUserAvatarPath((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 24: { bool _r = _t->addQuestionBank((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 25: { bool _r = _t->deleteQuestionBank((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 26: { QVariantList _r = _t->getAllQuestionBanks();
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 27: { QVariantMap _r = _t->getQuestionBankById((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QVariantMap*>(_a[0]) = std::move(_r); }  break;
+        case 28: { bool _r = _t->updateQuestionBank((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 29: { bool _r = _t->addQuestion((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< const QString(*)>(_a[4])),(*reinterpret_cast< const QStringList(*)>(_a[5])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 30: { bool _r = _t->addQuestion((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< const QString(*)>(_a[4])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 31: { bool _r = _t->deleteQuestion((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 32: { bool _r = _t->updateQuestion((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< const QString(*)>(_a[4])),(*reinterpret_cast< const QStringList(*)>(_a[5])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 33: { bool _r = _t->updateQuestion((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< const QString(*)>(_a[4])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 34: { QVariantList _r = _t->getQuestionsByBankId((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 35: { QVariantMap _r = _t->getQuestionById((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QVariantMap*>(_a[0]) = std::move(_r); }  break;
+        case 36: { bool _r = _t->importQuestions((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QVariantList(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
     }
@@ -233,13 +312,13 @@ int DatabaseManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 24)
+        if (_id < 37)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 24;
+        _id -= 37;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 24)
+        if (_id < 37)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 24;
+        _id -= 37;
     }
     return _id;
 }
