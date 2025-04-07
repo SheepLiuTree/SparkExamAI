@@ -1,572 +1,687 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
 
 Rectangle {
     id: strategiesSettingsPage
     color: "transparent"
     
-    property var strategies: [
-        { id: 1, name: "知识点全覆盖", active: true, description: "确保所有重要知识点均被覆盖，适合系统复习" },
-        { id: 2, name: "薄弱点强化", active: false, description: "根据学生历史答题情况，针对薄弱知识点进行强化训练" },
-        { id: 3, name: "重点题型练习", active: true, description: "集中练习某一题型，提高特定解题能力" },
-        { id: 4, name: "考前冲刺", active: false, description: "注重考点热点，提高应试能力" },
-        { id: 5, name: "难度递进", active: true, description: "题目难度逐步提升，培养解题信心" },
-        { id: 6, name: "错题重现", active: false, description: "重复错题，直到掌握" }
-    ]
+    // 状态信息
+    property string statusMessage: ""
+    property bool isSuccess: false
+    
+    // 题目配置
+    property int dailyQuestionCount: 20
+    property var questionBanks: []
+    property var bankDistributions: ({})
+    
+    Component.onCompleted: {
+        // 从数据库加载设置
+        loadSettings()
+        
+        // 加载题库列表
+        loadQuestionBanks()
+    }
     
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 20
         spacing: 15
         
-        Text {
-            text: "出题策略"
-            font.pixelSize: 20
-            font.bold: true
-            color: "#333333"
-            Layout.bottomMargin: 10
-        }
-        
-        Text {
-            text: "配置智能出题的策略，系统将根据选定的策略组合生成题目"
-            font.pixelSize: 14
-            color: "#666666"
-            Layout.bottomMargin: 20
-        }
-        
-        GridLayout {
-            columns: 2
-            columnSpacing: 20
-            rowSpacing: 20
+        // 星火日课配置区
+        Rectangle {
             Layout.fillWidth: true
+            Layout.preferredHeight: 120
+            color: "#44ffffff"
+            radius: 10
             
-            Repeater {
-                model: strategies
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 15
+                spacing: 15
                 
-                Rectangle {
+                Text {
+                    text: "星火日课配置"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 20
+                    font.bold: true
+                    color: "white"
+                }
+                
+                // 每日题目数量设置
+                RowLayout {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 160
-                    radius: 6
-                    color: modelData.active ? "#f5f9ff" : "#ffffff"
-                    border.color: modelData.active ? "#2c70b7" : "#e0e0e0"
-                    border.width: 1
+                    height: 40
+                    spacing: 10
                     
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            // 切换策略激活状态的逻辑
-                            console.log("策略切换: " + modelData.name)
-                        }
+                    Text {
+                        text: "题目数量:"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 18
+                        color: "white"
+                        Layout.preferredWidth: 120
+                        Layout.preferredHeight: 40
+                        verticalAlignment: Text.AlignVCenter
                     }
                     
-                    ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: 15
+                    RowLayout {
+                        Layout.fillWidth: true
                         spacing: 10
                         
-                        RowLayout {
+                        Slider {
+                            id: questionCountSlider
+                            from: 5
+                            to: 50
+                            value: dailyQuestionCount
+                            stepSize: 1
                             Layout.fillWidth: true
                             
-                            Text {
-                                text: modelData.name
-                                font.pixelSize: 16
-                                font.bold: true
-                                color: "#333333"
+                            onValueChanged: {
+                                dailyQuestionCount = value
+                                updateDistributions()
                             }
                             
-                            Item { Layout.fillWidth: true }
-                            
-                            Switch {
-                                checked: modelData.active
-                                onCheckedChanged: {
-                                    // 切换状态处理逻辑
+                            background: Rectangle {
+                                x: questionCountSlider.leftPadding
+                                y: questionCountSlider.topPadding + questionCountSlider.availableHeight / 2 - height / 2
+                                width: questionCountSlider.availableWidth
+                                height: 4
+                                radius: 2
+                                color: "#88ffffff"
+                                
+                                Rectangle {
+                                    width: questionCountSlider.visualPosition * parent.width
+                                    height: parent.height
+                                    color: "#2c70b7"
+                                    radius: 2
                                 }
                             }
-                        }
-                        
-                        Rectangle {
-                            Layout.fillWidth: true
-                            height: 1
-                            color: "#e0e0e0"
+                            
+                            handle: Rectangle {
+                                x: questionCountSlider.leftPadding + questionCountSlider.visualPosition * (questionCountSlider.availableWidth - width)
+                                y: questionCountSlider.topPadding + questionCountSlider.availableHeight / 2 - height / 2
+                                width: 16
+                                height: 16
+                                radius: 8
+                                color: questionCountSlider.pressed ? "#1e5b94" : "#2c70b7"
+                                border.color: "#2c70b7"
+                            }
                         }
                         
                         Text {
-                            text: modelData.description
-                            font.pixelSize: 14
-                            color: "#666666"
-                            wrapMode: Text.Wrap
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                        }
-                        
-                        Button {
-                            text: "配置参数"
-                            implicitWidth: 100
-                            implicitHeight: 36
-                            
-                            background: Rectangle {
-                                color: modelData.active ? "#2c70b7" : "#f5f5f5"
-                                border.color: modelData.active ? "#2c70b7" : "#d0d0d0"
-                                radius: 4
-                            }
-                            
-                            contentItem: Text {
-                                text: parent.text
-                                font.pixelSize: 14
-                                color: modelData.active ? "white" : "#444444"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                            }
-                            
-                            onClicked: {
-                                // 打开配置对话框
-                                configDialog.strategyId = modelData.id
-                                configDialog.strategyName = modelData.name
-                                configDialog.open()
-                            }
+                            text: dailyQuestionCount
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 16
+                            color: "white"
+                            Layout.preferredWidth: 30
+                            horizontalAlignment: Text.AlignRight
                         }
                     }
                 }
             }
         }
         
-        Item { Layout.fillHeight: true }
-        
+        // 题库分配区 - 让它填充中间区域
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 80
-            color: "#f5f5f5"
-            radius: 6
+            Layout.fillHeight: true
+            color: "#44ffffff"
+            radius: 10
             
-            RowLayout {
+            ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 15
+                spacing: 15
                 
-                Image {
-                    source: "qrc:/images/face_icon.png"
-                    sourceSize.width: 32
-                    sourceSize.height: 32
-                    Layout.preferredWidth: 32
-                    Layout.preferredHeight: 32
+                Text {
+                    text: "题库分配"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 20
+                    font.bold: true
+                    color: "white"
+                }
+                
+                Text {
+                    text: "设置每个题库的题目分配数量，总和应等于星火日课题目数量"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 14
+                    color: "white"
+                    opacity: 0.8
+                }
+                
+                // 添加一个平均分配按钮
+                RowLayout {
+                    Layout.fillWidth: true
                     
                     Text {
-                        visible: parent.status !== Image.Ready
-                        text: "ℹ️"
-                        font.pixelSize: 24
-                        anchors.centerIn: parent
-                    }
-                }
-                
-                Text {
-                    text: "提示：多种策略可以同时激活，系统将智能融合各策略进行出题。若需自定义策略，请点击右侧按钮。"
-                    font.pixelSize: 14
-                    color: "#666666"
-                    wrapMode: Text.Wrap
-                    Layout.fillWidth: true
-                }
-                
-                Button {
-                    text: "自定义策略"
-                    implicitWidth: 120
-                    implicitHeight: 36
-                    
-                    background: Rectangle {
-                        color: "#ffffff"
-                        border.color: "#2c70b7"
-                        border.width: 1
-                        radius: 4
-                    }
-                    
-                    contentItem: Text {
-                        text: parent.text
+                        id: hintText
+                        text: "提示: 分配总和必须等于题目数量 " + dailyQuestionCount
+                        font.family: "阿里妈妈数黑体"
                         font.pixelSize: 14
-                        color: "#2c70b7"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                        font.bold: true
+                        color: isDistributionValid() ? "#99ff99" : "#ff9999"
                     }
                     
-                    onClicked: {
-                        // 打开自定义策略对话框
-                        customStrategyDialog.open()
-                    }
-                }
-            }
-        }
-        
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.topMargin: 15
-            
-            Item { Layout.fillWidth: true }
-            
-            Button {
-                text: "应用策略"
-                implicitWidth: 120
-                implicitHeight: 40
-                
-                background: Rectangle {
-                    color: "#2c70b7"
-                    radius: 4
-                }
-                
-                contentItem: Text {
-                    text: parent.text
-                    font.pixelSize: 14
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                
-                onClicked: {
-                    // 应用策略逻辑
-                    console.log("应用策略")
-                }
-            }
-        }
-    }
-    
-    // 策略配置对话框
-    Dialog {
-        id: configDialog
-        title: "策略配置: " + strategyName
-        modal: true
-        width: 500
-        height: 400
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        
-        property int strategyId: 0
-        property string strategyName: ""
-        
-        contentItem: ColumnLayout {
-            spacing: 20
-            anchors.margins: 20
-            
-            Text {
-                text: "调整 \"" + configDialog.strategyName + "\" 策略的参数设置"
-                font.pixelSize: 14
-                color: "#666666"
-                Layout.fillWidth: true
-            }
-            
-            GridLayout {
-                columns: 2
-                columnSpacing: 15
-                rowSpacing: 15
-                Layout.fillWidth: true
-                
-                Text {
-                    text: "优先级:"
-                    font.pixelSize: 14
-                    color: "#333333"
-                }
-                
-                ComboBox {
-                    model: ["高", "中", "低"]
-                    currentIndex: 0
-                    Layout.fillWidth: true
-                }
-                
-                Text {
-                    text: "触发频率:"
-                    font.pixelSize: 14
-                    color: "#333333"
-                }
-                
-                Slider {
-                    from: 0
-                    to: 100
-                    value: 50
-                    Layout.fillWidth: true
-                    
-                    background: Rectangle {
-                        x: parent.leftPadding
-                        y: parent.topPadding + parent.availableHeight / 2 - height / 2
-                        width: parent.availableWidth
-                        height: 4
-                        radius: 2
-                        color: "#e0e0e0"
-                        
-                        Rectangle {
-                            width: parent.parent.visualPosition * parent.width
-                            height: parent.height
-                            color: "#2c70b7"
-                            radius: 2
-                        }
-                    }
-                    
-                    handle: Rectangle {
-                        x: parent.leftPadding + parent.visualPosition * (parent.availableWidth - width)
-                        y: parent.topPadding + parent.availableHeight / 2 - height / 2
-                        width: 16
-                        height: 16
-                        radius: 8
-                        color: parent.pressed ? "#1e5b94" : "#2c70b7"
-                        border.color: "#2c70b7"
-                    }
-                }
-                
-                Text {
-                    text: "应用科目:"
-                    font.pixelSize: 14
-                    color: "#333333"
-                }
-                
-                Flow {
-                    Layout.fillWidth: true
-                    spacing: 10
-                    
-                    CheckBox { text: "物理"; checked: true }
-                    CheckBox { text: "化学"; checked: true }
-                    CheckBox { text: "数学"; checked: true }
-                    CheckBox { text: "生物"; checked: false }
-                }
-                
-                Text {
-                    text: "适用题型:"
-                    font.pixelSize: 14
-                    color: "#333333"
-                }
-                
-                Flow {
-                    Layout.fillWidth: true
-                    spacing: 10
-                    
-                    CheckBox { text: "选择题"; checked: true }
-                    CheckBox { text: "填空题"; checked: true }
-                    CheckBox { text: "简答题"; checked: true }
-                    CheckBox { text: "计算题"; checked: true }
-                }
-                
-                Text {
-                    text: "高级参数:"
-                    font.pixelSize: 14
-                    color: "#333333"
-                }
-                
-                Button {
-                    text: "高级设置"
-                    implicitWidth: 100
-                    implicitHeight: 36
-                    
-                    background: Rectangle {
-                        color: "#f5f5f5"
-                        border.color: "#d0d0d0"
-                        border.width: 1
-                        radius: 4
-                    }
-                    
-                    contentItem: Text {
-                        text: parent.text
-                        font.pixelSize: 14
-                        color: "#444444"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                }
-            }
-        }
-        
-        footer: RowLayout {
-            spacing: 10
-            Layout.fillWidth: true
-            anchors.margins: 10
-            
-            Item { Layout.fillWidth: true }
-            
-            Button {
-                text: "取消"
-                implicitWidth: 100
-                implicitHeight: 40
-                
-                background: Rectangle {
-                    color: "#f0f0f0"
-                    border.color: "#d0d0d0"
-                    border.width: 1
-                    radius: 4
-                }
-                
-                contentItem: Text {
-                    text: parent.text
-                    font.pixelSize: 14
-                    color: "#444444"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                
-                onClicked: configDialog.reject()
-            }
-            
-            Button {
-                text: "保存"
-                implicitWidth: 100
-                implicitHeight: 40
-                
-                background: Rectangle {
-                    color: "#2c70b7"
-                    radius: 4
-                }
-                
-                contentItem: Text {
-                    text: parent.text
-                    font.pixelSize: 14
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                
-                onClicked: configDialog.accept()
-            }
-        }
-    }
-    
-    // 自定义策略对话框
-    Dialog {
-        id: customStrategyDialog
-        title: "自定义策略"
-        modal: true
-        width: 500
-        height: 450
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-        
-        contentItem: ColumnLayout {
-            spacing: 20
-            anchors.margins: 20
-            
-            Text {
-                text: "创建新的出题策略"
-                font.pixelSize: 14
-                color: "#666666"
-                Layout.fillWidth: true
-            }
-            
-            GridLayout {
-                columns: 2
-                columnSpacing: 15
-                rowSpacing: 15
-                Layout.fillWidth: true
-                
-                Text {
-                    text: "策略名称:"
-                    font.pixelSize: 14
-                    color: "#333333"
-                }
-                
-                TextField {
-                    placeholderText: "输入策略名称"
-                    Layout.fillWidth: true
-                }
-                
-                Text {
-                    text: "策略描述:"
-                    font.pixelSize: 14
-                    color: "#333333"
-                }
-                
-                TextArea {
-                    placeholderText: "输入策略描述"
-                    wrapMode: TextArea.Wrap
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 80
-                }
-                
-                Text {
-                    text: "构建规则:"
-                    font.pixelSize: 14
-                    color: "#333333"
-                    Layout.alignment: Qt.AlignTop
-                }
-                
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 10
-                    
-                    ComboBox {
-                        model: ["按知识点分布", "按题型分布", "按难度分布", "按错题率分布"]
-                        Layout.fillWidth: true
-                    }
-                    
-                    ComboBox {
-                        model: ["优先最近学习内容", "优先薄弱环节", "平均分布", "自定义权重"]
-                        Layout.fillWidth: true
-                    }
+                    Item { Layout.fillWidth: true }
                     
                     Button {
-                        text: "添加规则"
+                        text: "平均分配"
                         implicitWidth: 100
-                        implicitHeight: 36
+                        implicitHeight: 30
                         
                         background: Rectangle {
-                            color: "#f5f5f5"
-                            border.color: "#d0d0d0"
-                            border.width: 1
+                            color: "#2c70b7"
                             radius: 4
                         }
                         
                         contentItem: Text {
                             text: parent.text
+                            font.family: "阿里妈妈数黑体"
                             font.pixelSize: 14
-                            color: "#444444"
+                            color: "white"
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        onClicked: {
+                            distributeEvenly()
+                            bankListView.model = null
+                            bankListView.model = questionBanks
+                            statusUpdateTimer.restart()
+                        }
+                    }
+                }
+                
+                // 题库分配列表 - 让它填充剩余空间
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+                    clip: true
+                    
+                    ListView {
+                        id: bankListView
+                        width: parent.width
+                        height: parent.height
+                        model: questionBanks
+                        spacing: 8
+                        
+                        delegate: Rectangle {
+                            width: bankListView.width - 20
+                            height: 60
+                            color: "#33ffffff"
+                            radius: 6
+                            
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                spacing: 10
+                                
+                                Text {
+                                    text: modelData.name
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    Layout.preferredWidth: 160
+                                    elide: Text.ElideRight
+                                }
+                                
+                                Text {
+                                    text: "题库总量: " + modelData.count + "题"
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 14
+                                    color: "white"
+                                    opacity: 0.8
+                                    Layout.preferredWidth: 120
+                                }
+                                
+                                Text {
+                                    text: "分配:"
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 14
+                                    color: "white"
+                                }
+                                
+                                SpinBox {
+                                    id: distributionSpinBox
+                                    from: 0
+                                    to: Math.min(dailyQuestionCount, modelData.count)
+                                    value: getBankDistribution(modelData.id)
+                                    Layout.preferredWidth: 120
+                                    
+                                    onValueChanged: {
+                                        updateBankDistribution(modelData.id, value)
+                                    }
+                                    
+                                    contentItem: TextInput {
+                                        z: 2
+                                        text: distributionSpinBox.textFromValue(distributionSpinBox.value, distributionSpinBox.locale)
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 14
+                                        color: "white"
+                                        selectionColor: "#2c70b7"
+                                        selectedTextColor: "white"
+                                        horizontalAlignment: Qt.AlignHCenter
+                                        verticalAlignment: Qt.AlignVCenter
+                                        readOnly: !distributionSpinBox.editable
+                                        validator: distributionSpinBox.validator
+                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                    }
+                                    
+                                    up.indicator: Rectangle {
+                                        x: parent.width - width
+                                        height: parent.height
+                                        implicitWidth: 30
+                                        implicitHeight: 30
+                                        color: distributionSpinBox.up.pressed ? "#1e5b94" : "transparent"
+                                        border.color: "transparent"
+                                        
+                                        Text {
+                                            text: "+"
+                                            font.pixelSize: 16
+                                            color: "white"
+                                            anchors.centerIn: parent
+                                        }
+                                    }
+                                    
+                                    down.indicator: Rectangle {
+                                        x: 0
+                                        height: parent.height
+                                        implicitWidth: 30
+                                        implicitHeight: 30
+                                        color: distributionSpinBox.down.pressed ? "#1e5b94" : "transparent"
+                                        border.color: "transparent"
+                                        
+                                        Text {
+                                            text: "-"
+                                            font.pixelSize: 16
+                                            color: "white"
+                                            anchors.centerIn: parent
+                                        }
+                                    }
+                                    
+                                    background: Rectangle {
+                                        implicitWidth: 120
+                                        implicitHeight: 30
+                                        color: "#22ffffff"
+                                        radius: 4
+                                    }
+                                }
+                                
+                                Text {
+                                    text: "题"
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 14
+                                    color: "white"
+                                }
+                                
+                                Item { Layout.fillWidth: true }
+                            }
+                        }
+                    }
+                }
+                
+                // 分配信息
+                Rectangle {
+                    id: distributionStatusRect
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 40
+                    color: isDistributionValid() ? "#33009900" : "#33990000"
+                    radius: 4
+                    
+                    Text {
+                        id: distributionStatusText
+                        anchors.centerIn: parent
+                        text: getDistributionStatus()
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 14
+                        color: "white"
+                    }
+                    
+                    // 添加计时器用于延迟更新状态显示
+                    Timer {
+                        id: statusUpdateTimer
+                        interval: 50
+                        repeat: false
+                        onTriggered: {
+                            distributionStatusText.text = getDistributionStatus()
+                            // 更新状态颜色
+                            distributionStatusRect.color = isDistributionValid() ? "#33009900" : "#33990000"
                         }
                     }
                 }
             }
         }
         
-        footer: RowLayout {
-            spacing: 10
+        // 底部操作区 - 固定在底部
+        Rectangle {
             Layout.fillWidth: true
-            anchors.margins: 10
+            Layout.preferredHeight: 70
+            color: "#44ffffff"
+            radius: 10
             
-            Item { Layout.fillWidth: true }
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: 15
+                spacing: 15
+                
+                Item { Layout.fillWidth: true }
+                
+                // 保存按钮
+                Button {
+                    id: saveButton
+                    width: 160
+                    height: 40
+                    enabled: isDistributionValid()
+                    
+                    background: Rectangle {
+                        color: parent.enabled ? "#2c70b7" : "#88888888"
+                        radius: 4
+                    }
+                    
+                    contentItem: Text {
+                        text: "保存设置"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 18
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    onClicked: {
+                        saveSettings()
+                    }
+                }
+            }
+        }
+        
+        // 状态信息显示
+        Rectangle {
+            Layout.fillWidth: true
+            height: 40
+            color: isSuccess ? "#3366cc33" : "#33cc3333"
+            radius: 4
+            visible: statusMessage !== ""
             
-            Button {
-                text: "取消"
-                implicitWidth: 100
-                implicitHeight: 40
-                
-                background: Rectangle {
-                    color: "#f0f0f0"
-                    border.color: "#d0d0d0"
-                    border.width: 1
-                    radius: 4
-                }
-                
-                contentItem: Text {
-                    text: parent.text
-                    font.pixelSize: 14
-                    color: "#444444"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                
-                onClicked: customStrategyDialog.reject()
+            Text {
+                anchors.centerIn: parent
+                text: statusMessage
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 14
+                color: "white"
             }
             
-            Button {
-                text: "创建"
-                implicitWidth: 100
-                implicitHeight: 40
-                
-                background: Rectangle {
-                    color: "#2c70b7"
-                    radius: 4
+            // 3秒后自动隐藏消息
+            Timer {
+                running: statusMessage !== ""
+                interval: 3000
+                onTriggered: {
+                    statusMessage = ""
                 }
-                
-                contentItem: Text {
-                    text: parent.text
-                    font.pixelSize: 14
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                
-                onClicked: customStrategyDialog.accept()
             }
+        }
+    }
+    
+    // 从数据库加载设置
+    function loadSettings() {
+        // 加载每日题目数量
+        var count = dbManager.getSetting("daily_question_count", "20")
+        dailyQuestionCount = parseInt(count)
+        
+        // 加载题库分配设置
+        var distributionsStr = dbManager.getSetting("question_bank_distributions", "{}")
+        try {
+            bankDistributions = JSON.parse(distributionsStr)
+        } catch (e) {
+            console.error("解析题库分配设置失败:", e)
+            bankDistributions = {}
+        }
+        
+        // 验证数据的有效性
+        validateSettings()
+        
+        console.log("已从数据库加载设置")
+    }
+    
+    // 验证设置的有效性
+    function validateSettings() {
+        // 验证dailyQuestionCount的范围
+        if (isNaN(dailyQuestionCount) || dailyQuestionCount < 5 || dailyQuestionCount > 50) {
+            console.warn("每日题目数量无效，重置为默认值20")
+            dailyQuestionCount = 20
+        }
+        
+        // 验证bankDistributions中的每个分配数量
+        var needsUpdate = false
+        for (var bankId in bankDistributions) {
+            var value = bankDistributions[bankId]
+            if (isNaN(value) || value < 0) {
+                console.warn("题库分配数量无效，重置为0:", bankId)
+                bankDistributions[bankId] = 0
+                needsUpdate = true
+            }
+        }
+        
+        // 确保分配总和等于题目数量
+        ensureDistributionMatchesTotal()
+        
+        // 如果有无效数据被修正，更新一下分配状态
+        if (needsUpdate) {
+            statusUpdateTimer.restart()
+        }
+    }
+    
+    // 确保分配总和与题目总数一致
+    function ensureDistributionMatchesTotal() {
+        var total = getTotalDistribution()
+        console.log("当前总分配:", total, "目标总数:", dailyQuestionCount)
+        
+        if (total === 0 && questionBanks.length > 0) {
+            // 如果当前没有分配且有题库，则进行平均分配
+            distributeEvenly()
+            return
+        }
+        
+        if (total !== dailyQuestionCount) {
+            console.warn("分配总和不等于题目总数，将进行调整")
+            
+            if (total < dailyQuestionCount) {
+                // 如果总分配少于题目总数，把剩余题目分配给第一个题库
+                var remaining = dailyQuestionCount - total
+                if (questionBanks.length > 0) {
+                    var firstBankId = questionBanks[0].id
+                    var currentValue = bankDistributions[firstBankId] || 0
+                    bankDistributions[firstBankId] = currentValue + remaining
+                    console.log("将剩余", remaining, "题分配给题库", firstBankId)
+                }
+            } else {
+                // 如果总分配多于题目总数，按比例缩减
+                adjustDistributionsProportionally()
+            }
+        }
+    }
+    
+    // 平均分配题目到所有题库
+    function distributeEvenly() {
+        if (questionBanks.length === 0) return
+        
+        // 计算平均分配数和余数
+        var avgCount = Math.floor(dailyQuestionCount / questionBanks.length)
+        var remainder = dailyQuestionCount % questionBanks.length
+        
+        console.log("平均分配每个题库", avgCount, "题，余", remainder, "题")
+        
+        // 重置分配
+        bankDistributions = {}
+        
+        // 为每个题库分配平均数量的题目
+        for (var i = 0; i < questionBanks.length; i++) {
+            var bankId = questionBanks[i].id
+            var count = avgCount
+            
+            // 将余数分配给前几个题库
+            if (i < remainder) {
+                count += 1
+            }
+            
+            // 确保不超过题库题目总数
+            count = Math.min(count, questionBanks[i].count)
+            
+            bankDistributions[bankId] = count
+        }
+        
+        // 确保总和等于dailyQuestionCount
+        ensureDistributionMatchesTotal()
+    }
+    
+    // 按比例调整分配
+    function adjustDistributionsProportionally() {
+        var total = getTotalDistribution()
+        if (total === 0) return
+        
+        var ratio = dailyQuestionCount / total
+        console.log("按比例调整分配，比率:", ratio)
+        
+        // 首先按比例缩减所有分配
+        var newDistributions = {}
+        var newTotal = 0
+        
+        for (var bankId in bankDistributions) {
+            var adjusted = Math.floor(bankDistributions[bankId] * ratio)
+            newDistributions[bankId] = adjusted
+            newTotal += adjusted
+        }
+        
+        // 处理由于取整导致的差异
+        var diff = dailyQuestionCount - newTotal
+        
+        if (diff > 0) {
+            // 依次给每个有分配的题库增加1题，直到达到总数
+            var bankIds = Object.keys(newDistributions)
+            for (var i = 0; i < diff && i < bankIds.length; i++) {
+                newDistributions[bankIds[i]] += 1
+            }
+        }
+        
+        // 更新分配
+        bankDistributions = newDistributions
+        
+        // 更新保存按钮状态
+        saveButton.enabled = isDistributionValid()
+    }
+    
+    // 加载题库列表
+    function loadQuestionBanks() {
+        questionBanks = dbManager.getAllQuestionBanks()
+        console.log("已加载题库列表, 共", questionBanks.length, "个题库")
+    }
+    
+    // 获取题库分配数量
+    function getBankDistribution(bankId) {
+        return bankDistributions[bankId] || 0
+    }
+    
+    // 更新题库分配数量
+    function updateBankDistribution(bankId, value) {
+        bankDistributions[bankId] = value
+        console.log("更新题库分配:", bankId, "=>", value)
+        
+        // 检查分配是否有效
+        var isValid = isDistributionValid()
+        
+        // 更新UI状态
+        hintText.color = isValid ? "#99ff99" : "#ff9999"
+        saveButton.enabled = isValid
+        
+        // 触发状态更新，刷新分配信息显示
+        statusUpdateTimer.restart()
+    }
+    
+    // 更新分配，确保总和不超过每日题目数量
+    function updateDistributions() {
+        // 如果总分配超过了每日题目数量，按比例缩减
+        var total = getTotalDistribution()
+        if (total > dailyQuestionCount) {
+            var ratio = dailyQuestionCount / total
+            
+            for (var bankId in bankDistributions) {
+                bankDistributions[bankId] = Math.floor(bankDistributions[bankId] * ratio)
+            }
+            
+            // 刷新列表视图
+            bankListView.model = null
+            bankListView.model = questionBanks
+        }
+        
+        // 检查分配是否有效并更新保存按钮状态
+        var isValid = isDistributionValid()
+        hintText.color = isValid ? "#99ff99" : "#ff9999"
+        saveButton.enabled = isValid
+        
+        // 触发状态更新
+        statusUpdateTimer.restart()
+    }
+    
+    // 获取总分配数量
+    function getTotalDistribution() {
+        var total = 0
+        for (var bankId in bankDistributions) {
+            total += bankDistributions[bankId]
+        }
+        return total
+    }
+    
+    // 检查分配是否有效
+    function isDistributionValid() {
+        return getTotalDistribution() === dailyQuestionCount
+    }
+    
+    // 获取分配状态描述
+    function getDistributionStatus() {
+        var total = getTotalDistribution()
+        var remaining = dailyQuestionCount - total
+        
+        if (remaining === 0) {
+            return "题目分配完成，共 " + dailyQuestionCount + " 题"
+        } else if (remaining > 0) {
+            return "还需分配 " + remaining + " 题，当前已分配 " + total + " 题，共需 " + dailyQuestionCount + " 题"
+        } else {
+            return "分配超出 " + Math.abs(remaining) + " 题，当前已分配 " + total + " 题，共需 " + dailyQuestionCount + " 题"
+        }
+    }
+    
+    // 保存设置
+    function saveSettings() {
+        if (!isDistributionValid()) {
+            statusMessage = "分配无效，请调整后再保存"
+            isSuccess = false
+            return
+        }
+        
+        // 保存每日题目数量
+        var countSuccess = dbManager.setSetting("daily_question_count", dailyQuestionCount.toString())
+        
+        // 保存题库分配设置
+        var distributionsStr = JSON.stringify(bankDistributions)
+        var distributionsSuccess = dbManager.setSetting("question_bank_distributions", distributionsStr)
+        
+        // 保存星火日课启用状态
+        var enableSuccess = dbManager.setSetting("spark_daily_enabled", "true")
+        
+        // 保存设置时间
+        var now = new Date()
+        var timeStr = now.toISOString()
+        var timeSuccess = dbManager.setSetting("question_settings_updated_time", timeStr)
+        
+        if (countSuccess && distributionsSuccess && enableSuccess) {
+            statusMessage = "保存成功！设置已存入数据库"
+            isSuccess = true
+            console.log("成功保存出题策略设置:", timeStr)
+        } else {
+            statusMessage = "保存失败，请重试"
+            isSuccess = false
+            console.error("保存设置失败:", countSuccess, distributionsSuccess, enableSuccess)
         }
     }
 } 
