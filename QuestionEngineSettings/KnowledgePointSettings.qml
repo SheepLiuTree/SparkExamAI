@@ -269,6 +269,31 @@ Rectangle {
                         }
                     }
                     
+                    // 清空列表按钮
+                    Button {
+                        text: "清空列表"
+                        implicitWidth: 120
+                        implicitHeight: 30
+                        
+                        background: Rectangle {
+                            color: "#cc3333"
+                            radius: 4
+                        }
+                        
+                        contentItem: Text {
+                            text: parent.text
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        
+                        onClicked: {
+                            clearAllKnowledgePoints()
+                        }
+                    }
+                    
                     // 智点导入按钮
                     Button {
                         text: "导入智点"
@@ -347,6 +372,7 @@ Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                     clip: true
                     
                     ListView {
@@ -530,6 +556,29 @@ Rectangle {
             statusMessage = "保存失败，请重试"
             isSuccess = false
             console.error("保存设置失败")
+        }
+    }
+    
+    // 清空所有智点
+    function clearAllKnowledgePoints() {
+        // 从数据库清空所有智点
+        var success = dbManager.clearAllKnowledgePoints()
+        
+        if (success) {
+            // 清空本地列表
+            knowledgePoints = []
+            
+            // 刷新列表
+            knowledgePointListView.model = null
+            knowledgePointListView.model = knowledgePoints
+            
+            statusMessage = "已清空所有智点"
+            isSuccess = true
+            console.log("已清空所有智点")
+        } else {
+            statusMessage = "清空失败，请重试"
+            isSuccess = false
+            console.error("清空智点列表失败")
         }
     }
 } 

@@ -143,6 +143,9 @@ public:
     
     // 批量导入智点
     Q_INVOKABLE bool importKnowledgePoints(const QVariantList &points);
+    
+    // 清空所有智点
+    Q_INVOKABLE bool clearAllKnowledgePoints();
 
 private:
     QSqlDatabase m_database;

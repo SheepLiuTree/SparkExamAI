@@ -1271,6 +1271,29 @@ bool DatabaseManager::importKnowledgePoints(const QVariantList &points)
     }
 }
 
+// 清空所有智点
+bool DatabaseManager::clearAllKnowledgePoints()
+{
+    if (!m_database.isOpen()) {
+        qDebug() << "数据库未打开，尝试重新打开";
+        if (!m_database.open()) {
+            qDebug() << "无法打开数据库:" << m_database.lastError().text();
+            return false;
+        }
+    }
+    
+    QSqlQuery query(m_database);
+    query.prepare("DELETE FROM knowledge_points");
+    
+    if (!query.exec()) {
+        qDebug() << "清空智点列表失败:" << query.lastError().text();
+        return false;
+    }
+    
+    qDebug() << "成功清空所有智点";
+    return true;
+}
+
 QString getFieldValue(const QVariantMap &map, const QStringList &possibleKeys)
 {
     for (const QString &key : possibleKeys) {
