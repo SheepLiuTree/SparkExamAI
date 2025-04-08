@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QIcon>
 #include "FileManager.h"
 #include "DatabaseManager.h"
 #include "FaceRecognizer.h"
@@ -11,7 +12,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     QGuiApplication app(argc, argv);
-
+    
+    // 设置应用程序图标
+    app.setWindowIcon(QIcon(":/images/SparkExamAI.ico"));
+    
     QQmlApplicationEngine engine;
     
     // 创建FileManager实例并注册到QML上下文

@@ -39,6 +39,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Sql Multimedia
 set(PROJECT_SOURCES
         main.cpp
         qml.qrc
+        app_icon.rc
         FileManager.cpp
         FileManager.h
         DatabaseManager.cpp

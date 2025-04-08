@@ -8,7 +8,7 @@ Window {
     height: 480
     visible: true
     visibility: Window.Maximized
-    title: qsTr("Hello World")
+    title: qsTr("星火智能评测系统")
 
     Image {
         id: background

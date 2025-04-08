@@ -1,0 +1,140 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-77870e7290dcfc3fb82c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						3,
+						4,
+						5
+					]
+				},
+				{
+					"build" : "QXlsx",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-QXlsx-Debug-6fc2eb98daad08ebe38c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "QXlsx",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "SparkExamAI",
+					"targetIndexes" : 
+					[
+						3,
+						4,
+						5
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "QXlsx",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "QXlsx::@246fd2dd3a984c2618f9",
+					"jsonFile" : "target-QXlsx-Debug-c543ccce06a6c8105c05.json",
+					"name" : "QXlsx",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "QXlsx_autogen::@246fd2dd3a984c2618f9",
+					"jsonFile" : "target-QXlsx_autogen-Debug-47ce2b9a06710a650537.json",
+					"name" : "QXlsx_autogen",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "QXlsx_autogen_timestamp_deps::@246fd2dd3a984c2618f9",
+					"jsonFile" : "target-QXlsx_autogen_timestamp_deps-Debug-b8aa7dab17875044aa37.json",
+					"name" : "QXlsx_autogen_timestamp_deps",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SparkExamAI::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SparkExamAI-Debug-0653587032780a5dbc6f.json",
+					"name" : "SparkExamAI",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SparkExamAI_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SparkExamAI_autogen-Debug-92e71d75aef602602614.json",
+					"name" : "SparkExamAI_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "SparkExamAI_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SparkExamAI_autogen_timestamp_deps-Debug-257ca2d4f79e439a667e.json",
+					"name" : "SparkExamAI_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/build",
+		"source" : "E:/SparkExamAI/SparkExamAI/SparkExamAI"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
