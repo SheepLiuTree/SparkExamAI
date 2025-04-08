@@ -273,6 +273,160 @@ Window {
             }
         }
 
+        // 中间列
+        Rectangle {
+            id: middle_column
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: function_menu_background.right
+            anchors.right: personal_page_background.left
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: "transparent"
+
+            // 标题背景图
+            Image {
+                id: title_bg_image
+                source: "qrc:/images/title_bg.png"
+                width: 300
+                height: 150
+                fillMode: Image.PreserveAspectFit
+                anchors.horizontalCenter: parent.horizontalCenter   
+                anchors.bottom: knowledge_point_bg_image.top
+                anchors.bottomMargin: -50
+                // 智点速览文本
+                Text {
+                    text: "智 点 速 览"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 24
+                    color: "white"
+                    anchors.centerIn: parent
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            // 知识点背景图
+            Image {
+                id: knowledge_point_bg_image
+                source: "qrc:/images/KnowledgePoint_bg.png"
+                // 设置宽度为窗口的三分之一
+                width: parent.width / 8 * 5 
+                height: parent.height / 3
+                // fillMode: Image.PreserveAspectFit
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: -parent.height / 180
+
+                // 智点标题
+                Text {
+                    id: knowledge_point_title
+                    anchors.top: parent.top
+                    anchors.topMargin: 20
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "加载中..."
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 24
+                    color: "white"
+                }
+
+                // 智点内容
+                Text {
+                    id: knowledge_point_content
+                    anchors.top: knowledge_point_title.bottom
+                    anchors.topMargin: 20
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.leftMargin: parent.width / 10
+                    anchors.rightMargin: parent.width / 10
+                    text: "正在加载智点内容..."
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 20
+                    color: "white"
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                // 智点切换定时器
+                Timer {
+                    id: knowledge_point_timer
+                    interval: 7000  // 默认7秒
+                    repeat: true
+                    running: false  // 初始设置为不运行
+                }
+
+                // 使用Connections来处理定时器触发
+                Connections {
+                    target: knowledge_point_timer
+                    function onTriggered() {
+                        console.log("定时器触发，切换到下一个智点")
+                        knowledge_point_bg_image.switchToNextKnowledgePoint()
+                    }
+                }
+
+                // 组件加载完成后初始化
+                Component.onCompleted: {
+                    console.log("智点组件初始化")
+                    // 从数据库加载切换间隔设置
+                    var interval = dbManager.getSetting("knowledge_point_switch_interval", "7")
+                    knowledge_point_timer.interval = parseInt(interval) * 1000
+                    console.log("设置切换间隔为:", interval, "秒")
+                    
+                    // 加载第一个智点
+                    loadKnowledgePoints()
+                }
+
+                // 加载智点列表
+                function loadKnowledgePoints() {
+                    console.log("开始加载智点列表")
+                    var points = dbManager.getAllKnowledgePoints()
+                    console.log("从数据库获取到", points.length, "个智点")
+                    
+                    if (points.length > 0) {
+                        currentKnowledgePointIndex = 0
+                        displayKnowledgePoint(points[currentKnowledgePointIndex])
+                        // 启动定时器
+                        knowledge_point_timer.start()
+                    } else {
+                        knowledge_point_title.text = "暂无智点"
+                        knowledge_point_content.text = "请先在题策引擎中添加智点"
+                    }
+                }
+
+                // 切换到下一个智点
+                function switchToNextKnowledgePoint() {
+                    console.log("切换到下一个智点")
+                    var points = dbManager.getAllKnowledgePoints()
+                    if (points.length > 0) {
+                        currentKnowledgePointIndex = (currentKnowledgePointIndex + 1) % points.length
+                        displayKnowledgePoint(points[currentKnowledgePointIndex])
+                        console.log("显示智点:", points[currentKnowledgePointIndex].title)
+                    }
+                }
+
+                // 显示智点
+                function displayKnowledgePoint(point) {
+                    knowledge_point_title.text = point.title
+                    knowledge_point_content.text = point.content
+                    console.log("更新显示智点 - 标题:", point.title)
+                }
+
+                // 当前显示的智点索引
+                property int currentKnowledgePointIndex: 0
+
+                // 确保组件可见时定时器运行，不可见时停止
+                onVisibleChanged: {
+                    if (visible) {
+                        // 每次可见时重新获取最新的间隔设置
+                        var interval = dbManager.getSetting("knowledge_point_switch_interval", "7")
+                        knowledge_point_timer.interval = parseInt(interval) * 1000
+                        console.log("更新定时器间隔为:", interval, "秒")
+                        knowledge_point_timer.restart()
+                    } else {
+                        knowledge_point_timer.stop()
+                    }
+                }
+            }            
+        }
+
         Image {
             id: personal_page_background
             anchors.top: parent.top

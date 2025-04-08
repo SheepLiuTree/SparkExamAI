@@ -198,7 +198,14 @@ Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                     clip: true
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        onPressed: mouse.accepted = false
+                        onReleased: mouse.accepted = false
+                    }
                     
                     ListView {
                         id: bankListView
@@ -206,6 +213,7 @@ Rectangle {
                         height: parent.height
                         model: questionBanks
                         spacing: 8
+                        interactive: true
                         
                         delegate: Rectangle {
                             width: bankListView.width - 20

@@ -12,13 +12,12 @@
         <file>QuestionEngineSettings/SettingItem.qml</file>
         <file>images/face_icon.png</file>
         <file>images/sparklogo.png</file>
-        <file>images/064.png</file>
-        <file>images/106.png</file>
-        <file>images/125.png</file>
         <file>images/background.png</file>
         <file>images/button_bg.png</file>
         <file>images/headline.png</file>
         <file>images/menu.png</file>
+        <file>images/title_bg.png</file>
+        <file>images/KnowledgePoint_bg.png</file>
         <file>images/personal_button_bg.png</file>
         <file>images/SparkExamAI.ico</file>
         <file>images/SparkExamAI.png</file>

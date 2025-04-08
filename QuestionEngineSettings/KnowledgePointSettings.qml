@@ -375,12 +375,19 @@ Rectangle {
                     ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                     clip: true
                     
+                    MouseArea {
+                        anchors.fill: parent
+                        onPressed: mouse.accepted = false
+                        onReleased: mouse.accepted = false
+                    }
+                    
                     ListView {
                         id: knowledgePointListView
                         width: parent.width
                         height: parent.height
                         model: knowledgePoints
                         spacing: 8
+                        interactive: true
                         
                         delegate: Rectangle {
                             width: knowledgePointListView.width - 20
