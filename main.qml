@@ -4,10 +4,11 @@ import QtQuick.Controls 2.15
 import QtMultimedia 5.15
 
 Window {
-    width: 640
-    height: 480
+    width: Screen.width
+    height: Screen.height
     visible: true
-    visibility: Window.Maximized
+    visibility: Window.FullScreen
+    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     title: qsTr("星火智能评测系统")
 
     Image {
