@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_DatabaseManager_t {
-    QByteArrayData data[49];
-    char stringdata0[609];
+    QByteArrayData data[56];
+    char stringdata0[713];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -80,7 +80,14 @@ QT_MOC_LITERAL(44, 531, 14), // "updateQuestion"
 QT_MOC_LITERAL(45, 546, 20), // "getQuestionsByBankId"
 QT_MOC_LITERAL(46, 567, 15), // "getQuestionById"
 QT_MOC_LITERAL(47, 583, 15), // "importQuestions"
-QT_MOC_LITERAL(48, 599, 9) // "questions"
+QT_MOC_LITERAL(48, 599, 9), // "questions"
+QT_MOC_LITERAL(49, 609, 21), // "getAllKnowledgePoints"
+QT_MOC_LITERAL(50, 631, 17), // "addKnowledgePoint"
+QT_MOC_LITERAL(51, 649, 5), // "title"
+QT_MOC_LITERAL(52, 655, 20), // "deleteKnowledgePoint"
+QT_MOC_LITERAL(53, 676, 7), // "pointId"
+QT_MOC_LITERAL(54, 684, 21), // "importKnowledgePoints"
+QT_MOC_LITERAL(55, 706, 6) // "points"
 
     },
     "DatabaseManager\0initDatabase\0\0addFaceData\0"
@@ -100,7 +107,9 @@ QT_MOC_LITERAL(48, 599, 9) // "questions"
     "options\0deleteQuestion\0questionId\0"
     "updateQuestion\0getQuestionsByBankId\0"
     "getQuestionById\0importQuestions\0"
-    "questions"
+    "questions\0getAllKnowledgePoints\0"
+    "addKnowledgePoint\0title\0deleteKnowledgePoint\0"
+    "pointId\0importKnowledgePoints\0points"
 };
 #undef QT_MOC_LITERAL
 
@@ -110,7 +119,7 @@ static const uint qt_meta_data_DatabaseManager[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      37,   14, // methods
+      41,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -118,43 +127,47 @@ static const uint qt_meta_data_DatabaseManager[] = {
        0,       // signalCount
 
  // methods: name, argc, parameters, tag, flags
-       1,    0,  199,    2, 0x02 /* Public */,
-       3,    6,  200,    2, 0x02 /* Public */,
-       3,    5,  213,    2, 0x22 /* Public | MethodCloned */,
-      10,    1,  224,    2, 0x02 /* Public */,
-      11,    0,  227,    2, 0x02 /* Public */,
-      12,    1,  228,    2, 0x02 /* Public */,
-      13,    2,  231,    2, 0x02 /* Public */,
-      14,    1,  236,    2, 0x02 /* Public */,
-      15,    6,  239,    2, 0x02 /* Public */,
-      15,    5,  252,    2, 0x22 /* Public | MethodCloned */,
-      16,    2,  263,    2, 0x02 /* Public */,
-      19,    2,  268,    2, 0x02 /* Public */,
-      19,    1,  273,    2, 0x22 /* Public | MethodCloned */,
-      21,    1,  276,    2, 0x02 /* Public */,
-      22,    0,  279,    2, 0x02 /* Public */,
-      23,    2,  280,    2, 0x02 /* Public */,
-      23,    1,  285,    2, 0x22 /* Public | MethodCloned */,
-      23,    0,  288,    2, 0x22 /* Public | MethodCloned */,
-      26,    3,  289,    2, 0x02 /* Public */,
-      26,    2,  296,    2, 0x22 /* Public | MethodCloned */,
-      26,    1,  301,    2, 0x22 /* Public | MethodCloned */,
-      27,    1,  304,    2, 0x02 /* Public */,
-      27,    0,  307,    2, 0x22 /* Public | MethodCloned */,
-      29,    1,  308,    2, 0x02 /* Public */,
-      30,    2,  311,    2, 0x02 /* Public */,
-      32,    1,  316,    2, 0x02 /* Public */,
-      34,    0,  319,    2, 0x02 /* Public */,
-      35,    1,  320,    2, 0x02 /* Public */,
-      36,    2,  323,    2, 0x02 /* Public */,
-      37,    5,  328,    2, 0x02 /* Public */,
-      37,    4,  339,    2, 0x22 /* Public | MethodCloned */,
-      42,    1,  348,    2, 0x02 /* Public */,
-      44,    5,  351,    2, 0x02 /* Public */,
-      44,    4,  362,    2, 0x22 /* Public | MethodCloned */,
-      45,    1,  371,    2, 0x02 /* Public */,
-      46,    1,  374,    2, 0x02 /* Public */,
-      47,    2,  377,    2, 0x02 /* Public */,
+       1,    0,  219,    2, 0x02 /* Public */,
+       3,    6,  220,    2, 0x02 /* Public */,
+       3,    5,  233,    2, 0x22 /* Public | MethodCloned */,
+      10,    1,  244,    2, 0x02 /* Public */,
+      11,    0,  247,    2, 0x02 /* Public */,
+      12,    1,  248,    2, 0x02 /* Public */,
+      13,    2,  251,    2, 0x02 /* Public */,
+      14,    1,  256,    2, 0x02 /* Public */,
+      15,    6,  259,    2, 0x02 /* Public */,
+      15,    5,  272,    2, 0x22 /* Public | MethodCloned */,
+      16,    2,  283,    2, 0x02 /* Public */,
+      19,    2,  288,    2, 0x02 /* Public */,
+      19,    1,  293,    2, 0x22 /* Public | MethodCloned */,
+      21,    1,  296,    2, 0x02 /* Public */,
+      22,    0,  299,    2, 0x02 /* Public */,
+      23,    2,  300,    2, 0x02 /* Public */,
+      23,    1,  305,    2, 0x22 /* Public | MethodCloned */,
+      23,    0,  308,    2, 0x22 /* Public | MethodCloned */,
+      26,    3,  309,    2, 0x02 /* Public */,
+      26,    2,  316,    2, 0x22 /* Public | MethodCloned */,
+      26,    1,  321,    2, 0x22 /* Public | MethodCloned */,
+      27,    1,  324,    2, 0x02 /* Public */,
+      27,    0,  327,    2, 0x22 /* Public | MethodCloned */,
+      29,    1,  328,    2, 0x02 /* Public */,
+      30,    2,  331,    2, 0x02 /* Public */,
+      32,    1,  336,    2, 0x02 /* Public */,
+      34,    0,  339,    2, 0x02 /* Public */,
+      35,    1,  340,    2, 0x02 /* Public */,
+      36,    2,  343,    2, 0x02 /* Public */,
+      37,    5,  348,    2, 0x02 /* Public */,
+      37,    4,  359,    2, 0x22 /* Public | MethodCloned */,
+      42,    1,  368,    2, 0x02 /* Public */,
+      44,    5,  371,    2, 0x02 /* Public */,
+      44,    4,  382,    2, 0x22 /* Public | MethodCloned */,
+      45,    1,  391,    2, 0x02 /* Public */,
+      46,    1,  394,    2, 0x02 /* Public */,
+      47,    2,  397,    2, 0x02 /* Public */,
+      49,    0,  402,    2, 0x02 /* Public */,
+      50,    2,  403,    2, 0x02 /* Public */,
+      52,    1,  408,    2, 0x02 /* Public */,
+      54,    1,  411,    2, 0x02 /* Public */,
 
  // methods: parameters
     QMetaType::Bool,
@@ -194,6 +207,10 @@ static const uint qt_meta_data_DatabaseManager[] = {
     QMetaType::QVariantList, QMetaType::Int,   33,
     QMetaType::QVariantMap, QMetaType::Int,   43,
     QMetaType::Bool, QMetaType::Int, QMetaType::QVariantList,   33,   48,
+    QMetaType::QVariantList,
+    QMetaType::Bool, QMetaType::QString, QMetaType::QString,   51,   38,
+    QMetaType::Bool, QMetaType::Int,   53,
+    QMetaType::Bool, QMetaType::QVariantList,   55,
 
        0        // eod
 };
@@ -278,6 +295,14 @@ void DatabaseManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
             if (_a[0]) *reinterpret_cast< QVariantMap*>(_a[0]) = std::move(_r); }  break;
         case 36: { bool _r = _t->importQuestions((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QVariantList(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 37: { QVariantList _r = _t->getAllKnowledgePoints();
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 38: { bool _r = _t->addKnowledgePoint((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 39: { bool _r = _t->deleteKnowledgePoint((*reinterpret_cast< int(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 40: { bool _r = _t->importKnowledgePoints((*reinterpret_cast< const QVariantList(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
     }
@@ -312,13 +337,13 @@ int DatabaseManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 37)
+        if (_id < 41)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 37;
+        _id -= 41;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 37)
+        if (_id < 41)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 37;
+        _id -= 41;
     }
     return _id;
 }

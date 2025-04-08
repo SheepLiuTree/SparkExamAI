@@ -39,6 +39,12 @@ public:
     
     // 检查Excel文件结构是否符合题库导入格式
     Q_INVOKABLE bool validateExcelStructure(const QString &filePath);
+    
+    // 检查Excel文件结构是否符合智点导入格式
+    Q_INVOKABLE bool validateKnowledgePointExcelStructure(const QString &filePath);
+    
+    // 打开文件选择对话框
+    Q_INVOKABLE QString getOpenFilePath(const QString &title = "选择文件", const QString &filter = "所有文件 (*.*)");
 
 private:
   

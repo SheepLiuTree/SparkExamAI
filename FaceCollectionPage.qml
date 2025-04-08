@@ -77,6 +77,17 @@ Rectangle {
             verticalAlignment: Text.AlignVCenter
         }
         onClicked: {
+            console.log("返回按钮被点击")
+            // 确保在返回前清理所有状态
+            if (camera) {
+                camera.stop()
+            }
+            if (faceRecognitionPopup.visible) {
+                faceRecognitionPopup.close()
+            }
+            if (messagePopup.visible) {
+                messagePopup.close()
+            }
             stackView.pop()
         }
     }

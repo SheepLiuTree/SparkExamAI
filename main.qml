@@ -177,6 +177,18 @@ Window {
                         verticalAlignment: Text.AlignVCenter
                     }
                     onClicked: {
+                        // 检查当前页面是否已经是面容采集页面
+                        if (stackView.currentItem && stackView.currentItem.objectName === "FaceCollectionPage") {
+                            console.log("面容采集页面已经打开，不重复打开")
+                            return
+                        }
+                        
+                        // 确保在打开新页面前，先关闭可能存在的弹窗
+                        if (faceRecognitionPopup.visible) {
+                            faceRecognitionPopup.close()
+                        }
+                        
+                        console.log("打开面容采集页面")
                         stackView.push("FaceCollectionPage.qml")
                         
                         // 连接新页面的用户列表更新信号

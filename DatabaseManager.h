@@ -129,6 +129,20 @@ public:
     
     // 批量导入题目
     Q_INVOKABLE bool importQuestions(int bankId, const QVariantList &questions);
+    
+    // 智点相关方法
+    
+    // 获取所有智点
+    Q_INVOKABLE QVariantList getAllKnowledgePoints();
+    
+    // 添加单个智点
+    Q_INVOKABLE bool addKnowledgePoint(const QString &title, const QString &content);
+    
+    // 删除智点
+    Q_INVOKABLE bool deleteKnowledgePoint(int pointId);
+    
+    // 批量导入智点
+    Q_INVOKABLE bool importKnowledgePoints(const QVariantList &points);
 
 private:
     QSqlDatabase m_database;

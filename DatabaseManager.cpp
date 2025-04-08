@@ -180,6 +180,21 @@ bool DatabaseManager::createTables()
         return false;
     }
 
+    // 创建智点表
+    success = query.exec(
+        "CREATE TABLE IF NOT EXISTS knowledge_points ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "title TEXT NOT NULL, "
+        "content TEXT NOT NULL, "
+        "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        ")"
+    );
+
+    if (!success) {
+        qDebug() << "Failed to create knowledge_points table:" << query.lastError().text();
+        return false;
+    }
+
     return true;
 }
 
@@ -1104,6 +1119,156 @@ bool DatabaseManager::importQuestions(int bankId, const QVariantList &questions)
     
     qDebug() << "成功导入" << successCount << "道题目，失败" << failCount << "道题目";
     return successCount > 0;
+}
+
+// 获取所有智点
+QVariantList DatabaseManager::getAllKnowledgePoints()
+{
+    QVariantList points;
+    
+    if (!m_database.isOpen()) {
+        qDebug() << "数据库未打开，尝试重新打开";
+        if (!m_database.open()) {
+            qDebug() << "无法打开数据库:" << m_database.lastError().text();
+            return points;
+        }
+    }
+    
+    QSqlQuery query(m_database);
+    query.prepare("SELECT id, title, content FROM knowledge_points ORDER BY id DESC");
+    
+    if (!query.exec()) {
+        qDebug() << "获取智点失败:" << query.lastError().text();
+        return points;
+    }
+    
+    while (query.next()) {
+        QVariantMap point;
+        point["id"] = query.value("id").toInt();
+        point["title"] = query.value("title").toString();
+        point["content"] = query.value("content").toString();
+        points.append(point);
+    }
+    
+    return points;
+}
+
+// 添加单个智点
+bool DatabaseManager::addKnowledgePoint(const QString &title, const QString &content)
+{
+    if (title.isEmpty() || content.isEmpty()) {
+        qDebug() << "智点标题或内容不能为空";
+        return false;
+    }
+    
+    if (!m_database.isOpen()) {
+        qDebug() << "数据库未打开，尝试重新打开";
+        if (!m_database.open()) {
+            qDebug() << "无法打开数据库:" << m_database.lastError().text();
+            return false;
+        }
+    }
+    
+    QSqlQuery query(m_database);
+    query.prepare("INSERT INTO knowledge_points (title, content) VALUES (:title, :content)");
+    query.bindValue(":title", title);
+    query.bindValue(":content", content);
+    
+    if (!query.exec()) {
+        qDebug() << "添加智点失败:" << query.lastError().text();
+        return false;
+    }
+    
+    return true;
+}
+
+// 删除智点
+bool DatabaseManager::deleteKnowledgePoint(int pointId)
+{
+    if (!m_database.isOpen()) {
+        qDebug() << "数据库未打开，尝试重新打开";
+        if (!m_database.open()) {
+            qDebug() << "无法打开数据库:" << m_database.lastError().text();
+            return false;
+        }
+    }
+    
+    QSqlQuery query(m_database);
+    query.prepare("DELETE FROM knowledge_points WHERE id = :id");
+    query.bindValue(":id", pointId);
+    
+    if (!query.exec()) {
+        qDebug() << "删除智点失败:" << query.lastError().text();
+        return false;
+    }
+    
+    return true;
+}
+
+// 批量导入智点
+bool DatabaseManager::importKnowledgePoints(const QVariantList &points)
+{
+    if (points.isEmpty()) {
+        qDebug() << "没有智点需要导入";
+        return false;
+    }
+    
+    if (!m_database.isOpen()) {
+        qDebug() << "数据库未打开，尝试重新打开";
+        if (!m_database.open()) {
+            qDebug() << "无法打开数据库:" << m_database.lastError().text();
+            return false;
+        }
+    }
+    
+    // 开始事务
+    m_database.transaction();
+    
+    int successCount = 0;
+    int failCount = 0;
+    
+    for (const QVariant &pointVar : points) {
+        QVariantMap pointMap = pointVar.toMap();
+        
+        // 支持两种可能的表头名称：标题和内容
+        QString title = pointMap.value("标题").toString();
+        // 检查智点内容列
+        QString content = pointMap.value("智点内容").toString();
+        if (content.isEmpty()) {
+            content = pointMap.value("内容").toString();
+        }
+        
+        // 检查必要字段是否存在
+        if (title.isEmpty() || content.isEmpty()) {
+            qDebug() << "智点缺少必要字段，跳过导入";
+            failCount++;
+            continue;
+        }
+        
+        // 添加智点
+        if (!addKnowledgePoint(title, content)) {
+            qDebug() << "添加智点失败";
+            failCount++;
+            continue;
+        }
+        
+        successCount++;
+    }
+    
+    // 提交或回滚事务
+    if (successCount > 0) {
+        if (!m_database.commit()) {
+            qDebug() << "提交事务失败:" << m_database.lastError().text();
+            m_database.rollback();
+            return false;
+        }
+        qDebug() << "成功导入" << successCount << "条智点数据，失败" << failCount << "条";
+        return true;
+    } else {
+        m_database.rollback();
+        qDebug() << "所有智点导入失败，已回滚事务";
+        return false;
+    }
 }
 
 QString getFieldValue(const QVariantMap &map, const QStringList &possibleKeys)

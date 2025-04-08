@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_FileManager_t {
-    QByteArrayData data[16];
-    char stringdata0[198];
+    QByteArrayData data[19];
+    char stringdata0[258];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -47,7 +47,10 @@ QT_MOC_LITERAL(11, 130, 5), // "title"
 QT_MOC_LITERAL(12, 136, 13), // "readExcelFile"
 QT_MOC_LITERAL(13, 150, 8), // "filePath"
 QT_MOC_LITERAL(14, 159, 15), // "getExcelHeaders"
-QT_MOC_LITERAL(15, 175, 22) // "validateExcelStructure"
+QT_MOC_LITERAL(15, 175, 22), // "validateExcelStructure"
+QT_MOC_LITERAL(16, 198, 36), // "validateKnowledgePointExcelSt..."
+QT_MOC_LITERAL(17, 235, 15), // "getOpenFilePath"
+QT_MOC_LITERAL(18, 251, 6) // "filter"
 
     },
     "FileManager\0copyFile\0\0sourcePath\0"
@@ -55,7 +58,9 @@ QT_MOC_LITERAL(15, 175, 22) // "validateExcelStructure"
     "createDirectory\0dirPath\0directoryExists\0"
     "getFolderPath\0title\0readExcelFile\0"
     "filePath\0getExcelHeaders\0"
-    "validateExcelStructure"
+    "validateExcelStructure\0"
+    "validateKnowledgePointExcelStructure\0"
+    "getOpenFilePath\0filter"
 };
 #undef QT_MOC_LITERAL
 
@@ -65,7 +70,7 @@ static const uint qt_meta_data_FileManager[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      14,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -73,16 +78,20 @@ static const uint qt_meta_data_FileManager[] = {
        0,       // signalCount
 
  // methods: name, argc, parameters, tag, flags
-       1,    2,   64,    2, 0x02 /* Public */,
-       5,    2,   69,    2, 0x02 /* Public */,
-       6,    0,   74,    2, 0x02 /* Public */,
-       7,    1,   75,    2, 0x02 /* Public */,
-       9,    1,   78,    2, 0x02 /* Public */,
-      10,    1,   81,    2, 0x02 /* Public */,
-      10,    0,   84,    2, 0x22 /* Public | MethodCloned */,
-      12,    1,   85,    2, 0x02 /* Public */,
-      14,    1,   88,    2, 0x02 /* Public */,
-      15,    1,   91,    2, 0x02 /* Public */,
+       1,    2,   84,    2, 0x02 /* Public */,
+       5,    2,   89,    2, 0x02 /* Public */,
+       6,    0,   94,    2, 0x02 /* Public */,
+       7,    1,   95,    2, 0x02 /* Public */,
+       9,    1,   98,    2, 0x02 /* Public */,
+      10,    1,  101,    2, 0x02 /* Public */,
+      10,    0,  104,    2, 0x22 /* Public | MethodCloned */,
+      12,    1,  105,    2, 0x02 /* Public */,
+      14,    1,  108,    2, 0x02 /* Public */,
+      15,    1,  111,    2, 0x02 /* Public */,
+      16,    1,  114,    2, 0x02 /* Public */,
+      17,    2,  117,    2, 0x02 /* Public */,
+      17,    1,  122,    2, 0x22 /* Public | MethodCloned */,
+      17,    0,  125,    2, 0x22 /* Public | MethodCloned */,
 
  // methods: parameters
     QMetaType::Bool, QMetaType::QString, QMetaType::QString,    3,    4,
@@ -95,6 +104,10 @@ static const uint qt_meta_data_FileManager[] = {
     QMetaType::QVariantList, QMetaType::QString,   13,
     QMetaType::QStringList, QMetaType::QString,   13,
     QMetaType::Bool, QMetaType::QString,   13,
+    QMetaType::Bool, QMetaType::QString,   13,
+    QMetaType::QString, QMetaType::QString, QMetaType::QString,   11,   18,
+    QMetaType::QString, QMetaType::QString,   11,
+    QMetaType::QString,
 
        0        // eod
 };
@@ -125,6 +138,14 @@ void FileManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
             if (_a[0]) *reinterpret_cast< QStringList*>(_a[0]) = std::move(_r); }  break;
         case 9: { bool _r = _t->validateExcelStructure((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 10: { bool _r = _t->validateKnowledgePointExcelStructure((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 11: { QString _r = _t->getOpenFilePath((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 12: { QString _r = _t->getOpenFilePath((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
+        case 13: { QString _r = _t->getOpenFilePath();
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
     }
@@ -159,13 +180,13 @@ int FileManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 10)
+        if (_id < 14)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 14;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 10)
+        if (_id < 14)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 10;
+        _id -= 14;
     }
     return _id;
 }

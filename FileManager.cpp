@@ -141,64 +141,6 @@ QVariantList FileManager::readExcelFile(const QString &filePath)
         qDebug() << "表头" << col << ":" << header;
     }
     
-    // 定义必要的字段及其可能的变体
-    QMap<QString, QStringList> requiredFields;
-    requiredFields["题干"] = QStringList() << "题干" << "题目" << "题目内容" << "题目描述" << "内容";
-    requiredFields["答案"] = QStringList() << "答案" << "正确答案" << "标准答案";
-    
-    // 定义可选字段及其可能的变体
-    QMap<QString, QStringList> optionalFields;
-    optionalFields["解析"] = QStringList() << "解析" << "题目解析" << "答案解析" << "分析";
-    
-    // 检查是否包含所有必要字段
-    QMap<QString, QString> fieldMapping;
-    for (auto it = requiredFields.begin(); it != requiredFields.end(); ++it) {
-        QString mainField = it.key();
-        QStringList variants = it.value();
-        bool found = false;
-        
-        for (const QString &header : headers) {
-            for (const QString &variant : variants) {
-                if (header.contains(variant, Qt::CaseInsensitive)) {
-                    fieldMapping[mainField] = header;
-                    found = true;
-                    qDebug() << "找到字段" << mainField << "对应表头:" << header;
-                    break;
-                }
-            }
-            if (found) break;
-        }
-        
-        if (!found) {
-            qDebug() << "Excel文件缺少必要字段:" << mainField;
-            return result;
-        }
-    }
-    
-    // 检查可选字段
-    for (auto it = optionalFields.begin(); it != optionalFields.end(); ++it) {
-        QString mainField = it.key();
-        QStringList variants = it.value();
-        bool found = false;
-        
-        for (const QString &header : headers) {
-            for (const QString &variant : variants) {
-                if (header.contains(variant, Qt::CaseInsensitive)) {
-                    fieldMapping[mainField] = header;
-                    found = true;
-                    qDebug() << "找到可选字段" << mainField << "对应表头:" << header;
-                    break;
-                }
-            }
-            if (found) break;
-        }
-        
-        // 可选字段不存在也不报错
-        if (!found) {
-            qDebug() << "Excel文件缺少可选字段:" << mainField << "，将使用空值";
-        }
-    }
-    
     // 从第二行开始读取数据（跳过表头）
     for (int row = 2; row <= rowCount; ++row) {
         QVariantMap rowData;
@@ -219,15 +161,7 @@ QVariantList FileManager::readExcelFile(const QString &filePath)
             // 获取对应的列头
             QString headerText = (col <= headers.size()) ? headers[col-1] : QString("Column%1").arg(col);
             
-            // 检查是否是必要字段，如果是，使用标准字段名
-            for (auto it = fieldMapping.begin(); it != fieldMapping.end(); ++it) {
-                if (headerText == it.value()) {
-                    rowData[it.key()] = value;
-                    break;
-                }
-            }
-            
-            // 同时保留原始字段名
+            // 直接使用表头名称作为字段名
             rowData[headerText] = value;
         }
         
@@ -329,4 +263,57 @@ bool FileManager::validateExcelStructure(const QString &filePath)
     }
     
     return true;
+}
+
+bool FileManager::validateKnowledgePointExcelStructure(const QString &filePath)
+{
+    // 获取表头
+    QStringList headers = getExcelHeaders(filePath);
+    
+    // 检查是否包含"标题"字段
+    bool hasTitleField = false;
+    for (const QString &header : headers) {
+        if (header.contains("标题", Qt::CaseInsensitive)) {
+            hasTitleField = true;
+            break;
+        }
+    }
+    
+    if (!hasTitleField) {
+        qDebug() << "Excel文件缺少必要字段: 标题";
+        return false;
+    }
+    
+    // 检查是否包含"内容"字段（可以是"智点内容"或"内容"）
+    bool hasContentField = false;
+    for (const QString &header : headers) {
+        if (header.contains("内容", Qt::CaseInsensitive)) {
+            hasContentField = true;
+            break;
+        }
+    }
+    
+    if (!hasContentField) {
+        qDebug() << "Excel文件缺少必要字段: 内容/智点内容";
+        return false;
+    }
+    
+    return true;
+}
+
+QString FileManager::getOpenFilePath(const QString &title, const QString &filter)
+{
+    QString filePath = QFileDialog::getOpenFileName(
+        nullptr, 
+        title,
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
+        filter
+    );
+    
+    if (filePath.isEmpty()) {
+        qDebug() << "用户取消了文件选择";
+        return "";
+    }
+    
+    return filePath;
 }

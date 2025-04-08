@@ -8,6 +8,7 @@
         <file>QuestionCollectionPage.qml</file>
         <file>QuestionEngineSettings/GeneralSettings.qml</file>
         <file>QuestionEngineSettings/StrategiesSettings.qml</file>
+        <file>QuestionEngineSettings/KnowledgePointSettings.qml</file>
         <file>QuestionEngineSettings/SettingItem.qml</file>
         <file>images/face_icon.png</file>
         <file>images/sparklogo.png</file>
@@ -19,7 +20,5 @@
         <file>images/headline.png</file>
         <file>images/menu.png</file>
         <file>images/personal_button_bg.png</file>
-        <file>templates/README.txt</file>
-        <file>templates/question_template.txt</file>
     </qresource>
 </RCC>
