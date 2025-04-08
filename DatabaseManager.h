@@ -127,6 +127,9 @@ public:
     // 获取题目详情
     Q_INVOKABLE QVariantMap getQuestionById(int questionId);
     
+    // 从题库中随机抽取指定数量的题目
+    Q_INVOKABLE QVariantList getRandomQuestions(int bankId, int count);
+    
     // 批量导入题目
     Q_INVOKABLE bool importQuestions(int bankId, const QVariantList &questions);
     

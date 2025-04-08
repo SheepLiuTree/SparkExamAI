@@ -1043,6 +1043,82 @@ QVariantMap DatabaseManager::getQuestionById(int questionId)
     return result;
 }
 
+QVariantList DatabaseManager::getRandomQuestions(int bankId, int count)
+{
+    QVariantList result;
+    QSqlQuery query(m_database);
+    
+    // 首先获取题库中的总题目数
+    query.prepare("SELECT COUNT(*) FROM questions WHERE bank_id = :bank_id");
+    query.bindValue(":bank_id", bankId);
+    
+    if (!query.exec() || !query.next()) {
+        qDebug() << "获取题目总数失败:" << query.lastError().text();
+        return result;
+    }
+    
+    int totalQuestions = query.value(0).toInt();
+    if (totalQuestions == 0) {
+        qDebug() << "题库为空，无法抽取题目";
+        return result;
+    }
+    
+    // 确保不超过题库中的题目总数
+    count = qMin(count, totalQuestions);
+    
+    // 使用ORDER BY RANDOM()随机抽取题目
+    query.prepare(
+        "SELECT q.*, GROUP_CONCAT(o.option_text, '|') as options, "
+        "GROUP_CONCAT(o.option_index, '|') as option_indices "
+        "FROM questions q "
+        "LEFT JOIN question_options o ON q.id = o.question_id "
+        "WHERE q.bank_id = :bank_id "
+        "GROUP BY q.id "
+        "ORDER BY RANDOM() "
+        "LIMIT :count"
+    );
+    
+    query.bindValue(":bank_id", bankId);
+    query.bindValue(":count", count);
+    
+    if (!query.exec()) {
+        qDebug() << "随机抽取题目失败:" << query.lastError().text();
+        return result;
+    }
+    
+    while (query.next()) {
+        QVariantMap question;
+        question["id"] = query.value("id").toInt();
+        question["content"] = query.value("content").toString();
+        question["answer"] = query.value("answer").toString();
+        question["analysis"] = query.value("analysis").toString();
+        
+        // 处理选项
+        QString optionsStr = query.value("options").toString();
+        QString indicesStr = query.value("option_indices").toString();
+        
+        if (!optionsStr.isEmpty() && !indicesStr.isEmpty()) {
+            QStringList options = optionsStr.split("|");
+            QStringList indices = indicesStr.split("|");
+            
+            QVariantList optionsList;
+            for (int i = 0; i < options.length(); i++) {
+                QVariantMap option;
+                option["text"] = options[i];
+                option["index"] = indices[i].toInt();
+                optionsList.append(option);
+            }
+            question["options"] = optionsList;
+        } else {
+            question["options"] = QVariantList();
+        }
+        
+        result.append(question);
+    }
+    
+    return result;
+}
+
 bool DatabaseManager::importQuestions(int bankId, const QVariantList &questions)
 {
     if (questions.isEmpty()) {

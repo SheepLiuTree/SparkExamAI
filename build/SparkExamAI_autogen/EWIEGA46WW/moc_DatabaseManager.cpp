@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_DatabaseManager_t {
-    QByteArrayData data[57];
-    char stringdata0[737];
+    QByteArrayData data[59];
+    char stringdata0[762];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -79,16 +79,18 @@ QT_MOC_LITERAL(43, 520, 10), // "questionId"
 QT_MOC_LITERAL(44, 531, 14), // "updateQuestion"
 QT_MOC_LITERAL(45, 546, 20), // "getQuestionsByBankId"
 QT_MOC_LITERAL(46, 567, 15), // "getQuestionById"
-QT_MOC_LITERAL(47, 583, 15), // "importQuestions"
-QT_MOC_LITERAL(48, 599, 9), // "questions"
-QT_MOC_LITERAL(49, 609, 21), // "getAllKnowledgePoints"
-QT_MOC_LITERAL(50, 631, 17), // "addKnowledgePoint"
-QT_MOC_LITERAL(51, 649, 5), // "title"
-QT_MOC_LITERAL(52, 655, 20), // "deleteKnowledgePoint"
-QT_MOC_LITERAL(53, 676, 7), // "pointId"
-QT_MOC_LITERAL(54, 684, 21), // "importKnowledgePoints"
-QT_MOC_LITERAL(55, 706, 6), // "points"
-QT_MOC_LITERAL(56, 713, 23) // "clearAllKnowledgePoints"
+QT_MOC_LITERAL(47, 583, 18), // "getRandomQuestions"
+QT_MOC_LITERAL(48, 602, 5), // "count"
+QT_MOC_LITERAL(49, 608, 15), // "importQuestions"
+QT_MOC_LITERAL(50, 624, 9), // "questions"
+QT_MOC_LITERAL(51, 634, 21), // "getAllKnowledgePoints"
+QT_MOC_LITERAL(52, 656, 17), // "addKnowledgePoint"
+QT_MOC_LITERAL(53, 674, 5), // "title"
+QT_MOC_LITERAL(54, 680, 20), // "deleteKnowledgePoint"
+QT_MOC_LITERAL(55, 701, 7), // "pointId"
+QT_MOC_LITERAL(56, 709, 21), // "importKnowledgePoints"
+QT_MOC_LITERAL(57, 731, 6), // "points"
+QT_MOC_LITERAL(58, 738, 23) // "clearAllKnowledgePoints"
 
     },
     "DatabaseManager\0initDatabase\0\0addFaceData\0"
@@ -107,10 +109,11 @@ QT_MOC_LITERAL(56, 713, 23) // "clearAllKnowledgePoints"
     "addQuestion\0content\0answer\0analysis\0"
     "options\0deleteQuestion\0questionId\0"
     "updateQuestion\0getQuestionsByBankId\0"
-    "getQuestionById\0importQuestions\0"
-    "questions\0getAllKnowledgePoints\0"
-    "addKnowledgePoint\0title\0deleteKnowledgePoint\0"
-    "pointId\0importKnowledgePoints\0points\0"
+    "getQuestionById\0getRandomQuestions\0"
+    "count\0importQuestions\0questions\0"
+    "getAllKnowledgePoints\0addKnowledgePoint\0"
+    "title\0deleteKnowledgePoint\0pointId\0"
+    "importKnowledgePoints\0points\0"
     "clearAllKnowledgePoints"
 };
 #undef QT_MOC_LITERAL
@@ -121,7 +124,7 @@ static const uint qt_meta_data_DatabaseManager[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      42,   14, // methods
+      43,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -129,48 +132,49 @@ static const uint qt_meta_data_DatabaseManager[] = {
        0,       // signalCount
 
  // methods: name, argc, parameters, tag, flags
-       1,    0,  224,    2, 0x02 /* Public */,
-       3,    6,  225,    2, 0x02 /* Public */,
-       3,    5,  238,    2, 0x22 /* Public | MethodCloned */,
-      10,    1,  249,    2, 0x02 /* Public */,
-      11,    0,  252,    2, 0x02 /* Public */,
-      12,    1,  253,    2, 0x02 /* Public */,
-      13,    2,  256,    2, 0x02 /* Public */,
-      14,    1,  261,    2, 0x02 /* Public */,
-      15,    6,  264,    2, 0x02 /* Public */,
-      15,    5,  277,    2, 0x22 /* Public | MethodCloned */,
-      16,    2,  288,    2, 0x02 /* Public */,
-      19,    2,  293,    2, 0x02 /* Public */,
-      19,    1,  298,    2, 0x22 /* Public | MethodCloned */,
-      21,    1,  301,    2, 0x02 /* Public */,
-      22,    0,  304,    2, 0x02 /* Public */,
-      23,    2,  305,    2, 0x02 /* Public */,
-      23,    1,  310,    2, 0x22 /* Public | MethodCloned */,
-      23,    0,  313,    2, 0x22 /* Public | MethodCloned */,
-      26,    3,  314,    2, 0x02 /* Public */,
-      26,    2,  321,    2, 0x22 /* Public | MethodCloned */,
-      26,    1,  326,    2, 0x22 /* Public | MethodCloned */,
-      27,    1,  329,    2, 0x02 /* Public */,
-      27,    0,  332,    2, 0x22 /* Public | MethodCloned */,
-      29,    1,  333,    2, 0x02 /* Public */,
-      30,    2,  336,    2, 0x02 /* Public */,
-      32,    1,  341,    2, 0x02 /* Public */,
-      34,    0,  344,    2, 0x02 /* Public */,
-      35,    1,  345,    2, 0x02 /* Public */,
-      36,    2,  348,    2, 0x02 /* Public */,
-      37,    5,  353,    2, 0x02 /* Public */,
-      37,    4,  364,    2, 0x22 /* Public | MethodCloned */,
-      42,    1,  373,    2, 0x02 /* Public */,
-      44,    5,  376,    2, 0x02 /* Public */,
-      44,    4,  387,    2, 0x22 /* Public | MethodCloned */,
-      45,    1,  396,    2, 0x02 /* Public */,
-      46,    1,  399,    2, 0x02 /* Public */,
-      47,    2,  402,    2, 0x02 /* Public */,
-      49,    0,  407,    2, 0x02 /* Public */,
-      50,    2,  408,    2, 0x02 /* Public */,
-      52,    1,  413,    2, 0x02 /* Public */,
-      54,    1,  416,    2, 0x02 /* Public */,
-      56,    0,  419,    2, 0x02 /* Public */,
+       1,    0,  229,    2, 0x02 /* Public */,
+       3,    6,  230,    2, 0x02 /* Public */,
+       3,    5,  243,    2, 0x22 /* Public | MethodCloned */,
+      10,    1,  254,    2, 0x02 /* Public */,
+      11,    0,  257,    2, 0x02 /* Public */,
+      12,    1,  258,    2, 0x02 /* Public */,
+      13,    2,  261,    2, 0x02 /* Public */,
+      14,    1,  266,    2, 0x02 /* Public */,
+      15,    6,  269,    2, 0x02 /* Public */,
+      15,    5,  282,    2, 0x22 /* Public | MethodCloned */,
+      16,    2,  293,    2, 0x02 /* Public */,
+      19,    2,  298,    2, 0x02 /* Public */,
+      19,    1,  303,    2, 0x22 /* Public | MethodCloned */,
+      21,    1,  306,    2, 0x02 /* Public */,
+      22,    0,  309,    2, 0x02 /* Public */,
+      23,    2,  310,    2, 0x02 /* Public */,
+      23,    1,  315,    2, 0x22 /* Public | MethodCloned */,
+      23,    0,  318,    2, 0x22 /* Public | MethodCloned */,
+      26,    3,  319,    2, 0x02 /* Public */,
+      26,    2,  326,    2, 0x22 /* Public | MethodCloned */,
+      26,    1,  331,    2, 0x22 /* Public | MethodCloned */,
+      27,    1,  334,    2, 0x02 /* Public */,
+      27,    0,  337,    2, 0x22 /* Public | MethodCloned */,
+      29,    1,  338,    2, 0x02 /* Public */,
+      30,    2,  341,    2, 0x02 /* Public */,
+      32,    1,  346,    2, 0x02 /* Public */,
+      34,    0,  349,    2, 0x02 /* Public */,
+      35,    1,  350,    2, 0x02 /* Public */,
+      36,    2,  353,    2, 0x02 /* Public */,
+      37,    5,  358,    2, 0x02 /* Public */,
+      37,    4,  369,    2, 0x22 /* Public | MethodCloned */,
+      42,    1,  378,    2, 0x02 /* Public */,
+      44,    5,  381,    2, 0x02 /* Public */,
+      44,    4,  392,    2, 0x22 /* Public | MethodCloned */,
+      45,    1,  401,    2, 0x02 /* Public */,
+      46,    1,  404,    2, 0x02 /* Public */,
+      47,    2,  407,    2, 0x02 /* Public */,
+      49,    2,  412,    2, 0x02 /* Public */,
+      51,    0,  417,    2, 0x02 /* Public */,
+      52,    2,  418,    2, 0x02 /* Public */,
+      54,    1,  423,    2, 0x02 /* Public */,
+      56,    1,  426,    2, 0x02 /* Public */,
+      58,    0,  429,    2, 0x02 /* Public */,
 
  // methods: parameters
     QMetaType::Bool,
@@ -209,11 +213,12 @@ static const uint qt_meta_data_DatabaseManager[] = {
     QMetaType::Bool, QMetaType::Int, QMetaType::QString, QMetaType::QString, QMetaType::QString,   43,   38,   39,   40,
     QMetaType::QVariantList, QMetaType::Int,   33,
     QMetaType::QVariantMap, QMetaType::Int,   43,
-    QMetaType::Bool, QMetaType::Int, QMetaType::QVariantList,   33,   48,
+    QMetaType::QVariantList, QMetaType::Int, QMetaType::Int,   33,   48,
+    QMetaType::Bool, QMetaType::Int, QMetaType::QVariantList,   33,   50,
     QMetaType::QVariantList,
-    QMetaType::Bool, QMetaType::QString, QMetaType::QString,   51,   38,
-    QMetaType::Bool, QMetaType::Int,   53,
-    QMetaType::Bool, QMetaType::QVariantList,   55,
+    QMetaType::Bool, QMetaType::QString, QMetaType::QString,   53,   38,
+    QMetaType::Bool, QMetaType::Int,   55,
+    QMetaType::Bool, QMetaType::QVariantList,   57,
     QMetaType::Bool,
 
        0        // eod
@@ -297,17 +302,19 @@ void DatabaseManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
         case 35: { QVariantMap _r = _t->getQuestionById((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariantMap*>(_a[0]) = std::move(_r); }  break;
-        case 36: { bool _r = _t->importQuestions((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QVariantList(*)>(_a[2])));
-            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 37: { QVariantList _r = _t->getAllKnowledgePoints();
+        case 36: { QVariantList _r = _t->getRandomQuestions((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 38: { bool _r = _t->addKnowledgePoint((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+        case 37: { bool _r = _t->importQuestions((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< const QVariantList(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 39: { bool _r = _t->deleteKnowledgePoint((*reinterpret_cast< int(*)>(_a[1])));
+        case 38: { QVariantList _r = _t->getAllKnowledgePoints();
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 39: { bool _r = _t->addKnowledgePoint((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 40: { bool _r = _t->importKnowledgePoints((*reinterpret_cast< const QVariantList(*)>(_a[1])));
+        case 40: { bool _r = _t->deleteKnowledgePoint((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 41: { bool _r = _t->clearAllKnowledgePoints();
+        case 41: { bool _r = _t->importKnowledgePoints((*reinterpret_cast< const QVariantList(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 42: { bool _r = _t->clearAllKnowledgePoints();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
@@ -343,13 +350,13 @@ int DatabaseManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 42)
+        if (_id < 43)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 42;
+        _id -= 43;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 42)
+        if (_id < 43)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 42;
+        _id -= 43;
     }
     return _id;
 }
