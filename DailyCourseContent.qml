@@ -78,7 +78,12 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter
             }
             onClicked: {
-                stackView.pop()
+                confirmDialog.dialogTitle = "返回确认"
+                confirmDialog.dialogMessage = "确定要返回上一页吗？\n当前进度将不会保存。"
+                confirmDialog.confirmAction = function() {
+                    stackView.pop()
+                }
+                confirmDialog.open()
             }
         }
         
@@ -409,12 +414,14 @@ Rectangle {
                         }
                     }
                     
+                    // 提交按钮
                     Button {
-                        Layout.fillWidth: true
-                        height: 40
+                        Layout.preferredWidth: 120
+                        Layout.preferredHeight: 50
+                        Layout.alignment: Qt.AlignHCenter
                         background: Rectangle {
-                            color: "#2c70b7"
-                            radius: 4
+                            color: "#4CAF50"
+                            radius: 5
                         }
                         contentItem: Text {
                             text: "提交答案"
@@ -446,37 +453,1019 @@ Rectangle {
         
         if (unanswered.length > 0) {
             // 显示未答题提示
-            var message = "还有题目未作答：第 " + unanswered.join("、") + " 题"
+            var message = ""
+            
+            if (unanswered.length <= 5) {
+                message = "您有题目尚未作答：\n第 " + unanswered.join("、") + " 题"
+            } else {
+                // 如果未答题目较多，只显示数量和题号
+                message = "您有 " + unanswered.length + " 道题目尚未作答：\n第 "
+                
+                // 所有题号一起显示，用顿号分隔
+                message += unanswered.join("、") + " 题"
+            }
+            
             console.log(message)
+            // 显示提示对话框
+            messageDialog.messageText = message
+            messageDialog.open()
             return
         }
         
         // 计算得分
         var score = 0
         var total = currentQuestions.length
+        var detailedAnswers = []
         
         for (var i = 0; i < currentQuestions.length; i++) {
             var question = currentQuestions[i]
             var userAnswer = userAnswers[i]
             var correctAnswer = question.answer
+            var isCorrect = false
+            var userAnswerStr = ""
             
             if (Array.isArray(userAnswer)) {
                 // 多选题
-                var userAnswerStr = userAnswer.map(function(index) {
+                userAnswerStr = userAnswer.map(function(index) {
                     return String.fromCharCode(65 + index)
                 }).join('')
-                if (userAnswerStr === correctAnswer) {
-                    score++
+                
+                // 对多选题，比较选项内容是否相同，忽略顺序
+                if (userAnswerStr.length === correctAnswer.length) {
+                    // 检查用户答案中的每个字符是否都在正确答案中
+                    var allFound = true
+                    for (var j = 0; j < userAnswerStr.length; j++) {
+                        if (correctAnswer.indexOf(userAnswerStr[j]) === -1) {
+                            allFound = false
+                            break
+                        }
+                    }
+                    // 检查正确答案中的每个字符是否都在用户答案中
+                    if (allFound) {
+                        for (var j = 0; j < correctAnswer.length; j++) {
+                            if (userAnswerStr.indexOf(correctAnswer[j]) === -1) {
+                                allFound = false
+                                break
+                            }
+                        }
+                    }
+                    isCorrect = allFound
+                } else {
+                    isCorrect = false
                 }
             } else {
                 // 单选题或判断题
-                var userAnswerStr = String.fromCharCode(65 + userAnswer)
-                if (userAnswerStr === correctAnswer) {
-                    score++
+                userAnswerStr = String.fromCharCode(65 + userAnswer)
+                isCorrect = (userAnswerStr === correctAnswer)
+            }
+            
+            if (isCorrect) {
+                score++
+            }
+            
+            // 记录详细答题数据
+            detailedAnswers.push({
+                "questionId": question.id,
+                "questionContent": question.content,
+                "correctAnswer": correctAnswer,
+                "userAnswer": userAnswerStr,
+                "isCorrect": isCorrect
+            })
+        }
+        
+        console.log("得分：" + score + "/" + total)
+        
+        // 准备保存到数据库的数据
+        var answerData = JSON.stringify(detailedAnswers)
+        
+        // 检查用户数据是否存在
+        if (!userData || !userData.workId) {
+            console.error("用户数据不存在，无法保存答题记录")
+            messageDialog.messageText = "用户数据不存在，无法保存答题记录"
+            messageDialog.open()
+            return
+        }
+        
+        // 保存到数据库
+        var success = dbManager.saveUserAnswerRecord(
+            userData.workId,
+            userData.name,
+            "星火日课",
+            total,
+            score,
+            answerData
+        )
+        
+        if (success) {
+            console.log("答题记录已保存到数据库")
+            
+            // 显示得分结果
+            resultDialog.score = score
+            resultDialog.total = total
+            resultDialog.percentage = Math.round(score / total * 100)
+            resultDialog.open()
+        } else {
+            console.error("保存答题记录失败")
+            messageDialog.messageText = "保存答题记录失败，请重试"
+            messageDialog.open()
+        }
+    }
+    
+    // 获取错题列表
+    function getWrongQuestions() {
+        // 从详细答题数据中筛选出错题
+        var wrongQuestions = []
+        
+        // 添加调试输出
+        console.log("当前题目数量:", currentQuestions.length);
+        console.log("用户答案:", JSON.stringify(userAnswers));
+        
+        for (var i = 0; i < currentQuestions.length; i++) {
+            if (!currentQuestions[i]) {
+                console.log("题目", i, "不存在");
+                continue;
+            }
+            
+            var userAnswer = userAnswers[i]
+            if (userAnswer === undefined) {
+                console.log("题目", i, "没有答案");
+                continue;
+            }
+            
+            var correctAnswer = currentQuestions[i].answer
+            var isCorrect = false
+            var userAnswerStr = ""
+            
+            console.log("处理题目", i, "正确答案:", correctAnswer);
+            
+            if (Array.isArray(userAnswer)) {
+                // 多选题
+                userAnswerStr = userAnswer.map(function(index) {
+                    return String.fromCharCode(65 + index)
+                }).join('')
+                console.log("多选题用户答案:", userAnswerStr);
+                
+                // 对多选题，比较选项内容是否相同，忽略顺序
+                if (userAnswerStr.length === correctAnswer.length) {
+                    // 检查用户答案中的每个字符是否都在正确答案中
+                    var allFound = true
+                    for (var j = 0; j < userAnswerStr.length; j++) {
+                        if (correctAnswer.indexOf(userAnswerStr[j]) === -1) {
+                            allFound = false
+                            break
+                        }
+                    }
+                    // 检查正确答案中的每个字符是否都在用户答案中
+                    if (allFound) {
+                        for (var j = 0; j < correctAnswer.length; j++) {
+                            if (userAnswerStr.indexOf(correctAnswer[j]) === -1) {
+                                allFound = false
+                                break
+                            }
+                        }
+                    }
+                    isCorrect = allFound
+                } else {
+                    isCorrect = false
+                }
+            } else {
+                // 单选题或判断题
+                userAnswerStr = String.fromCharCode(65 + userAnswer)
+                console.log("单选题用户答案:", userAnswerStr);
+                isCorrect = (userAnswerStr === correctAnswer)
+            }
+            
+            console.log("题目", i, "是否正确:", isCorrect);
+            
+            if (!isCorrect) {
+                wrongQuestions.push({
+                    index: i,
+                    question: currentQuestions[i],
+                    userAnswer: userAnswer,
+                    userAnswerStr: userAnswerStr
+                });
+                console.log("添加到错题列表:", i);
+            }
+        }
+        
+        console.log("错题列表长度:", wrongQuestions.length);
+        return wrongQuestions;
+    }
+    
+    // 结果对话框
+    Dialog {
+        id: resultDialog
+        anchors.centerIn: parent
+        width: 500
+        height: 360
+        modal: true
+        closePolicy: Popup.CloseOnEscape
+        
+        property int score: 0
+        property int total: 0
+        property int percentage: 0
+        
+        background: Rectangle {
+            color: "#1e293b"
+            radius: 12
+            border.color: "#2c70b7"
+            border.width: 2
+        }
+        
+        contentItem: Rectangle {
+            color: "transparent"
+            anchors.fill: parent
+            
+            Column {
+                anchors.centerIn: parent
+                spacing: 20
+                width: parent.width - 60
+                
+                // 标题装饰图案
+                Rectangle {
+                    width: parent.width
+                    height: 50
+                    radius: 8
+                    color: "#2c70b7"
+                    
+                    Text {
+                        text: "✨ 星火日课结果 ✨"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 22
+                        font.bold: true
+                        color: "white"
+                        anchors.centerIn: parent
+                    }
+                }
+                
+                Text {
+                    text: "恭喜完成本次学习任务！"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 20
+                    color: "#f0f9ff"
+                    width: parent.width
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                
+                // 分数展示区域
+                Rectangle {
+                    width: parent.width
+                    height: 80
+                    radius: 8
+                    color: "#0c4a82"
+                    
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: 15
+                        
+                        Column {
+                            spacing: 5
+                            
+                            Text {
+                                text: "得分"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 16
+                                color: "#a5f3fc"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            
+                            Text {
+                                text: resultDialog.score + "/" + resultDialog.total
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 24
+                                font.bold: true
+                                color: "#ffffff"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                        
+                        Rectangle {
+                            width: 1
+                            height: 50
+                            color: "#4d84b8"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        
+                        Column {
+                            spacing: 5
+                            
+                            Text {
+                                text: "正确率"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 16
+                                color: "#a5f3fc"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            
+                            Text {
+                                text: resultDialog.percentage + "%"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 24
+                                font.bold: true
+                                color: {
+                                    var percent = resultDialog.percentage
+                                    if (percent >= 90) return "#4ade80"
+                                    else if (percent >= 80) return "#22d3ee"
+                                    else if (percent >= 60) return "#fcd34d"
+                                    else return "#f87171"
+                                }
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                    }
+                }
+                
+                // 评价显示
+                Rectangle {
+                    width: parent.width
+                    height: 50
+                    radius: 8
+                    color: {
+                        var percent = resultDialog.percentage
+                        if (percent >= 90) return "#064e3b"
+                        else if (percent >= 80) return "#065f46"
+                        else if (percent >= 60) return "#854d0e"
+                        else return "#7f1d1d"
+                    }
+                    
+                    Text {
+                        anchors.centerIn: parent
+                        text: {
+                            var percent = resultDialog.percentage
+                            if (percent >= 90) return "评价：优秀，继续保持！🏆"
+                            else if (percent >= 80) return "评价：良好，再接再厉！👍"
+                            else if (percent >= 60) return "评价：及格，需要更多努力！💪"
+                            else return "评价：需要加强复习，不要气馁！📚"
+                        }
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 18
+                        color: "#ffffff"
+                        width: parent.width - 20
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                }
+                
+                // 按钮行
+                Row {
+                    spacing: 20
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    
+                    // 退出按钮
+                    Button {
+                        width: 150
+                        height: 45
+                        background: Rectangle {
+                            radius: 8
+                            gradient: Gradient {
+                                GradientStop { position: 0.0; color: "#64748b" }
+                                GradientStop { position: 1.0; color: "#475569" }
+                            }
+                        }
+                        contentItem: Text {
+                            text: "退出"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 18
+                            font.bold: true
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        onClicked: {
+                            confirmDialog.dialogTitle = "退出确认"
+                            confirmDialog.dialogMessage = "确定要退出星火日课吗？"
+                            confirmDialog.confirmAction = function() {
+                                resultDialog.close()
+                                stackView.pop()
+                            }
+                            confirmDialog.open()
+                        }
+                    }
+                    
+                    // 查看错题按钮
+                    Button {
+                        width: 150
+                        height: 45
+                        background: Rectangle {
+                            radius: 8
+                            gradient: Gradient {
+                                GradientStop { position: 0.0; color: "#2563eb" }
+                                GradientStop { position: 1.0; color: "#1d4ed8" }
+                            }
+                        }
+                        contentItem: Text {
+                            text: "查看错题"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 18
+                            font.bold: true
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        onClicked: {
+                            resultDialog.close()
+                            wrongQuestionsDialog.open()
+                        }
+                    }
                 }
             }
         }
         
-        console.log("得分：" + score + "/" + total)
+        footer: null
+    }
+    
+    // 错题对话框
+    Dialog {
+        id: wrongQuestionsDialog
+        anchors.centerIn: parent
+        width: 700
+        height: 500
+        modal: true
+        closePolicy: Popup.CloseOnEscape
+        
+        background: Rectangle {
+            color: "#1e293b"
+            radius: 12
+            border.color: "#f97316"
+            border.width: 2
+        }
+        
+        contentItem: Rectangle {
+            color: "transparent"
+            anchors.fill: parent
+            
+            Column {
+                anchors.fill: parent
+                anchors.margins: 20
+                spacing: 15
+                
+                // 标题装饰图案
+                Rectangle {
+                    width: parent.width
+                    height: 50
+                    radius: 8
+                    color: "#f97316"
+                    
+                    Text {
+                        text: "错题集"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 22
+                        font.bold: true
+                        color: "white"
+                        anchors.centerIn: parent
+                    }
+                }
+                
+                // 错题列表
+                Flickable {
+                    id: wrongQuestionsScrollView
+                    width: parent.width
+                    height: parent.height - 130
+                    contentWidth: width
+                    contentHeight: wrongQuestionsColumn.height
+                    clip: true
+                    
+                    // 设置Flickable的属性以支持触摸和鼠标拖动
+                    boundsBehavior: Flickable.StopAtBounds
+                    flickableDirection: Flickable.VerticalFlick
+                    interactive: true
+                    
+                    // 添加ScrollBar
+                    ScrollBar.vertical: ScrollBar {
+                        policy: ScrollBar.AsNeeded
+                        active: true
+                        interactive: true
+                        visible: wrongQuestionsColumn.height > wrongQuestionsScrollView.height
+                    }
+                    
+                    Column {
+                        id: wrongQuestionsColumn
+                        width: parent.width - 20
+                        spacing: 30
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        
+                        Repeater {
+                            id: wrongQuestionsRepeater
+                            model: {
+                                // 添加调试输出，检查错题数量
+                                var wrongQuestions = getWrongQuestions();
+                                console.log("错题数量：", wrongQuestions.length);
+                                return wrongQuestions;
+                            }
+                            
+                            Rectangle {
+                                width: parent.width
+                                implicitHeight: wrongQuestionColumn.implicitHeight + 20
+                                radius: 8
+                                color: "#0f172a"
+                                
+                                Column {
+                                    id: wrongQuestionColumn
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.top: parent.top
+                                    anchors.margins: 10
+                                    spacing: 10
+                                    
+                                    // 题目标题
+                                    Text {
+                                        width: parent.width
+                                        text: {
+                                            try {
+                                                return "第 " + (modelData.index + 1) + " 题：" + 
+                                                       (modelData.question.options && modelData.question.options.length > 0 ? 
+                                                       (modelData.question.answer.length > 1 ? "多选题" : "单选题") : "判断题");
+                                            } catch(e) {
+                                                console.error("显示题目标题错误:", e);
+                                                return "题目标题";
+                                            }
+                                        }
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 16
+                                        font.bold: true
+                                        color: "#f97316"
+                                        wrapMode: Text.WordWrap
+                                    }
+                                    
+                                    // 题目内容
+                                    Rectangle {
+                                        width: parent.width
+                                        height: Math.max(100, contentText.implicitHeight + 20)
+                                        color: "#1a2942"
+                                        radius: 4
+                                        
+                                        Text {
+                                            id: contentText
+                                            anchors.fill: parent
+                                            anchors.margins: 10
+                                            text: {
+                                                // 添加调试输出，检查内容是否能获取到
+                                                console.log("错题内容：", modelData.question.content);
+                                                if (modelData && modelData.question && modelData.question.content) {
+                                                    return modelData.question.content;
+                                                } else {
+                                                    console.log("错题内容为空或不存在");
+                                                    return "题目内容不可用";
+                                                }
+                                            }
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 16
+                                            color: "white"
+                                            wrapMode: Text.WordWrap
+                                            elide: Text.ElideNone
+                                            textFormat: Text.PlainText
+                                        }
+                                    }
+                                    
+                                    // 选项显示
+                                    Rectangle {
+                                        width: parent.width
+                                        implicitHeight: optionsColumn.implicitHeight + 10
+                                        color: "#21293a"
+                                        radius: 4
+                                        visible: modelData.question.options && modelData.question.options.length > 0
+                                        
+                                        Column {
+                                            id: optionsColumn
+                                            width: parent.width - 10
+                                            anchors.centerIn: parent
+                                            spacing: 8
+                                            
+                                            Repeater {
+                                                model: {
+                                                    if (!modelData.question.options || modelData.question.options.length === 0) {
+                                                        // 判断题选项
+                                                        return [
+                                                            { index: 0, text: "正确" },
+                                                            { index: 1, text: "错误" }
+                                                        ]
+                                                    }
+                                                    return modelData.question.options
+                                                }
+                                                
+                                                Row {
+                                                    spacing: 10
+                                                    width: parent.width
+                                                    
+                                                    Rectangle {
+                                                        width: 25
+                                                        height: 25
+                                                        radius: 12.5
+                                                        color: {
+                                                            var userAns = modelData.index
+                                                            var correctAns = modelData.question.answer
+                                                            var letter = String.fromCharCode(65 + userAns)
+                                                            
+                                                            if (Array.isArray(modelData.userAnswer)) {
+                                                                // 多选题
+                                                                var isLetterInCorrectAns = correctAns.indexOf(letter) !== -1
+                                                                var isUserSelected = modelData.userAnswer.includes(userAns)
+                                                                
+                                                                if (isUserSelected) {
+                                                                    // 用户选择了此项
+                                                                    return isLetterInCorrectAns ? "#22c55e" : "#ef4444"
+                                                                } else {
+                                                                    // 用户未选此项
+                                                                    return isLetterInCorrectAns ? "#fde047" : "transparent"
+                                                                }
+                                                            } else {
+                                                                // 单选
+                                                                if (modelData.userAnswer === userAns) {
+                                                                    // 用户选择了此项
+                                                                    return letter === correctAns ? "#22c55e" : "#ef4444"
+                                                                } else {
+                                                                    // 用户未选此项
+                                                                    return letter === correctAns ? "#fde047" : "transparent"
+                                                                }
+                                                            }
+                                                        }
+                                                        border.width: 1
+                                                        border.color: "white"
+                                                        
+                                                        Text {
+                                                            anchors.centerIn: parent
+                                                            text: String.fromCharCode(65 + modelData.index)
+                                                            font.family: "阿里妈妈数黑体"
+                                                            font.pixelSize: 14
+                                                            color: "white"
+                                                        }
+                                                    }
+                                                    
+                                                    Text {
+                                                        id: optionText
+                                                        text: modelData.text
+                                                        font.family: "阿里妈妈数黑体"
+                                                        font.pixelSize: 14
+                                                        color: "white"
+                                                        width: parent.width - 35
+                                                        wrapMode: Text.WordWrap
+                                                        anchors.verticalCenter: parent.verticalCenter
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    // 答案比对
+                                    Rectangle {
+                                        width: parent.width
+                                        implicitHeight: answerCompareColumn.implicitHeight + 16
+                                        color: "#0f2942"
+                                        radius: 4
+                                        
+                                        Column {
+                                            id: answerCompareColumn
+                                            anchors.left: parent.left
+                                            anchors.right: parent.right
+                                            anchors.top: parent.top
+                                            anchors.margins: 8
+                                            spacing: 8
+                                            
+                                            Rectangle {
+                                                width: parent.width
+                                                height: userAnswerText.implicitHeight + 10
+                                                color: "#331e1e"
+                                                radius: 4
+                                                
+                                                Text {
+                                                    id: userAnswerText
+                                                    anchors.fill: parent
+                                                    anchors.margins: 5
+                                                    text: "您的答案：" + modelData.userAnswerStr
+                                                    font.family: "阿里妈妈数黑体"
+                                                    font.pixelSize: 14
+                                                    color: "#ef4444"
+                                                    wrapMode: Text.WordWrap
+                                                }
+                                            }
+                                            
+                                            Rectangle {
+                                                width: parent.width
+                                                height: correctAnswerText.implicitHeight + 10
+                                                color: "#173320"
+                                                radius: 4
+                                                
+                                                Text {
+                                                    id: correctAnswerText
+                                                    anchors.fill: parent
+                                                    anchors.margins: 5
+                                                    text: "正确答案：" + modelData.question.answer
+                                                    font.family: "阿里妈妈数黑体"
+                                                    font.pixelSize: 14
+                                                    color: "#22c55e"
+                                                    wrapMode: Text.WordWrap
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    // 解析（如果有）
+                                    Rectangle {
+                                        width: parent.width
+                                        height: Math.max(80, analysisText.implicitHeight + 20)
+                                        color: "#292524"
+                                        radius: 4
+                                        visible: modelData.question.analysis && modelData.question.analysis.length > 0
+                                        
+                                        Text {
+                                            id: analysisText
+                                            anchors.fill: parent
+                                            anchors.margins: 10
+                                            text: {
+                                                // 添加调试输出，检查解析是否能获取到
+                                                console.log("错题解析：", modelData.question.analysis);
+                                                if (modelData && modelData.question && modelData.question.analysis) {
+                                                    return "解析：" + modelData.question.analysis;
+                                                } else {
+                                                    console.log("错题解析为空或不存在");
+                                                    return "无解析";
+                                                }
+                                            }
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 14
+                                            color: "#fde047"
+                                            wrapMode: Text.WordWrap
+                                            elide: Text.ElideNone
+                                            textFormat: Text.PlainText
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // 如果没有错题
+                        Item {
+                            width: parent.width
+                            height: 100
+                            visible: wrongQuestionsRepeater.count === 0
+                            
+                            Text {
+                                anchors.centerIn: parent
+                                text: "恭喜您！全部答对，没有错题！"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 20
+                                color: "#22c55e"
+                            }
+                        }
+                    }
+                }
+                
+                // 关闭按钮
+                Button {
+                    width: 150
+                    height: 45
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    background: Rectangle {
+                        radius: 8
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: "#0891b2" }
+                            GradientStop { position: 1.0; color: "#0e7490" }
+                        }
+                    }
+                    contentItem: Text {
+                        text: "返回结果页面"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 18
+                        font.bold: true
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        wrongQuestionsDialog.close()
+                        resultDialog.open()
+                    }
+                }
+            }
+        }
+        
+        footer: null
+    }
+    
+    // 消息对话框
+    Dialog {
+        id: messageDialog
+        anchors.centerIn: parent
+        width: 450
+        height: 320
+        modal: true
+        closePolicy: Popup.CloseOnEscape
+        
+        property string messageText: ""
+        
+        background: Rectangle {
+            color: "#1e293b"
+            radius: 10
+            border.color: "#e11d48"
+            border.width: 2
+        }
+        
+        contentItem: Rectangle {
+            color: "transparent"
+            anchors.fill: parent
+            
+            Column {
+                anchors.centerIn: parent
+                spacing: 15
+                width: parent.width - 60
+                
+                // 顶部留白
+                Item {
+                    width: parent.width
+                    height: 10
+                }
+                
+                // 标题
+                Rectangle {
+                    width: parent.width
+                    height: 40
+                    radius: 6
+                    color: "#e11d48"
+                    
+                    Text {
+                        text: "提示信息"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 18
+                        font.bold: true
+                        color: "white"
+                        anchors.centerIn: parent
+                    }
+                }
+                
+                // 警告图标
+                Text {
+                    text: "⚠️"
+                    font.pixelSize: 36
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                
+                // 消息内容区域，使用ScrollView确保内容过多时可滚动
+                ScrollView {
+                    width: parent.width
+                    height: 120
+                    clip: true
+                    
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "transparent"
+                        
+                        Text {
+                            width: parent.width - 20
+                            text: messageDialog.messageText
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 16
+                            color: "#f0f9ff"
+                            wrapMode: Text.Wrap
+                            horizontalAlignment: Text.AlignHCenter
+                            anchors.centerIn: parent
+                        }
+                    }
+                }
+                
+                // 确定按钮
+                Button {
+                    width: 120
+                    height: 40
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    background: Rectangle {
+                        radius: 6
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: "#e11d48" }
+                            GradientStop { position: 1.0; color: "#be123c" }
+                        }
+                    }
+                    contentItem: Text {
+                        text: "确定"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        messageDialog.close()
+                    }
+                }
+                
+                // 底部留白
+                Item {
+                    width: parent.width
+                    height: 10
+                }
+            }
+        }
+        
+        footer: null
+    }
+    
+    // 确认对话框
+    Dialog {
+        id: confirmDialog
+        anchors.centerIn: parent
+        width: 400
+        height: 250
+        modal: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        property string dialogTitle: "确认"
+        property string dialogMessage: "确定执行此操作吗？"
+        property var confirmAction: function() {}
+        
+        background: Rectangle {
+            color: "#1e293b"
+            radius: 10
+            border.color: "#334155"
+            border.width: 2
+        }
+        
+        header: Rectangle {
+            color: "#334155"
+            height: 50
+            radius: 8
+            
+            Text {
+                text: confirmDialog.dialogTitle
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 20
+                font.bold: true
+                color: "white"
+                anchors.centerIn: parent
+            }
+        }
+        
+        contentItem: Rectangle {
+            color: "transparent"
+            
+            Text {
+                width: parent.width - 40
+                anchors.centerIn: parent
+                text: confirmDialog.dialogMessage
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 16
+                color: "#f0f9ff"
+                wrapMode: Text.Wrap
+                horizontalAlignment: Text.AlignHCenter
+            }
+        }
+        
+        footer: Rectangle {
+            color: "transparent"
+            height: 70
+            
+            Row {
+                anchors.centerIn: parent
+                spacing: 30
+                
+                // 取消按钮
+                Button {
+                    width: 120
+                    height: 40
+                    background: Rectangle {
+                        radius: 6
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: "#64748b" }
+                            GradientStop { position: 1.0; color: "#475569" }
+                        }
+                    }
+                    contentItem: Text {
+                        text: "取消"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        confirmDialog.close()
+                    }
+                }
+                
+                // 确认按钮
+                Button {
+                    width: 120
+                    height: 40
+                    background: Rectangle {
+                        radius: 6
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: "#0891b2" }
+                            GradientStop { position: 1.0; color: "#0e7490" }
+                        }
+                    }
+                    contentItem: Text {
+                        text: "确认"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        confirmDialog.confirmAction()
+                        confirmDialog.close()
+                    }
+                }
+            }
+        }
     }
 } 

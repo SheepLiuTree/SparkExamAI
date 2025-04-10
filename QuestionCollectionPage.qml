@@ -42,11 +42,8 @@ Rectangle {
             verticalAlignment: Text.AlignVCenter
         }
         onClicked: {
-            // 返回到主界面
-            stackView.pop(null)
-            
-            // 返回上一页
-            console.log("返回上一页")
+            // 显示确认对话框
+            confirmDialog.open()
         }
     }
     
@@ -998,6 +995,117 @@ Rectangle {
             
             // 验证Excel格式并加载表头
             batchImportDialog.isValidExcel = fileManager.validateExcelStructure(path)
+        }
+    }
+    
+    // 确认对话框
+    Dialog {
+        id: confirmDialog
+        anchors.centerIn: parent
+        width: 400
+        height: 250
+        modal: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        background: Rectangle {
+            color: "#1e293b"
+            radius: 10
+            border.color: "#334155"
+            border.width: 2
+        }
+        
+        header: Rectangle {
+            color: "#334155"
+            height: 50
+            radius: 8
+            
+            Text {
+                text: "返回确认"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 20
+                font.bold: true
+                color: "white"
+                anchors.centerIn: parent
+            }
+        }
+        
+        contentItem: Rectangle {
+            color: "transparent"
+            
+            Text {
+                width: parent.width - 40
+                anchors.centerIn: parent
+                text: "确定要退出题集速录吗？"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 16
+                color: "#f0f9ff"
+                wrapMode: Text.Wrap
+                horizontalAlignment: Text.AlignHCenter
+            }
+        }
+        
+        footer: Rectangle {
+            color: "transparent"
+            height: 70
+            
+            Row {
+                anchors.centerIn: parent
+                spacing: 30
+                
+                // 取消按钮
+                Button {
+                    width: 120
+                    height: 40
+                    background: Rectangle {
+                        radius: 6
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: "#64748b" }
+                            GradientStop { position: 1.0; color: "#475569" }
+                        }
+                    }
+                    contentItem: Text {
+                        text: "取消"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        confirmDialog.close()
+                    }
+                }
+                
+                // 确认按钮
+                Button {
+                    width: 120
+                    height: 40
+                    background: Rectangle {
+                        radius: 6
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: "#0891b2" }
+                            GradientStop { position: 1.0; color: "#0e7490" }
+                        }
+                    }
+                    contentItem: Text {
+                        text: "确认"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        // 返回到主界面
+                        stackView.pop(null)
+                        
+                        // 返回上一页
+                        console.log("返回上一页")
+                        confirmDialog.close()
+                    }
+                }
+            }
         }
     }
 } 

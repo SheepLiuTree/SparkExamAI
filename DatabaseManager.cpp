@@ -194,6 +194,27 @@ bool DatabaseManager::createTables()
         qDebug() << "Failed to create knowledge_points table:" << query.lastError().text();
         return false;
     }
+    
+    // 创建用户答题记录表
+    success = query.exec(
+        "CREATE TABLE IF NOT EXISTS user_answer_records ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "work_id TEXT NOT NULL, "
+        "user_name TEXT NOT NULL, "
+        "exam_type TEXT NOT NULL, "
+        "total_questions INTEGER NOT NULL, "
+        "correct_count INTEGER NOT NULL, "
+        "answer_data TEXT NOT NULL, "
+        "score_percentage REAL NOT NULL, "
+        "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+        "FOREIGN KEY (work_id) REFERENCES users(work_id)"
+        ")"
+    );
+
+    if (!success) {
+        qDebug() << "Failed to create user_answer_records table:" << query.lastError().text();
+        return false;
+    }
 
     return true;
 }
@@ -1381,4 +1402,143 @@ QString getFieldValue(const QVariantMap &map, const QStringList &possibleKeys)
         }
     }
     return QString();
+}
+
+bool DatabaseManager::saveUserAnswerRecord(const QString &workId, 
+                                       const QString &userName,
+                                       const QString &examType,
+                                       int totalQuestions,
+                                       int correctCount,
+                                       const QString &answerData)
+{
+    if (!m_database.isOpen()) {
+        qDebug() << "数据库未打开，尝试重新打开";
+        if (!m_database.open()) {
+            qDebug() << "无法打开数据库:" << m_database.lastError().text();
+            return false;
+        }
+    }
+    
+    QSqlQuery query(m_database);
+    query.prepare(
+        "INSERT INTO user_answer_records "
+        "(work_id, user_name, exam_type, total_questions, correct_count, answer_data, score_percentage) "
+        "VALUES (:work_id, :user_name, :exam_type, :total_questions, :correct_count, :answer_data, :score_percentage)"
+    );
+    
+    query.bindValue(":work_id", workId);
+    query.bindValue(":user_name", userName);
+    query.bindValue(":exam_type", examType);
+    query.bindValue(":total_questions", totalQuestions);
+    query.bindValue(":correct_count", correctCount);
+    query.bindValue(":answer_data", answerData);
+    
+    // 计算得分百分比
+    float scorePercentage = 0;
+    if (totalQuestions > 0) {
+        scorePercentage = (float)correctCount / totalQuestions * 100.0;
+    }
+    query.bindValue(":score_percentage", scorePercentage);
+    
+    if (!query.exec()) {
+        qDebug() << "保存用户答题记录失败:" << query.lastError().text();
+        return false;
+    }
+    
+    qDebug() << "用户" << userName << "答题记录保存成功, 得分: " << correctCount << "/" << totalQuestions;
+    return true;
+}
+
+QVariantList DatabaseManager::getUserAnswerRecords(const QString &workId, int limit, int offset)
+{
+    QVariantList result;
+    
+    if (!m_database.isOpen()) {
+        qDebug() << "数据库未打开，尝试重新打开";
+        if (!m_database.open()) {
+            qDebug() << "无法打开数据库:" << m_database.lastError().text();
+            return result;
+        }
+    }
+    
+    QSqlQuery query(m_database);
+    query.prepare(
+        "SELECT * FROM user_answer_records "
+        "WHERE work_id = :work_id "
+        "ORDER BY created_at DESC "
+        "LIMIT :limit OFFSET :offset"
+    );
+    
+    query.bindValue(":work_id", workId);
+    query.bindValue(":limit", limit);
+    query.bindValue(":offset", offset);
+    
+    if (!query.exec()) {
+        qDebug() << "获取用户答题记录失败:" << query.lastError().text();
+        return result;
+    }
+    
+    while (query.next()) {
+        QVariantMap record;
+        record["id"] = query.value("id").toInt();
+        record["workId"] = query.value("work_id").toString();
+        record["userName"] = query.value("user_name").toString();
+        record["examType"] = query.value("exam_type").toString();
+        record["totalQuestions"] = query.value("total_questions").toInt();
+        record["correctCount"] = query.value("correct_count").toInt();
+        record["answerData"] = query.value("answer_data").toString();
+        record["scorePercentage"] = query.value("score_percentage").toFloat();
+        record["createdAt"] = query.value("created_at").toString();
+        
+        result.append(record);
+    }
+    
+    return result;
+}
+
+QVariantList DatabaseManager::getAllAnswerRecords(int limit, int offset)
+{
+    QVariantList result;
+    
+    if (!m_database.isOpen()) {
+        qDebug() << "数据库未打开，尝试重新打开";
+        if (!m_database.open()) {
+            qDebug() << "无法打开数据库:" << m_database.lastError().text();
+            return result;
+        }
+    }
+    
+    QSqlQuery query(m_database);
+    query.prepare(
+        "SELECT r.*, u.name as user_name "
+        "FROM user_answer_records r "
+        "LEFT JOIN users u ON r.work_id = u.work_id "
+        "ORDER BY r.created_at DESC "
+        "LIMIT :limit OFFSET :offset"
+    );
+    
+    query.bindValue(":limit", limit);
+    query.bindValue(":offset", offset);
+    
+    if (!query.exec()) {
+        qDebug() << "获取所有答题记录失败:" << query.lastError().text();
+        return result;
+    }
+    
+    while (query.next()) {
+        QVariantMap record;
+        record["id"] = query.value("id").toInt();
+        record["workId"] = query.value("work_id").toString();
+        record["userName"] = query.value("user_name").toString();
+        record["examType"] = query.value("exam_type").toString();
+        record["totalQuestions"] = query.value("total_questions").toInt();
+        record["correctCount"] = query.value("correct_count").toInt();
+        record["answerData"] = query.value("answer_data").toString();
+        record["scorePercentage"] = query.value("score_percentage").toFloat();
+        record["createdAt"] = query.value("created_at").toString();
+        
+        result.append(record);
+    }
+    
+    return result;
 } 

@@ -149,6 +149,22 @@ public:
     
     // 清空所有智点
     Q_INVOKABLE bool clearAllKnowledgePoints();
+    
+    // 用户答题记录相关方法
+    
+    // 保存用户答题记录
+    Q_INVOKABLE bool saveUserAnswerRecord(const QString &workId, 
+                                         const QString &userName,
+                                         const QString &examType,
+                                         int totalQuestions,
+                                         int correctCount,
+                                         const QString &answerData);
+    
+    // 获取用户答题记录
+    Q_INVOKABLE QVariantList getUserAnswerRecords(const QString &workId, int limit = 100, int offset = 0);
+    
+    // 获取所有答题记录
+    Q_INVOKABLE QVariantList getAllAnswerRecords(int limit = 100, int offset = 0);
 
 private:
     QSqlDatabase m_database;
