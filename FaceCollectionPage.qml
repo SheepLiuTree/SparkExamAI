@@ -6,6 +6,7 @@ import QtQuick.Dialogs 1.3
 
 Rectangle {
     color: "transparent" 
+    objectName: "FaceCollectionPage"
 
     // 添加信号，用于通知主窗口用户列表已更新
     signal userListUpdated()
@@ -1211,7 +1212,7 @@ Rectangle {
     }
 
     // 确认对话框
-    Dialog {
+    Popup {
         id: confirmDialog
         anchors.centerIn: parent
         width: 400
@@ -1226,23 +1227,26 @@ Rectangle {
             border.width: 2
         }
         
-        header: Rectangle {
-            color: "#334155"
-            height: 50
-            radius: 8
+        contentItem: Item {
+            anchors.fill: parent
             
-            Text {
-                text: "返回确认"
-                font.family: "阿里妈妈数黑体"
-                font.pixelSize: 20
-                font.bold: true
-                color: "white"
-                anchors.centerIn: parent
+            Rectangle {
+                id: headerRect
+                width: parent.width
+                height: 50
+                color: "#334155"
+                radius: 8
+                anchors.top: parent.top
+                
+                Text {
+                    text: "返回确认"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 20
+                    font.bold: true
+                    color: "white"
+                    anchors.centerIn: parent
+                }
             }
-        }
-        
-        contentItem: Rectangle {
-            color: "transparent"
             
             Text {
                 width: parent.width - 40
@@ -1254,73 +1258,75 @@ Rectangle {
                 wrapMode: Text.Wrap
                 horizontalAlignment: Text.AlignHCenter
             }
-        }
-        
-        footer: Rectangle {
-            color: "transparent"
-            height: 70
             
-            Row {
-                anchors.centerIn: parent
-                spacing: 30
+            Rectangle {
+                width: parent.width
+                height: 70
+                color: "transparent"
+                anchors.bottom: parent.bottom
                 
-                // 取消按钮
-                Button {
-                    width: 120
-                    height: 40
-                    background: Rectangle {
-                        radius: 6
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: "#64748b" }
-                            GradientStop { position: 1.0; color: "#475569" }
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 30
+                    
+                    // 取消按钮
+                    Button {
+                        width: 120
+                        height: 40
+                        background: Rectangle {
+                            radius: 6
+                            gradient: Gradient {
+                                GradientStop { position: 0.0; color: "#64748b" }
+                                GradientStop { position: 1.0; color: "#475569" }
+                            }
+                        }
+                        contentItem: Text {
+                            text: "取消"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 16
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        onClicked: {
+                            confirmDialog.close()
                         }
                     }
-                    contentItem: Text {
-                        text: "取消"
-                        font.family: "阿里妈妈数黑体"
-                        font.pixelSize: 16
-                        color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                    onClicked: {
-                        confirmDialog.close()
-                    }
-                }
-                
-                // 确认按钮
-                Button {
-                    width: 120
-                    height: 40
-                    background: Rectangle {
-                        radius: 6
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: "#0891b2" }
-                            GradientStop { position: 1.0; color: "#0e7490" }
+                    
+                    // 确认按钮
+                    Button {
+                        width: 120
+                        height: 40
+                        background: Rectangle {
+                            radius: 6
+                            gradient: Gradient {
+                                GradientStop { position: 0.0; color: "#0891b2" }
+                                GradientStop { position: 1.0; color: "#0e7490" }
+                            }
                         }
-                    }
-                    contentItem: Text {
-                        text: "确认"
-                        font.family: "阿里妈妈数黑体"
-                        font.pixelSize: 16
-                        font.bold: true
-                        color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                    onClicked: {
-                        // 确保在返回前清理所有状态
-                        if (camera) {
-                            camera.stop()
+                        contentItem: Text {
+                            text: "确认"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 16
+                            font.bold: true
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
                         }
-                        if (faceRecognitionPopup.visible) {
-                            faceRecognitionPopup.close()
+                        onClicked: {
+                            // 确保在返回前清理所有状态
+                            if (camera) {
+                                camera.stop()
+                            }
+                            if (faceRecognitionPopup.visible) {
+                                faceRecognitionPopup.close()
+                            }
+                            if (messagePopup.visible) {
+                                messagePopup.close()
+                            }
+                            stackView.pop()
+                            confirmDialog.close()
                         }
-                        if (messagePopup.visible) {
-                            messagePopup.close()
-                        }
-                        stackView.pop()
-                        confirmDialog.close()
                     }
                 }
             }

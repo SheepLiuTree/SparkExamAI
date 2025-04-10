@@ -193,16 +193,12 @@ Window {
                         stackView.push("FaceCollectionPage.qml")
                         
                         // 连接新页面的用户列表更新信号
-                        stackView.currentItem.userListUpdated.connect(function() {
-                            console.log("收到用户列表更新信号")
-                            personal_page_column.loadUserListFromDatabase()
-                        })
-                        
-                        // 在页面关闭时断开信号连接
-                        stackView.currentItem.Component.onDestruction.connect(function() {
-                            console.log("面容采集页面关闭，断开信号连接")
-                            stackView.currentItem.userListUpdated.disconnect()
-                        })
+                        if (stackView.currentItem && stackView.currentItem.userListUpdated) {
+                            stackView.currentItem.userListUpdated.connect(function() {
+                                console.log("收到用户列表更新信号")
+                                personal_page_column.loadUserListFromDatabase()
+                            })
+                        }
                     }
                 }
 
