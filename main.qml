@@ -1185,8 +1185,15 @@ Window {
                                 adminRequiredPopup.open()
                             } else {
                                 console.log("用户已确认信息，正在跳转到" + userInfoDialog.titleText + "页面...")
-                                // 确认后跳转到对应页面
-                                stackView.push(userInfoDialog.targetPage)
+                                // 确认后跳转到对应页面，并传递用户数据
+                                var component = Qt.createComponent(userInfoDialog.targetPage)
+                                if (component.status === Component.Ready) {
+                                    var pageObject = component.createObject(stackView, {"userData": userInfoDialog.userData})
+                                    stackView.push(pageObject)
+                                } else {
+                                    console.error("组件加载失败:", component.errorString())
+                                    stackView.push(userInfoDialog.targetPage)
+                                }
                             }
                         }
                     }

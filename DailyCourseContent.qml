@@ -57,39 +57,38 @@ Rectangle {
         height: 60
         color: "transparent"
         
-        RowLayout {
-            anchors.fill: parent
-            anchors.margins: 10
-            spacing: 20
-            
-            Button {
-                Layout.preferredWidth: 100
-                Layout.preferredHeight: 40
-        background: Image {
-            source: "qrc:/images/button_bg.png"
-            fillMode: Image.Stretch
-        }
-        contentItem: Text {
-            text: "返回"
-            font.family: "阿里妈妈数黑体"
-            font.pixelSize: 18
-            color: "white"
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
-        onClicked: {
-            stackView.pop()
-        }
-    }
-    
-    Text {
-                text: "星火日课 - " + (userData ? userData.name : "用户")
-        font.family: "阿里妈妈数黑体"
-                font.pixelSize: 24
-        color: "white"
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
+        // 返回按钮，放在左侧
+        Button {
+            id: backButton
+            width: 100
+            height: 40
+            anchors.left: parent.left
+            anchors.leftMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
+            background: Image {
+                source: "qrc:/images/button_bg.png"
+                fillMode: Image.Stretch
             }
+            contentItem: Text {
+                text: "返回"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 18
+                color: "white"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+            onClicked: {
+                stackView.pop()
+            }
+        }
+        
+        // 标题文本，放在中央
+        Text {
+            text: "星火日课 - " + (userData ? userData.name : "用户")
+            font.family: "阿里妈妈数黑体"
+            font.pixelSize: 24
+            color: "white"
+            anchors.centerIn: parent
         }
     }
     
