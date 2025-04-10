@@ -16,23 +16,190 @@ Rectangle {
         id: faceCollectionModel
     }
 
+    // 定义顶级摄像头组件
+    Camera {
+        id: camera
+        viewfinder.resolution: Qt.size(640, 360)
+        deviceId: ""  // 初始为空，在初始化函数中设置正确的值
+            
+        imageCapture {
+            onImageCaptured: {
+                console.log("Image captured with id: " + requestId)
+                capturedImage.source = preview
+            }
+            onImageSaved: {
+                console.log("Image saved as: " + path)
+                fileManager.moveFile(path, "faceimages/" + nameInput.text + ".jpg")
+            }
+        }
+        
+        onCameraStateChanged: {
+            console.log("摄像头状态变化:", cameraState)
+            if (cameraState === Camera.ActiveState) {
+                cameraReady = true
+                console.log("摄像头已激活，使用的设备ID:", deviceId)
+            } else {
+                cameraReady = false
+            }
+        }
+        
+        onErrorChanged: {
+            if (error !== Camera.NoError) {
+                console.log("摄像头错误:", error, errorString)
+            }
+        }
+    }
+    
+    // 摄像头就绪状态
+    property bool cameraReady: false
+    
+    // 初始化尝试次数
+    property int initAttempts: 0
+    property int maxInitAttempts: 5
+
     // 组件加载完成后，从数据库加载数据
     Component.onCompleted: {
         // 加载面部数据列表
         loadFaceDataFromDatabase()
+        console.log("FaceCollectionPage完成加载，将在1秒后初始化摄像头")
         
-        // 获取当前摄像头设置并应用
-        var savedCameraId = dbManager.getSetting("camera_device", "")
-        if (savedCameraId !== "") {
-            camera.deviceId = savedCameraId
-            console.log("使用设置的摄像头ID:", savedCameraId)
-        } else {
-            camera.deviceId = QtMultimedia.defaultCamera.deviceId
-            console.log("使用默认摄像头")
+        // 第一次尝试初始化摄像头
+        firstInitTimer.start()
+    }
+    
+    // 首次初始化定时器
+    Timer {
+        id: firstInitTimer
+        interval: 1000  // 1秒延迟
+        running: false
+        repeat: false
+        onTriggered: {
+            initCamera()
+        }
+    }
+    
+    // 初始化摄像头
+    function initCamera() {
+        console.log("开始初始化摄像头, 尝试次数:", initAttempts + 1)
+        
+        // 超过最大尝试次数
+        if (initAttempts >= maxInitAttempts) {
+            console.log("达到最大尝试次数，初始化失败")
+            return
         }
         
+        initAttempts++
+        
+        // 先释放已存在的资源
+        if (camera.cameraState === Camera.ActiveState) {
+            console.log("摄像头已在活动状态，先停止")
+            camera.stop()
+            // 短暂延迟后再重新启动
+            Qt.callLater(function() {
+                startCamera()
+            })
+        } else {
+            startCamera()
+        }
+    }
+    
+    // 启动摄像头
+    function startCamera() {
+        // 获取摄像头设置
+        var savedCameraId = dbManager.getSetting("camera_device", "auto")
+        console.log("获取摄像头设置:", savedCameraId)
+        
+        // 检查可用摄像头
+        var cameras = QtMultimedia.availableCameras
+        console.log("可用摄像头数量:", cameras.length)
+        for (var i = 0; i < cameras.length; i++) {
+            console.log("摄像头 #" + i + ": " + cameras[i].deviceId + " - " + cameras[i].displayName)
+        }
+        
+        // 设置摄像头ID
+        if (savedCameraId === "auto") {
+            // 自动模式，使用默认摄像头
+            if (cameras.length > 0) {
+                camera.deviceId = QtMultimedia.defaultCamera.deviceId
+                console.log("使用默认摄像头:", camera.deviceId)
+            } else {
+                console.log("没有可用摄像头!")
+                return
+            }
+        } else if (savedCameraId !== "") {
+            // 使用指定的摄像头ID
+            var foundDevice = false
+            // 先检查指定的ID是否在可用列表中
+            for (var i = 0; i < cameras.length; i++) {
+                if (cameras[i].deviceId === savedCameraId) {
+                    foundDevice = true
+                    break
+                }
+            }
+            
+            if (foundDevice) {
+                camera.deviceId = savedCameraId
+                console.log("使用指定摄像头:", savedCameraId)
+            } else {
+                console.log("指定的摄像头不可用，使用默认摄像头")
+                if (cameras.length > 0) {
+                    camera.deviceId = QtMultimedia.defaultCamera.deviceId
+                    console.log("退回到默认摄像头:", camera.deviceId)
+                } else {
+                    console.log("没有可用摄像头!")
+                    return
+                }
+            }
+        } else {
+            // 空设置，使用默认摄像头
+            if (cameras.length > 0) {
+                camera.deviceId = QtMultimedia.defaultCamera.deviceId
+                console.log("使用默认摄像头:", camera.deviceId)
+            } else {
+                console.log("没有可用摄像头!")
+                return
+            }
+        }
+        
+        // 记录当前使用的摄像头ID
+        console.log("最终设置的摄像头ID:", camera.deviceId)
+        
         // 启动摄像头
+        console.log("启动摄像头...")
         camera.start()
+        
+        // 启动监视定时器
+        cameraMonitorTimer.start()
+    }
+    
+    // 摄像头监视定时器
+    Timer {
+        id: cameraMonitorTimer
+        interval: 1000  // 1秒检查一次
+        running: false
+        repeat: true
+        property int checkCount: 0
+        
+        onTriggered: {
+            checkCount++
+            console.log("监视摄像头状态:", camera.cameraState, "就绪:", cameraReady, "次数:", checkCount)
+            
+            if (cameraReady) {
+                console.log("摄像头就绪，停止监视")
+                cameraMonitorTimer.stop()
+                checkCount = 0
+            } else if (checkCount >= 5) {
+                console.log("摄像头未就绪，重试初始化")
+                camera.stop()
+                cameraMonitorTimer.stop()
+                checkCount = 0
+                
+                // 短暂延迟后重试
+                Qt.callLater(function() {
+                    initCamera()
+                })
+            }
+        }
     }
 
     // 从数据库加载人脸数据的函数
@@ -135,17 +302,26 @@ Rectangle {
             avatarPathInput.text = ""
             avatarPathInput.filePath = ""
             
-            // 获取当前摄像头设置并应用
-            var savedCameraId = dbManager.getSetting("camera_device", "")
-            if (savedCameraId !== "") {
-                camera.deviceId = savedCameraId
-                console.log("使用设置的摄像头ID:", savedCameraId)
-            } else {
-                camera.deviceId = QtMultimedia.defaultCamera.deviceId
-                console.log("使用默认摄像头")
-            }
+            console.log("相机弹窗打开 - 摄像头状态:", camera.cameraState, "就绪:", cameraReady)
             
-            camera.start()
+            // 始终重新初始化摄像头，确保使用正确的设备
+            console.log("重新初始化摄像头以确保使用正确的设备")
+            
+            // 如果摄像头在活动状态，先停止
+            if (camera.cameraState === Camera.ActiveState) {
+                camera.stop()
+                // 短暂延迟后重新初始化
+                Qt.callLater(function() {
+                    initCamera()
+                })
+            } else {
+                // 直接初始化
+                initCamera()
+            }
+        }
+        
+        onClosed: {
+            console.log("相机弹窗关闭 - 不停止摄像头，保持运行状态")
         }
 
         background: Rectangle {
@@ -166,23 +342,6 @@ Rectangle {
                 width: parent.width * 0.5 - 30
                 height: parent.height - 100
                 color: "black"
-
-                Camera {
-                    id: camera
-                    
-                    viewfinder.resolution: Qt.size(640, 360)
-                    
-                    imageCapture {
-                        onImageCaptured: {
-                            console.log("Image captured with id: " + requestId)
-                            capturedImage.source = preview
-                        }
-                        onImageSaved: {
-                            console.log("Image saved as: " + path)
-                            fileManager.moveFile(path, "faceimages/" + nameInput.text + ".jpg")
-                        }
-                    }
-                }
 
                 VideoOutput {
                     id: videoOutput
@@ -1316,20 +1475,49 @@ Rectangle {
                         onClicked: {
                             // 确保在返回前清理所有状态
                             if (camera) {
+                                console.log("关闭摄像头...")
                                 camera.stop()
+                                // 设置deviceId为空，彻底释放资源
+                                camera.deviceId = ""
                             }
-                            if (faceRecognitionPopup.visible) {
-                                faceRecognitionPopup.close()
-                            }
+                            
+                            // 停止所有定时器
+                            if (firstInitTimer.running)
+                                firstInitTimer.stop()
+                            if (cameraMonitorTimer && cameraMonitorTimer.running)
+                                cameraMonitorTimer.stop()
+                            
                             if (messagePopup.visible) {
                                 messagePopup.close()
                             }
+                            console.log("返回上一页面")
                             stackView.pop()
                             confirmDialog.close()
                         }
                     }
                 }
             }
+        }
+    }
+
+    // 页面销毁时关闭摄像头
+    Component.onDestruction: {
+        console.log("FaceCollectionPage即将销毁 - 停止所有定时器和摄像头")
+        
+        // 停止所有定时器
+        if (firstInitTimer.running)
+            firstInitTimer.stop()
+            
+        if (cameraMonitorTimer && cameraMonitorTimer.running)
+            cameraMonitorTimer.stop()
+        
+        // 彻底停止摄像头
+        if (camera) {
+            console.log("正在停止摄像头...")
+            camera.stop()
+            
+            // 设置deviceId为空，彻底释放资源
+            camera.deviceId = ""
         }
     }
 }

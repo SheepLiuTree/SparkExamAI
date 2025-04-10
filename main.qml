@@ -189,15 +189,33 @@ Window {
                             faceRecognitionPopup.close()
                         }
                         
-                        console.log("打开面容采集页面")
-                        stackView.push("FaceCollectionPage.qml")
+                        // 确保释放任何可能在使用的摄像头资源
+                        if (camera && camera.cameraState === Camera.ActiveState) {
+                            console.log("面容采集前释放已使用的摄像头资源")
+                            camera.stop()
+                        }
                         
-                        // 连接新页面的用户列表更新信号
-                        if (stackView.currentItem && stackView.currentItem.userListUpdated) {
-                            stackView.currentItem.userListUpdated.connect(function() {
-                                console.log("收到用户列表更新信号")
-                                personal_page_column.loadUserListFromDatabase()
-                            })
+                        // 短暂延迟后再打开页面，确保资源释放完成
+                        delayOpenFaceCollection.start()
+                    }
+                    
+                    // 添加延迟定时器，确保摄像头资源得到释放
+                    Timer {
+                        id: delayOpenFaceCollection
+                        interval: 500
+                        running: false
+                        repeat: false
+                        onTriggered: {
+                            console.log("延迟后打开面容采集页面")
+                            stackView.push("FaceCollectionPage.qml")
+                            
+                            // 连接新页面的用户列表更新信号
+                            if (stackView.currentItem && stackView.currentItem.userListUpdated) {
+                                stackView.currentItem.userListUpdated.connect(function() {
+                                    console.log("收到用户列表更新信号")
+                                    personal_page_column.loadUserListFromDatabase()
+                                })
+                            }
                         }
                     }
                 }
@@ -559,62 +577,81 @@ Window {
         property string titleText: ""
         
         onOpened: {
-            // 清空之前的状态
-            capturedImage.visible = false
-            videoOutput.visible = true
-            capturedImagePath = ""
-            statusText.text = "正在准备摄像头..."
-            isRecognizing = false
-            isFaceDetected = false
-            detectedFaceRect = Qt.rect(0, 0, 0, 0)
+            console.log("人脸识别弹窗已打开")
             
-            // 确保临时目录存在
-            var appDir = fileManager.getApplicationDir()
-            var tempDir = appDir + "/temp"
-            
-            if (!fileManager.directoryExists(tempDir)) {
-                fileManager.createDirectory(tempDir)
-                console.log("创建临时目录: " + tempDir)
-            }
-            
-            // 获取当前摄像头设置并应用
-            var savedCameraId = dbManager.getSetting("camera_device", "")
-            if (savedCameraId !== "") {
-                camera.deviceId = savedCameraId
-                console.log("使用设置的摄像头ID:", savedCameraId)
-            } else {
-                camera.deviceId = QtMultimedia.defaultCamera.deviceId
-                console.log("使用默认摄像头")
-            }
-            
-            // 启动摄像头
-            camera.start()
-            console.log("启动摄像头，状态:", camera.cameraState)
-            
-            // 检查可用的摄像头
-            var cameras = QtMultimedia.availableCameras
-            console.log("可用摄像头数量:", cameras.length)
-            for (var i = 0; i < cameras.length; i++) {
-                console.log("摄像头 #" + i + ": " + cameras[i].deviceId + " - " + cameras[i].displayName)
-            }
-            console.log("当前使用摄像头ID:", camera.deviceId)
-            
-            // 启动人脸跟踪
-            faceTrackingTimer.start()
-            console.log("人脸跟踪定时器已启动")
-            
-            // 延迟2秒后开始人脸识别
-            recognitionTimerId = recognitionTimer.restart()
-        }
-        
-        onClosed: {
-            // 停止摄像头和识别
+            // 先关闭之前可能在运行的摄像头
             if (camera.cameraState === Camera.ActiveState) {
                 camera.stop()
             }
-            isRecognizing = false
-            recognitionTimer.stop()
+            
+            // 确保完全重新初始化摄像头
+            Qt.callLater(function() {
+                // 获取摄像头设置
+                var savedCameraId = dbManager.getSetting("camera_device", "auto")
+                console.log("人脸识别弹窗 - 重新设置摄像头，设置:", savedCameraId)
+                
+                if (savedCameraId === "auto") {
+                    // 自动模式，使用默认摄像头
+                    if (QtMultimedia.availableCameras.length > 0) {
+                        camera.deviceId = QtMultimedia.defaultCamera.deviceId
+                        console.log("人脸识别弹窗 - 使用默认摄像头:", camera.deviceId)
+                    }
+                } else if (savedCameraId !== "") {
+                    // 使用指定的摄像头ID
+                    var foundDevice = false
+                    // 先检查指定的ID是否在可用列表中
+                    for (var i = 0; i < QtMultimedia.availableCameras.length; i++) {
+                        if (QtMultimedia.availableCameras[i].deviceId === savedCameraId) {
+                            foundDevice = true
+                            break
+                        }
+                    }
+                    
+                    if (foundDevice) {
+                        camera.deviceId = savedCameraId
+                        console.log("人脸识别弹窗 - 使用指定摄像头:", camera.deviceId)
+                    } else if (QtMultimedia.availableCameras.length > 0) {
+                        camera.deviceId = QtMultimedia.defaultCamera.deviceId
+                        console.log("人脸识别弹窗 - 指定摄像头不可用，使用默认摄像头:", camera.deviceId)
+                    }
+                }
+                
+                // 启动摄像头
+                console.log("人脸识别弹窗 - 启动摄像头")
+                camera.start()
+                
+                // 重置变量
+                isRecognizing = false
+                isFaceDetected = false
+                detectedFaceRect = Qt.rect(0, 0, 0, 0)
+                statusText.text = "请对准摄像头"
+                
+                // 启动人脸跟踪定时器
+                console.log("启动人脸跟踪定时器")
+                faceTrackingTimer.start()
+                
+                // 延迟启动人脸识别
+                recognitionTimer.restart()
+            })
+        }
+        
+        onClosed: {
+            console.log("人脸识别弹窗已关闭，停止摄像头")
+            
+            // 停止摄像头
+            camera.stop()
+            
+            // 停止定时器
             faceTrackingTimer.stop()
+            recognitionTimer.stop()
+            periodicRecognitionTimer.stop()
+            
+            // 清理变量
+            isRecognizing = false
+            isFaceDetected = false
+            
+            // 触发状态文本预设
+            statusText.text = "正在准备摄像头..."
         }
         
         // 用于延迟启动识别的定时器
@@ -628,7 +665,6 @@ Window {
             function restart() {
                 stop()
                 start()
-                return setTimeout(function() {}, interval)
             }
         }
         
@@ -791,6 +827,39 @@ Window {
                         id: camera
                         
                         viewfinder.resolution: Qt.size(640, 360)
+                        
+                        // 在初始化时根据设置选择摄像头设备
+                        Component.onCompleted: {
+                            // 获取摄像头设置
+                            var savedCameraId = dbManager.getSetting("camera_device", "auto")
+                            console.log("人脸识别弹窗 - 读取摄像头设置:", savedCameraId)
+                            
+                            if (savedCameraId === "auto") {
+                                // 自动模式，使用默认摄像头
+                                if (QtMultimedia.availableCameras.length > 0) {
+                                    deviceId = QtMultimedia.defaultCamera.deviceId
+                                    console.log("人脸识别弹窗 - 使用默认摄像头:", deviceId)
+                                }
+                            } else if (savedCameraId !== "") {
+                                // 使用指定的摄像头ID
+                                var foundDevice = false
+                                // 先检查指定的ID是否在可用列表中
+                                for (var i = 0; i < QtMultimedia.availableCameras.length; i++) {
+                                    if (QtMultimedia.availableCameras[i].deviceId === savedCameraId) {
+                                        foundDevice = true
+                                        break
+                                    }
+                                }
+                                
+                                if (foundDevice) {
+                                    deviceId = savedCameraId
+                                    console.log("人脸识别弹窗 - 使用指定摄像头:", deviceId)
+                                } else if (QtMultimedia.availableCameras.length > 0) {
+                                    deviceId = QtMultimedia.defaultCamera.deviceId
+                                    console.log("人脸识别弹窗 - 指定摄像头不可用，使用默认摄像头:", deviceId)
+                                }
+                            }
+                        }
                         
                         imageCapture {
                             onImageSaved: {
@@ -1173,22 +1242,34 @@ Window {
                         onClicked: {
                             userInfoDialog.close()
                             
-                            // 检查是否是题策引擎或题集速录且用户不是管理员
-                            if ((userInfoDialog.titleText === "题策引擎" || userInfoDialog.titleText === "题集速录") && !userInfoDialog.userData.isAdmin) {
-                                console.log("非管理员用户尝试访问" + userInfoDialog.titleText)
-                                // 显示管理员权限提示弹窗
-                                adminRequiredPopup.titleText = userInfoDialog.titleText
-                                adminRequiredPopup.open()
-                            } else {
-                                console.log("用户已确认信息，正在跳转到" + userInfoDialog.titleText + "页面...")
+                            // 单独判断题策引擎，只有它需要管理员权限
+                            var needsAdmin = false;
+                            if (userInfoDialog.titleText === "题策引擎") {
+                                needsAdmin = true;
+                            }
+                            
+                            // 明确检查是否可以进入页面
+                            var canEnterPage = true;
+                            
+                            // 如果需要管理员权限但用户不是管理员则不能进入
+                            if (needsAdmin && !userInfoDialog.userData.isAdmin) {
+                                canEnterPage = false;
+                                console.log("非管理员用户尝试访问需要管理员权限的" + userInfoDialog.titleText);
+                                adminRequiredPopup.titleText = userInfoDialog.titleText;
+                                adminRequiredPopup.open();
+                            }
+                            
+                            // 如果可以进入页面，则创建并跳转
+                            if (canEnterPage) {
+                                console.log("用户已确认信息，正在跳转到" + userInfoDialog.titleText + "页面...");
                                 // 确认后跳转到对应页面，并传递用户数据
-                                var component = Qt.createComponent(userInfoDialog.targetPage)
+                                var component = Qt.createComponent(userInfoDialog.targetPage);
                                 if (component.status === Component.Ready) {
-                                    var pageObject = component.createObject(stackView, {"userData": userInfoDialog.userData})
-                                    stackView.push(pageObject)
+                                    var pageObject = component.createObject(stackView, {"userData": userInfoDialog.userData});
+                                    stackView.push(pageObject);
                                 } else {
-                                    console.error("组件加载失败:", component.errorString())
-                                    stackView.push(userInfoDialog.targetPage)
+                                    console.error("组件加载失败:", component.errorString());
+                                    stackView.push(userInfoDialog.targetPage);
                                 }
                             }
                         }

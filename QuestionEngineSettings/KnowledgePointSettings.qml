@@ -539,12 +539,8 @@ Rectangle {
         knowledgePoints = dbManager.getAllKnowledgePoints()
         
         if (knowledgePoints.length === 0) {
-            // 如果没有数据，添加两条示例数据
-            dbManager.addKnowledgePoint("网络七层协议", "物理层、数据链路层、网络层、传输层、会话层、表示层、应用层")
-            dbManager.addKnowledgePoint("二叉树遍历", "前序遍历、中序遍历、后序遍历、层序遍历")
-            
-            // 重新获取数据
-            knowledgePoints = dbManager.getAllKnowledgePoints()
+            // 没有数据，直接显示空列表
+            console.log("智点列表为空")
         }
         
         console.log("已加载智点列表, 共", knowledgePoints.length, "个智点")

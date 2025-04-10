@@ -9,10 +9,25 @@ Rectangle {
     
     property string userName: "管理员"
     property var questionBanks: []
+    property var userData: ({})
+    
+    // 检测userData变化
+    onUserDataChanged: {
+        if (userData && userData.name) {
+            userName = userData.name
+            console.log("题集速录页面已接收用户数据: " + userName)
+        }
+    }
     
     // 初始化时从数据库加载题库
     Component.onCompleted: {
         loadQuestionBanks()
+        
+        // 如果已经有userData，则更新userName
+        if (userData && userData.name) {
+            userName = userData.name
+            console.log("题集速录页面初始化完成，用户名: " + userName)
+        }
     }
     
     // 从数据库加载题库
@@ -999,7 +1014,7 @@ Rectangle {
     }
     
     // 确认对话框
-    Dialog {
+    Popup {
         id: confirmDialog
         anchors.centerIn: parent
         width: 400
@@ -1014,24 +1029,29 @@ Rectangle {
             border.width: 2
         }
         
-        header: Rectangle {
-            color: "#334155"
-            height: 50
-            radius: 8
+        contentItem: Item {
+            anchors.fill: parent
             
-            Text {
-                text: "返回确认"
-                font.family: "阿里妈妈数黑体"
-                font.pixelSize: 20
-                font.bold: true
-                color: "white"
-                anchors.centerIn: parent
+            // 头部标题
+            Rectangle {
+                id: headerRect
+                width: parent.width
+                height: 50
+                color: "#334155"
+                radius: 8
+                anchors.top: parent.top
+                
+                Text {
+                    text: "返回确认"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 20
+                    font.bold: true
+                    color: "white"
+                    anchors.centerIn: parent
+                }
             }
-        }
-        
-        contentItem: Rectangle {
-            color: "transparent"
             
+            // 内容区域
             Text {
                 width: parent.width - 40
                 anchors.centerIn: parent
@@ -1042,67 +1062,70 @@ Rectangle {
                 wrapMode: Text.Wrap
                 horizontalAlignment: Text.AlignHCenter
             }
-        }
-        
-        footer: Rectangle {
-            color: "transparent"
-            height: 70
             
-            Row {
-                anchors.centerIn: parent
-                spacing: 30
+            // 底部按钮区域
+            Rectangle {
+                width: parent.width
+                height: 70
+                color: "transparent"
+                anchors.bottom: parent.bottom
                 
-                // 取消按钮
-                Button {
-                    width: 120
-                    height: 40
-                    background: Rectangle {
-                        radius: 6
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: "#64748b" }
-                            GradientStop { position: 1.0; color: "#475569" }
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 30
+                    
+                    // 取消按钮
+                    Button {
+                        width: 120
+                        height: 40
+                        background: Rectangle {
+                            radius: 6
+                            gradient: Gradient {
+                                GradientStop { position: 0.0; color: "#64748b" }
+                                GradientStop { position: 1.0; color: "#475569" }
+                            }
+                        }
+                        contentItem: Text {
+                            text: "取消"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 16
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        onClicked: {
+                            confirmDialog.close()
                         }
                     }
-                    contentItem: Text {
-                        text: "取消"
-                        font.family: "阿里妈妈数黑体"
-                        font.pixelSize: 16
-                        color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                    onClicked: {
-                        confirmDialog.close()
-                    }
-                }
-                
-                // 确认按钮
-                Button {
-                    width: 120
-                    height: 40
-                    background: Rectangle {
-                        radius: 6
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: "#0891b2" }
-                            GradientStop { position: 1.0; color: "#0e7490" }
+                    
+                    // 确认按钮
+                    Button {
+                        width: 120
+                        height: 40
+                        background: Rectangle {
+                            radius: 6
+                            gradient: Gradient {
+                                GradientStop { position: 0.0; color: "#0891b2" }
+                                GradientStop { position: 1.0; color: "#0e7490" }
+                            }
                         }
-                    }
-                    contentItem: Text {
-                        text: "确认"
-                        font.family: "阿里妈妈数黑体"
-                        font.pixelSize: 16
-                        font.bold: true
-                        color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                    onClicked: {
-                        // 返回到主界面
-                        stackView.pop(null)
-                        
-                        // 返回上一页
-                        console.log("返回上一页")
-                        confirmDialog.close()
+                        contentItem: Text {
+                            text: "确认"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 16
+                            font.bold: true
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        onClicked: {
+                            // 返回到主界面
+                            stackView.pop(null)
+                            
+                            // 返回上一页
+                            console.log("返回上一页")
+                            confirmDialog.close()
+                        }
                     }
                 }
             }

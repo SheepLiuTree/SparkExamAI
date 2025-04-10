@@ -525,9 +525,15 @@ void DatabaseManager::initDefaultSettings()
         // 默认管理员工号
         setSetting("default_admin_id", "admin001");
         
+        // 设置默认管理员密码
+        setSetting("admin_password", "123456");
+        
         // 其他可能的默认设置
         setSetting("enable_logs", "true");
         setSetting("max_log_days", "30");
+        
+        // 默认摄像头设置 - 使用特殊值"auto"表示自动检测
+        setSetting("camera_device", "auto");
         
         qDebug() << "初始化默认设置完成";
     }
