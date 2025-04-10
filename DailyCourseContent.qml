@@ -55,7 +55,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         height: 60
-        color: "#44ffffff"
+        color: "transparent"
         
         RowLayout {
             anchors.fill: parent
@@ -65,50 +65,30 @@ Rectangle {
             Button {
                 Layout.preferredWidth: 100
                 Layout.preferredHeight: 40
-                background: Image {
-                    source: "qrc:/images/button_bg.png"
-                    fillMode: Image.Stretch
-                }
-                contentItem: Text {
-                    text: "返回"
-                    font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 18
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                onClicked: {
-                    stackView.pop()
-                }
-            }
-            
-            Text {
+        background: Image {
+            source: "qrc:/images/button_bg.png"
+            fillMode: Image.Stretch
+        }
+        contentItem: Text {
+            text: "返回"
+            font.family: "阿里妈妈数黑体"
+            font.pixelSize: 18
+            color: "white"
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+        onClicked: {
+            stackView.pop()
+        }
+    }
+    
+    Text {
                 text: "星火日课 - " + (userData ? userData.name : "用户")
-                font.family: "阿里妈妈数黑体"
+        font.family: "阿里妈妈数黑体"
                 font.pixelSize: 24
-                color: "white"
+        color: "white"
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
-            }
-            
-            Button {
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 40
-                background: Image {
-                    source: "qrc:/images/button_bg.png"
-                    fillMode: Image.Stretch
-                }
-                contentItem: Text {
-                    text: "提交答案"
-                    font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 18
-                    color: "white"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                onClicked: {
-                    submitAnswers()
-                }
             }
         }
     }
@@ -156,28 +136,12 @@ Rectangle {
                             
                             Item { Layout.fillWidth: true }
                         }
-                        
-                        Text {
-                            text: {
-                                if (!currentQuestions[currentQuestionIndex]) return ""
-                                if (!currentQuestions[currentQuestionIndex].options || currentQuestions[currentQuestionIndex].options.length === 0) {
-                                    return "填空题"
-                                } else if (currentQuestions[currentQuestionIndex].options.length === 2) {
-                                    return "判断题"
-                                } else {
-                                    return "多选题"
-                                }
-                            }
-                            font.family: "阿里妈妈数黑体"
-                            font.pixelSize: 18
-                            color: "white"
-                        }
                     }
                     
                     // 题目内容
                     Rectangle {
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        Layout.preferredHeight: 200  // 固定高度
                         color: "#33ffffff"
                         radius: 8
                         
@@ -187,6 +151,7 @@ Rectangle {
                             spacing: 10
                             
                             Text {
+                                Layout.fillWidth: true
                                 text: {
                                     if (!currentQuestions[currentQuestionIndex]) return ""
                                     var answer = currentQuestions[currentQuestionIndex].answer
@@ -199,15 +164,16 @@ Rectangle {
                                     }
                                 }
                                 font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 18
-                                color: "white"
+                                font.pixelSize: 20
+                                color: "#2c70b7"
                                 Layout.alignment: Qt.AlignLeft
+                                font.bold: true
                             }
                             
                             ScrollView {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                clip: true
+            clip: true
                                 
                                 Text {
                                     text: currentQuestions[currentQuestionIndex] ? currentQuestions[currentQuestionIndex].content : ""
@@ -225,97 +191,105 @@ Rectangle {
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 10
+                        Layout.topMargin: 20
+                        Layout.preferredHeight: 300
                         
-                        Repeater {
-                            model: currentQuestions[currentQuestionIndex] ? currentQuestions[currentQuestionIndex].options : []
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
                             
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 50
-                                color: {
-                                    var answer = userAnswers[currentQuestionIndex]
-                                    if (Array.isArray(answer)) {
-                                        return answer.includes(modelData.index) ? "#2c70b7" : "#33ffffff"
-                                    }
-                                    return answer === modelData.index ? "#2c70b7" : "#33ffffff"
-                                }
-                                radius: 8
+                            ColumnLayout {
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                spacing: 10
                                 
-                                RowLayout {
-                                    anchors.fill: parent
-                                    anchors.margins: 10
-                                    spacing: 10
-                                    
-                                    Text {
-                                        text: String.fromCharCode(65 + modelData.index)
-                                        font.family: "阿里妈妈数黑体"
-                                        font.pixelSize: 16
-                                        color: "white"
+                                Repeater {
+                                    model: {
+                                        if (!currentQuestions[currentQuestionIndex]) return []
+                                        if (!currentQuestions[currentQuestionIndex].options || currentQuestions[currentQuestionIndex].options.length === 0) {
+                                            // 判断题选项
+                                            return [
+                                                { index: 0, text: "正确" },
+                                                { index: 1, text: "错误" }
+                                            ]
+                                        }
+                                        return currentQuestions[currentQuestionIndex].options
                                     }
                                     
-                                    Text {
-                                        text: modelData.text
-                                        font.family: "阿里妈妈数黑体"
-                                        font.pixelSize: 16
-                                        color: "white"
+                                    Rectangle {
                                         Layout.fillWidth: true
-                                    }
-                                }
-                                
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        var currentAnswer = userAnswers[currentQuestionIndex]
-                                        var question = currentQuestions[currentQuestionIndex]
+                                        height: 50
+                                        color: {
+                                            var answer = userAnswers[currentQuestionIndex]
+                                            if (Array.isArray(answer)) {
+                                                return answer.includes(modelData.index) ? "#2c70b7" : "#33ffffff"
+                                            }
+                                            return answer === modelData.index ? "#2c70b7" : "#33ffffff"
+                                        }
+                                        radius: 8
                                         
-                                        if (!question.options || question.options.length === 0) {
-                                            // 判断题
-                                            userAnswers[currentQuestionIndex] = modelData.index
-                                        } else if (question.answer.length > 1) {
-                                            // 多选题
-                                            if (!Array.isArray(currentAnswer)) {
-                                                currentAnswer = []
+                                        RowLayout {
+                                            anchors.fill: parent
+                                            anchors.margins: 10
+                                            spacing: 10
+                                            
+                                            Text {
+                                                text: String.fromCharCode(65 + modelData.index)
+                                                font.family: "阿里妈妈数黑体"
+                                                font.pixelSize: 16
+                                                color: "white"
                                             }
-                                            var index = currentAnswer.indexOf(modelData.index)
-                                            if (index === -1) {
-                                                currentAnswer.push(modelData.index)
-                                            } else {
-                                                currentAnswer.splice(index, 1)
+                                            
+                                            Text {
+                                                text: modelData.text
+                                                font.family: "阿里妈妈数黑体"
+                                                font.pixelSize: 16
+                                                color: "white"
+                                                Layout.fillWidth: true
                                             }
-                                            userAnswers[currentQuestionIndex] = currentAnswer
-                                        } else {
-                                            // 单选题
-                                            userAnswers[currentQuestionIndex] = modelData.index
+                                        }
+                                        
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                var currentAnswer = userAnswers[currentQuestionIndex]
+                                                var question = currentQuestions[currentQuestionIndex]
+                                                
+                                                if (!question.options || question.options.length === 0) {
+                                                    // 判断题
+                                                    userAnswers[currentQuestionIndex] = modelData.index
+                                                } else if (question.answer.length > 1) {
+                                                    // 多选题
+                                                    if (!Array.isArray(currentAnswer)) {
+                                                        currentAnswer = []
+                                                    }
+                                                    var index = currentAnswer.indexOf(modelData.index)
+                                                    if (index === -1) {
+                                                        currentAnswer.push(modelData.index)
+                                                    } else {
+                                                        currentAnswer.splice(index, 1)
+                                                    }
+                                                    // 如果所有选项都被取消，则设置为undefined
+                                                    if (currentAnswer.length === 0) {
+                                                        userAnswers[currentQuestionIndex] = undefined
+                                                    } else {
+                                                        userAnswers[currentQuestionIndex] = currentAnswer
+                                                    }
+                                                } else {
+                                                    // 单选题
+                                                    userAnswers[currentQuestionIndex] = modelData.index
+                                                }
+                                                
+                                                // 强制更新UI
+                                                userAnswers = Object.assign({}, userAnswers)
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        }
-                    }
-                    
-                    // 填空题答题区域
-                    Rectangle {
-                        id: textInputRect
-                        Layout.fillWidth: true
-                        height: 50
-                        color: "#33ffffff"
-                        radius: 8
-                        visible: {
-                            if (currentQuestionIndex >= 0 && currentQuestionIndex < currentQuestions.length) {
-                                return !currentQuestions[currentQuestionIndex].options || currentQuestions[currentQuestionIndex].options.length === 0
-                            }
-                            return false
-                        }
-                        
-                        TextInput {
-                            anchors.fill: parent
-                            anchors.margins: 10
-                            font.family: "阿里妈妈数黑体"
-                            font.pixelSize: 16
-                            color: "white"
-                            text: userAnswers[currentQuestionIndex] || ""
-                            onTextChanged: {
-                                userAnswers[currentQuestionIndex] = text
+                                
+                                Item {
+                                    Layout.fillHeight: true
+                                }
                             }
                         }
                     }
@@ -324,10 +298,11 @@ Rectangle {
                     RowLayout {
                         Layout.fillWidth: true
                         spacing: 20
+                        Layout.topMargin: 20  // 添加顶部间距
                         
                         Button {
                             Layout.fillWidth: true
-                            height: 40
+                            Layout.preferredHeight: 40
                             enabled: currentQuestionIndex > 0
                             background: Rectangle {
                                 color: parent.enabled ? "#2c70b7" : "#666666"
@@ -350,7 +325,7 @@ Rectangle {
                         
                         Button {
                             Layout.fillWidth: true
-                            height: 40
+                            Layout.preferredHeight: 40
                             enabled: currentQuestionIndex < currentQuestions.length - 1
                             background: Rectangle {
                                 color: parent.enabled ? "#2c70b7" : "#666666"
@@ -414,22 +389,44 @@ Rectangle {
                                     return "#33ffffff"
                                 }
                                 radius: 4
-                                
-                                Text {
+                    
+                    Text {
                                     anchors.centerIn: parent
                                     text: index + 1
-                                    font.family: "阿里妈妈数黑体"
-                                    font.pixelSize: 16
-                                    color: "white"
-                                }
-                                
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: {
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                }
+                
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
                                         currentQuestionIndex = index
                                     }
                                 }
                             }
+                        }
+                    }
+                    
+                    Button {
+                        Layout.fillWidth: true
+                        height: 40
+                        background: Rectangle {
+                            color: "#2c70b7"
+                            radius: 4
+                        }
+                        contentItem: Text {
+                            text: "提交答案"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 18
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        onClicked: {
+                            submitAnswers()
                         }
                     }
                 }
