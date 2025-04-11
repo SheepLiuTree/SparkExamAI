@@ -259,11 +259,11 @@
 	"dependencies" : 
 	[
 		{
-			"id" : "QXlsx_autogen_timestamp_deps::@246fd2dd3a984c2618f9"
-		},
-		{
 			"backtrace" : 0,
 			"id" : "QXlsx_autogen::@246fd2dd3a984c2618f9"
+		},
+		{
+			"id" : "QXlsx_autogen_timestamp_deps::@246fd2dd3a984c2618f9"
 		}
 	],
 	"id" : "QXlsx::@246fd2dd3a984c2618f9",
