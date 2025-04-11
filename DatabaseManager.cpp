@@ -535,6 +535,13 @@ void DatabaseManager::initDefaultSettings()
         // 默认摄像头设置 - 使用特殊值"auto"表示自动检测
         setSetting("camera_device", "auto");
         
+        // 五芒图默认标题设置
+        setSetting("pentagon_title_1", "基础认知");
+        setSetting("pentagon_title_2", "原理理解");
+        setSetting("pentagon_title_3", "操作应用");
+        setSetting("pentagon_title_4", "诊断分析");
+        setSetting("pentagon_title_5", "安全规范");
+        
         qDebug() << "初始化默认设置完成";
     }
 }

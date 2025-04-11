@@ -10,6 +10,7 @@ Rectangle {
     property var settingCategories: [
         { id: "general", name: "通用设置", icon: "qrc:/images/setting.png", component: "QuestionEngineSettings/GeneralSettings.qml" },
         { id: "strategies", name: "出题策略", icon: "qrc:/images/strategy.png", component: "QuestionEngineSettings/StrategiesSettings.qml" },
+        { id: "pentagon", name: "五芒图设置", icon: "qrc:/images/chart.png", component: "QuestionEngineSettings/PentagonalChartSettings.qml" },
         { id: "knowledge", name: "智点速览", icon: "qrc:/images/list.png", component: "QuestionEngineSettings/KnowledgePointSettings.qml" }
     ]
     
@@ -241,6 +242,8 @@ Rectangle {
             return "⚙️"
         case "strategies":
             return "🎯"
+        case "pentagon":
+            return "📊"
         case "knowledge":
             return "📚"
         default:

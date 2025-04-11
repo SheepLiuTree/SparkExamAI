@@ -10,6 +10,7 @@
         <file>QuestionEngineSettings/StrategiesSettings.qml</file>
         <file>QuestionEngineSettings/KnowledgePointSettings.qml</file>
         <file>QuestionEngineSettings/SettingItem.qml</file>
+        <file>QuestionEngineSettings/PentagonalChartSettings.qml</file>
         <file>images/face_icon.png</file>
         <file>images/sparklogo.png</file>
         <file>images/background.png</file>
@@ -24,5 +25,6 @@
         <file>images/setting.png</file>
         <file>images/list.png</file>
         <file>images/strategy.png</file>
+        <file>images/chart.png</file>
     </qresource>
 </RCC>
