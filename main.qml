@@ -616,6 +616,21 @@ Window {
                     }
                 }
                 
+                // 确保VideoOutput的所有属性正确设置
+                if (videoOutput) {
+                    console.log("重置VideoOutput所有变换和属性")
+                    videoOutput.rotation = 0
+                    
+                    // 重新创建和设置变换
+                    var newTransform = []
+                    newTransform.push(Qt.createQmlObject(
+                        'import QtQuick 2.15; Scale { xScale: -1; yScale: 1; origin.x: videoOutput.width / 2 }',
+                        videoOutput, 
+                        "dynamicScaleTransform"
+                    ));
+                    videoOutput.transform = newTransform
+                }
+                
                 // 启动摄像头
                 console.log("人脸识别弹窗 - 启动摄像头")
                 camera.start()
@@ -649,6 +664,21 @@ Window {
             // 清理变量
             isRecognizing = false
             isFaceDetected = false
+            
+            // 重置所有摄像头和视频输出属性
+            if (videoOutput) {
+                console.log("完全重置VideoOutput属性")
+                videoOutput.rotation = 0
+                
+                // 重置变换
+                var newTransform = []
+                newTransform.push(Qt.createQmlObject(
+                    'import QtQuick 2.15; Scale { xScale: -1; yScale: 1; origin.x: videoOutput.width / 2 }',
+                    videoOutput, 
+                    "dynamicCloseTransform"
+                ));
+                videoOutput.transform = newTransform
+            }
             
             // 触发状态文本预设
             statusText.text = "正在准备摄像头..."
@@ -827,7 +857,6 @@ Window {
                         id: camera
                         
                         viewfinder.resolution: Qt.size(640, 360)
-                        
                         // 在初始化时根据设置选择摄像头设备
                         Component.onCompleted: {
                             // 获取摄像头设置
@@ -880,12 +909,17 @@ Window {
                         fillMode: VideoOutput.PreserveAspectFit
                         focus: visible
                         visible: true
+                        rotation: 0 // 显式设置为0度，防止旋转
                         
                         // 添加水平镜像变换
-                        transform: Scale {
-                            xScale: -1
-                            origin.x: videoOutput.width / 2
-                        }
+                        transform: [
+                            Scale {
+                                id: videoPopupTransform
+                                xScale: -1
+                                yScale: 1  // 明确设置yScale为1确保不会垂直翻转
+                                origin.x: videoOutput ? videoOutput.width / 2 : 0
+                            }
+                        ]
                         
                         property rect contentRect: {
                             if (camera.viewfinder.resolution.width <= 0 || camera.viewfinder.resolution.height <= 0) {
@@ -920,12 +954,16 @@ Window {
                         anchors.fill: parent
                         fillMode: Image.PreserveAspectFit
                         visible: false
+                        rotation: 0 // 显式设置为0度，防止旋转
                         
                         // 添加水平镜像变换，与视频输出保持一致
-                        transform: Scale {
-                            xScale: -1
-                            origin.x: capturedImage.width / 2
-                        }
+                        transform: [
+                            Scale {
+                                xScale: -1
+                                yScale: 1  // 明确设置yScale为1确保不会垂直翻转
+                                origin.x: capturedImage.width / 2
+                            }
+                        ]
                     }
                     
                     // 人脸框辅助线 - 根据检测到的位置动态调整

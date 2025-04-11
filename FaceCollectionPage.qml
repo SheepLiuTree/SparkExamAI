@@ -21,7 +21,7 @@ Rectangle {
         id: camera
         viewfinder.resolution: Qt.size(640, 360)
         deviceId: ""  // 初始为空，在初始化函数中设置正确的值
-            
+        
         imageCapture {
             onImageCaptured: {
                 console.log("Image captured with id: " + requestId)
@@ -167,6 +167,24 @@ Rectangle {
         // 启动摄像头
         console.log("启动摄像头...")
         camera.start()
+        
+        // 确保VideoOutput变换设置正确
+        Qt.callLater(function() {
+            // 重置VideoOutput的变换，确保只有水平镜像，没有垂直翻转
+            if (videoOutput) {
+                console.log("设置VideoOutput正确的变换")
+                videoOutput.rotation = 0
+                
+                // 创建新的变换对象
+                var newTransform = []
+                newTransform.push(Qt.createQmlObject(
+                    'import QtQuick 2.15; Scale { xScale: -1; yScale: 1; origin.x: videoOutput.width / 2 }',
+                    videoOutput, 
+                    "dynamicStartTransform"
+                ));
+                videoOutput.transform = newTransform
+            }
+        })
         
         // 启动监视定时器
         cameraMonitorTimer.start()
@@ -350,12 +368,17 @@ Rectangle {
                     fillMode: VideoOutput.PreserveAspectFit
                     focus: visible
                     visible: true
+                    rotation: 0 // 显式设置为0度，防止旋转
                     
                     // 添加水平镜像变换
-                    transform: Scale {
-                        xScale: -1
-                        origin.x: videoOutput.width / 2
-                    }
+                    transform: [
+                        Scale {
+                            id: videoTransform
+                            xScale: -1
+                            yScale: 1  // 明确设置yScale为1确保不会垂直翻转
+                            origin.x: videoOutput.width / 2
+                        }
+                    ]
                     
                     // 计算实际视频内容区域
                     property rect contentRect: {
@@ -391,12 +414,16 @@ Rectangle {
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectFit
                     visible: false
+                    rotation: 0 // 显式设置为0度，防止旋转
                     
                     // 添加水平镜像变换，与视频输出保持一致
-                    transform: Scale {
-                        xScale: -1
-                        origin.x: capturedImage.width / 2
-                    }
+                    transform: [
+                        Scale {
+                            xScale: -1
+                            yScale: 1  // 明确设置yScale为1确保不会垂直翻转
+                            origin.x: capturedImage.width / 2
+                        }
+                    ]
                 }
                 
                 // 顶部指导文字
@@ -440,6 +467,7 @@ Rectangle {
                         
                         // 添加旋转变换
                         transform: Rotation {
+                            id: clearAreaRotation
                             angle: 90
                             origin.x: clearArea.width / 2
                             origin.y: clearArea.height / 2
@@ -1519,5 +1547,51 @@ Rectangle {
             // 设置deviceId为空，彻底释放资源
             camera.deviceId = ""
         }
+        
+        // 重置所有变换，确保不会影响其他页面
+        if (videoOutput) {
+            console.log("完全重置VideoOutput所有属性")
+            videoOutput.rotation = 0
+            
+            // 创建新的简单变换作为最终状态
+            var newTransform = []
+            newTransform.push(Qt.createQmlObject(
+                'import QtQuick 2.15; Scale { xScale: -1; yScale: 1; origin.x: videoOutput.width / 2 }',
+                videoOutput, 
+                "dynamicFinalTransform"
+            ));
+            videoOutput.transform = newTransform
+        }
+    }
+
+    // 组件可见性变化时
+    onVisibleChanged: {
+        if (visible) {
+            console.log("FaceCollectionPage变为可见，确保摄像头设置正确")
+            // 确保VideoOutput变换设置正确
+            Qt.callLater(function() {
+                // 重置VideoOutput的变换，确保只有水平镜像，没有垂直翻转
+                if (videoOutput) {
+                    console.log("重置VideoOutput所有变换和属性")
+                    videoOutput.rotation = 0
+                    
+                    // 重新创建和设置变换
+                    var newTransform = []
+                    newTransform.push(Qt.createQmlObject(
+                        'import QtQuick 2.15; Scale { xScale: -1; yScale: 1; origin.x: videoOutput.width / 2 }',
+                        videoOutput, 
+                        "dynamicVisibleTransform"
+                    ));
+                    videoOutput.transform = newTransform
+                }
+            })
+        }
+    }
+
+    // 定义水平镜像变换，用于重置
+    Scale {
+        id: scaleTransform
+        xScale: -1
+        origin.x: 0
     }
 }
