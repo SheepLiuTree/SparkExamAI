@@ -8,7 +8,7 @@ Window {
     height: Screen.height
     visible: true
     visibility: Window.FullScreen
-    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
+    flags: Qt.Window | Qt.FramelessWindowHint //| Qt.WindowStaysOnTopHint
     title: qsTr("星火智能评测系统")
 
     Image {
