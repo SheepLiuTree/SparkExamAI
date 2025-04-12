@@ -166,6 +166,21 @@ public:
     // 获取所有答题记录
     Q_INVOKABLE QVariantList getAllAnswerRecords(int limit = 100, int offset = 0);
     
+    // 获取用户当月刷题数量
+    Q_INVOKABLE int getUserCurrentMonthQuestionCount(const QString &workId);
+    
+    // 获取用户年度刷题数据（按月统计）
+    Q_INVOKABLE QVariantList getUserYearlyQuestionData(const QString &workId);
+    
+    // 获取用户滚动年度刷题数据（从当前月份向前12个月）
+    Q_INVOKABLE QVariantList getUserRollingYearQuestionData(const QString &workId);
+    
+    // 获取所有用户当月最大刷题量
+    Q_INVOKABLE int getMaxMonthlyQuestionCount();
+    
+    // 获取用户能力值数据
+    Q_INVOKABLE QVariantMap getUserAbilityData(const QString &workId);
+    
     // 获取用户练习数据统计
     Q_INVOKABLE QVariantMap getUserPracticeData(const QString &workId);
     

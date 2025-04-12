@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_DatabaseManager_t {
-    QByteArrayData data[73];
-    char stringdata0[975];
+    QByteArrayData data[78];
+    char stringdata0[1111];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -99,12 +99,17 @@ QT_MOC_LITERAL(63, 816, 12), // "correctCount"
 QT_MOC_LITERAL(64, 829, 10), // "answerData"
 QT_MOC_LITERAL(65, 840, 20), // "getUserAnswerRecords"
 QT_MOC_LITERAL(66, 861, 19), // "getAllAnswerRecords"
-QT_MOC_LITERAL(67, 881, 19), // "getUserPracticeData"
-QT_MOC_LITERAL(68, 901, 26), // "getUserMonthlyPracticeData"
-QT_MOC_LITERAL(69, 928, 10), // "monthCount"
-QT_MOC_LITERAL(70, 939, 24), // "getUserDailyPracticeData"
-QT_MOC_LITERAL(71, 964, 4), // "year"
-QT_MOC_LITERAL(72, 969, 5) // "month"
+QT_MOC_LITERAL(67, 881, 32), // "getUserCurrentMonthQuestionCount"
+QT_MOC_LITERAL(68, 914, 25), // "getUserYearlyQuestionData"
+QT_MOC_LITERAL(69, 940, 30), // "getUserRollingYearQuestionData"
+QT_MOC_LITERAL(70, 971, 26), // "getMaxMonthlyQuestionCount"
+QT_MOC_LITERAL(71, 998, 18), // "getUserAbilityData"
+QT_MOC_LITERAL(72, 1017, 19), // "getUserPracticeData"
+QT_MOC_LITERAL(73, 1037, 26), // "getUserMonthlyPracticeData"
+QT_MOC_LITERAL(74, 1064, 10), // "monthCount"
+QT_MOC_LITERAL(75, 1075, 24), // "getUserDailyPracticeData"
+QT_MOC_LITERAL(76, 1100, 4), // "year"
+QT_MOC_LITERAL(77, 1105, 5) // "month"
 
     },
     "DatabaseManager\0initDatabase\0\0addFaceData\0"
@@ -131,7 +136,12 @@ QT_MOC_LITERAL(72, 969, 5) // "month"
     "clearAllKnowledgePoints\0saveUserAnswerRecord\0"
     "userName\0examType\0totalQuestions\0"
     "correctCount\0answerData\0getUserAnswerRecords\0"
-    "getAllAnswerRecords\0getUserPracticeData\0"
+    "getAllAnswerRecords\0"
+    "getUserCurrentMonthQuestionCount\0"
+    "getUserYearlyQuestionData\0"
+    "getUserRollingYearQuestionData\0"
+    "getMaxMonthlyQuestionCount\0"
+    "getUserAbilityData\0getUserPracticeData\0"
     "getUserMonthlyPracticeData\0monthCount\0"
     "getUserDailyPracticeData\0year\0month"
 };
@@ -143,7 +153,7 @@ static const uint qt_meta_data_DatabaseManager[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      54,   14, // methods
+      59,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -151,60 +161,65 @@ static const uint qt_meta_data_DatabaseManager[] = {
        0,       // signalCount
 
  // methods: name, argc, parameters, tag, flags
-       1,    0,  284,    2, 0x02 /* Public */,
-       3,    6,  285,    2, 0x02 /* Public */,
-       3,    5,  298,    2, 0x22 /* Public | MethodCloned */,
-      10,    1,  309,    2, 0x02 /* Public */,
-      11,    0,  312,    2, 0x02 /* Public */,
-      12,    1,  313,    2, 0x02 /* Public */,
-      13,    2,  316,    2, 0x02 /* Public */,
-      14,    1,  321,    2, 0x02 /* Public */,
-      15,    6,  324,    2, 0x02 /* Public */,
-      15,    5,  337,    2, 0x22 /* Public | MethodCloned */,
-      16,    2,  348,    2, 0x02 /* Public */,
-      19,    2,  353,    2, 0x02 /* Public */,
-      19,    1,  358,    2, 0x22 /* Public | MethodCloned */,
-      21,    1,  361,    2, 0x02 /* Public */,
-      22,    0,  364,    2, 0x02 /* Public */,
-      23,    2,  365,    2, 0x02 /* Public */,
-      23,    1,  370,    2, 0x22 /* Public | MethodCloned */,
-      23,    0,  373,    2, 0x22 /* Public | MethodCloned */,
-      26,    3,  374,    2, 0x02 /* Public */,
-      26,    2,  381,    2, 0x22 /* Public | MethodCloned */,
-      26,    1,  386,    2, 0x22 /* Public | MethodCloned */,
-      27,    1,  389,    2, 0x02 /* Public */,
-      27,    0,  392,    2, 0x22 /* Public | MethodCloned */,
-      29,    1,  393,    2, 0x02 /* Public */,
-      30,    2,  396,    2, 0x02 /* Public */,
-      32,    1,  401,    2, 0x02 /* Public */,
-      34,    0,  404,    2, 0x02 /* Public */,
-      35,    1,  405,    2, 0x02 /* Public */,
-      36,    2,  408,    2, 0x02 /* Public */,
-      37,    5,  413,    2, 0x02 /* Public */,
-      37,    4,  424,    2, 0x22 /* Public | MethodCloned */,
-      42,    1,  433,    2, 0x02 /* Public */,
-      44,    5,  436,    2, 0x02 /* Public */,
-      44,    4,  447,    2, 0x22 /* Public | MethodCloned */,
-      45,    1,  456,    2, 0x02 /* Public */,
-      46,    1,  459,    2, 0x02 /* Public */,
-      47,    2,  462,    2, 0x02 /* Public */,
-      49,    2,  467,    2, 0x02 /* Public */,
-      51,    0,  472,    2, 0x02 /* Public */,
-      52,    2,  473,    2, 0x02 /* Public */,
-      54,    1,  478,    2, 0x02 /* Public */,
-      56,    1,  481,    2, 0x02 /* Public */,
-      58,    0,  484,    2, 0x02 /* Public */,
-      59,    6,  485,    2, 0x02 /* Public */,
-      65,    3,  498,    2, 0x02 /* Public */,
-      65,    2,  505,    2, 0x22 /* Public | MethodCloned */,
-      65,    1,  510,    2, 0x22 /* Public | MethodCloned */,
-      66,    2,  513,    2, 0x02 /* Public */,
-      66,    1,  518,    2, 0x22 /* Public | MethodCloned */,
-      66,    0,  521,    2, 0x22 /* Public | MethodCloned */,
-      67,    1,  522,    2, 0x02 /* Public */,
-      68,    2,  525,    2, 0x02 /* Public */,
-      68,    1,  530,    2, 0x22 /* Public | MethodCloned */,
-      70,    3,  533,    2, 0x02 /* Public */,
+       1,    0,  309,    2, 0x02 /* Public */,
+       3,    6,  310,    2, 0x02 /* Public */,
+       3,    5,  323,    2, 0x22 /* Public | MethodCloned */,
+      10,    1,  334,    2, 0x02 /* Public */,
+      11,    0,  337,    2, 0x02 /* Public */,
+      12,    1,  338,    2, 0x02 /* Public */,
+      13,    2,  341,    2, 0x02 /* Public */,
+      14,    1,  346,    2, 0x02 /* Public */,
+      15,    6,  349,    2, 0x02 /* Public */,
+      15,    5,  362,    2, 0x22 /* Public | MethodCloned */,
+      16,    2,  373,    2, 0x02 /* Public */,
+      19,    2,  378,    2, 0x02 /* Public */,
+      19,    1,  383,    2, 0x22 /* Public | MethodCloned */,
+      21,    1,  386,    2, 0x02 /* Public */,
+      22,    0,  389,    2, 0x02 /* Public */,
+      23,    2,  390,    2, 0x02 /* Public */,
+      23,    1,  395,    2, 0x22 /* Public | MethodCloned */,
+      23,    0,  398,    2, 0x22 /* Public | MethodCloned */,
+      26,    3,  399,    2, 0x02 /* Public */,
+      26,    2,  406,    2, 0x22 /* Public | MethodCloned */,
+      26,    1,  411,    2, 0x22 /* Public | MethodCloned */,
+      27,    1,  414,    2, 0x02 /* Public */,
+      27,    0,  417,    2, 0x22 /* Public | MethodCloned */,
+      29,    1,  418,    2, 0x02 /* Public */,
+      30,    2,  421,    2, 0x02 /* Public */,
+      32,    1,  426,    2, 0x02 /* Public */,
+      34,    0,  429,    2, 0x02 /* Public */,
+      35,    1,  430,    2, 0x02 /* Public */,
+      36,    2,  433,    2, 0x02 /* Public */,
+      37,    5,  438,    2, 0x02 /* Public */,
+      37,    4,  449,    2, 0x22 /* Public | MethodCloned */,
+      42,    1,  458,    2, 0x02 /* Public */,
+      44,    5,  461,    2, 0x02 /* Public */,
+      44,    4,  472,    2, 0x22 /* Public | MethodCloned */,
+      45,    1,  481,    2, 0x02 /* Public */,
+      46,    1,  484,    2, 0x02 /* Public */,
+      47,    2,  487,    2, 0x02 /* Public */,
+      49,    2,  492,    2, 0x02 /* Public */,
+      51,    0,  497,    2, 0x02 /* Public */,
+      52,    2,  498,    2, 0x02 /* Public */,
+      54,    1,  503,    2, 0x02 /* Public */,
+      56,    1,  506,    2, 0x02 /* Public */,
+      58,    0,  509,    2, 0x02 /* Public */,
+      59,    6,  510,    2, 0x02 /* Public */,
+      65,    3,  523,    2, 0x02 /* Public */,
+      65,    2,  530,    2, 0x22 /* Public | MethodCloned */,
+      65,    1,  535,    2, 0x22 /* Public | MethodCloned */,
+      66,    2,  538,    2, 0x02 /* Public */,
+      66,    1,  543,    2, 0x22 /* Public | MethodCloned */,
+      66,    0,  546,    2, 0x22 /* Public | MethodCloned */,
+      67,    1,  547,    2, 0x02 /* Public */,
+      68,    1,  550,    2, 0x02 /* Public */,
+      69,    1,  553,    2, 0x02 /* Public */,
+      70,    0,  556,    2, 0x02 /* Public */,
+      71,    1,  557,    2, 0x02 /* Public */,
+      72,    1,  560,    2, 0x02 /* Public */,
+      73,    2,  563,    2, 0x02 /* Public */,
+      73,    1,  568,    2, 0x22 /* Public | MethodCloned */,
+      75,    3,  571,    2, 0x02 /* Public */,
 
  // methods: parameters
     QMetaType::Bool,
@@ -257,10 +272,15 @@ static const uint qt_meta_data_DatabaseManager[] = {
     QMetaType::QVariantList, QMetaType::Int, QMetaType::Int,   24,   25,
     QMetaType::QVariantList, QMetaType::Int,   24,
     QMetaType::QVariantList,
-    QMetaType::QVariantMap, QMetaType::QString,    6,
-    QMetaType::QVariantList, QMetaType::QString, QMetaType::Int,    6,   69,
+    QMetaType::Int, QMetaType::QString,    6,
     QMetaType::QVariantList, QMetaType::QString,    6,
-    QMetaType::QVariantList, QMetaType::QString, QMetaType::Int, QMetaType::Int,    6,   71,   72,
+    QMetaType::QVariantList, QMetaType::QString,    6,
+    QMetaType::Int,
+    QMetaType::QVariantMap, QMetaType::QString,    6,
+    QMetaType::QVariantMap, QMetaType::QString,    6,
+    QMetaType::QVariantList, QMetaType::QString, QMetaType::Int,    6,   74,
+    QMetaType::QVariantList, QMetaType::QString,    6,
+    QMetaType::QVariantList, QMetaType::QString, QMetaType::Int, QMetaType::Int,    6,   76,   77,
 
        0        // eod
 };
@@ -371,13 +391,23 @@ void DatabaseManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
         case 49: { QVariantList _r = _t->getAllAnswerRecords();
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 50: { QVariantMap _r = _t->getUserPracticeData((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 50: { int _r = _t->getUserCurrentMonthQuestionCount((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 51: { QVariantList _r = _t->getUserYearlyQuestionData((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 52: { QVariantList _r = _t->getUserRollingYearQuestionData((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 53: { int _r = _t->getMaxMonthlyQuestionCount();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 54: { QVariantMap _r = _t->getUserAbilityData((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariantMap*>(_a[0]) = std::move(_r); }  break;
-        case 51: { QVariantList _r = _t->getUserMonthlyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+        case 55: { QVariantMap _r = _t->getUserPracticeData((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QVariantMap*>(_a[0]) = std::move(_r); }  break;
+        case 56: { QVariantList _r = _t->getUserMonthlyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 52: { QVariantList _r = _t->getUserMonthlyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 57: { QVariantList _r = _t->getUserMonthlyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 53: { QVariantList _r = _t->getUserDailyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
+        case 58: { QVariantList _r = _t->getUserDailyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
@@ -413,13 +443,13 @@ int DatabaseManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 54)
+        if (_id < 59)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 54;
+        _id -= 59;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 54)
+        if (_id < 59)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 54;
+        _id -= 59;
     }
     return _id;
 }

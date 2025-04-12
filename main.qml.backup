@@ -717,14 +717,14 @@ Window {
                 anchors.right: parent.right
                 anchors.leftMargin: parent.width * 0.1
                 anchors.rightMargin: parent.width * 0.1
-                height: parent.height * 0.3
+                height: parent.height * 0.35 // 增加图表高度
                 color: "#1e3a5f"
                 opacity: 0.7
                 radius: 10
                 
                 Text {
                     id: yearly_stats_title
-                    text: "近一年刷题统计"
+                    text: new Date().getFullYear() + "年刷题统计"
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 18
                     color: "white"
@@ -747,7 +747,7 @@ Window {
                     anchors.bottom: parent.bottom
                     anchors.leftMargin: 40
                     anchors.rightMargin: 20
-                    anchors.bottomMargin: 40 // 增加底部空间以容纳月份标签
+                    anchors.bottomMargin: 80 // 进一步增加底部边距确保标签可见
                     color: "transparent"
                     
                     // Y轴刻度线
@@ -780,74 +780,128 @@ Window {
                         }
                     }
                     
-                    // 月份柱状图
-                    Row {
-                        id: month_bars
+                    // 使用 Flickable 支持水平滑动
+                    Flickable {
+                        id: chartFlickable
                         anchors.fill: parent
-                        // 根据图表宽度和柱子数量自动计算间距，确保均匀分布
-                        spacing: (parent.width - 12 * 30) / 11 // 使用更均衡的间距计算方式
-                        layoutDirection: Qt.LeftToRight // 确保从左到右排列
+                        clip: true
+                        flickableDirection: Flickable.HorizontalFlick
+                        contentWidth: month_bars.width
+                        contentHeight: height
                         
-                        // 12个月的数据
-                        property var monthlyData: [120, 200, 150, 80, 70, 110, 130, 200, 150, 80, 70, 110]
+                        // 启用滚动条
+                        ScrollBar.horizontal: ScrollBar {
+                            policy: ScrollBar.AsNeeded
+                            interactive: true
+                        }
                         
-                        Repeater {
-                            model: 12
+                        // 月份柱状图
+                        Row {
+                            id: month_bars
+                            height: parent.height - 50 // 减小高度给标签留空间
+                            y: 0 // 确保从顶部开始
+                            spacing: 30 // 增加柱子间距，让标签不重叠
+                            width: Math.max(chartFlickable.width, monthlyData.length * (30 + spacing)) // 根据新间距调整宽度
                             
-                            Item {
-                                width: 30 // 和柱状图宽度相同
-                                height: parent.height // 占据整个高度空间
+                            // 所有历史月份的数据
+                            property var monthlyData: []
+                            
+                            Repeater {
+                                model: month_bars.monthlyData.length
                                 
-                                Rectangle {
-                                    id: monthBar
-                                    width: 30 // 柱子宽度
-                                    // 计算高度，确保即使值为0也至少有1像素高度
-                                    height: {
-                                        var value = month_bars.monthlyData[index];
-                                        // 如果值为0，使用一个非常小但可见的高度
-                                        return value > 0 ? (value / yearly_stats_rect.maxValue * parent.height) : 1;
-                                    }
-                                    anchors.bottom: parent.bottom // 从底部向上增长
-                                    // 当前月使用不同颜色突出显示
-                                    color: index === 11 ? "#78C1FF" : "#5B9BD5"
-                                    visible: true // 确保始终可见，即使数据为0
+                                Item {
+                                    width: 40 // 增加宽度
+                                    height: month_bars.height + 50 // 增加高度以容纳标签
                                     
-                                    // 添加数值标签
-                                    Text {
-                                        text: month_bars.monthlyData[index]
-                                        font.family: "阿里妈妈数黑体"
-                                        font.pixelSize: 10
-                                        color: "white"
-                                        anchors.bottom: parent.top
-                                        anchors.bottomMargin: 5
+                                    Rectangle {
+                                        width: 30 // 增加柱宽
+                                        height: month_bars.monthlyData[index] / yearly_stats_rect.maxValue * parent.height
+                                        y: parent.height - height
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                        visible: month_bars.monthlyData[index] > 0
-                                    }
-                                }
-                                
-                                // 月份标签
-                                Text {
-                                    // 显示从现在起前12个月的月份标签
-                                    text: {
-                                        var d = new Date();
-                                        // 从11个月前到当月 (index 0 = 11个月前, index 11 = 当月)
-                                        d.setMonth(d.getMonth() - 11 + index);
-                                        var month = d.getMonth() + 1;
+                                        color: {
+                                            // 当前月及之前的月份用蓝色，后面的月份用灰色
+                                            var currentDate = new Date();
+                                            var currentMonth = currentDate.getMonth();
+                                            var currentYear = currentDate.getFullYear();
+                                            
+                                            // 计算模型索引对应的年月
+                                            var displayMonth, displayYear;
+                                            
+                                            if (month_bars.monthlyData.length <= 12) {
+                                                // 不到一年的数据
+                                                displayMonth = (currentMonth - (month_bars.monthlyData.length - 1 - index) + 12) % 12;
+                                                displayYear = currentYear - Math.floor((month_bars.monthlyData.length - 1 - index + currentMonth) / 12);
+                                            } else {
+                                                // 超过一年的数据
+                                                displayMonth = (currentMonth - (month_bars.monthlyData.length - 1 - index) + 1200) % 12; // 加1200确保结果为正
+                                                displayYear = currentYear - Math.floor((month_bars.monthlyData.length - 1 - index + currentMonth) / 12);
+                                            }
+                                            
+                                            // 如果是当前或之前的月份，使用蓝色
+                                            if (displayYear < currentYear || 
+                                                (displayYear === currentYear && displayMonth <= currentMonth)) {
+                                                return "#5B9BD5";
+                                            } else {
+                                                // 未来月份使用灰色
+                                                return "#777777";
+                                            }
+                                        }
                                         
-                                        // 如果是当前月，显示"本月"
-                                        if (index === 11) {
-                                            return month + "月\n(本月)";
-                                        } else {
-                                            return month + "月";
+                                        // 当鼠标悬停显示数值
+                                        ToolTip {
+                                            visible: mouseArea.containsMouse
+                                            delay: 500
+                                            text: month_bars.monthlyData[index]
                                         }
                                     }
-                                    font.family: "阿里妈妈数黑体"
-                                    font.pixelSize: 10
-                                    color: "#BBDEFB"
-                                    anchors.top: parent.bottom // 改为anchors.bottom
-                                    anchors.topMargin: 10 // 距离底部的距离
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    horizontalAlignment: Text.AlignHCenter
+                                    
+                                    MouseArea {
+                                        id: mouseArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                    }
+                                    
+                                    Rectangle {
+                                        id: labelBackground
+                                        width: monthLabel.width + 6  // 增加宽度
+                                        height: monthLabel.height + 6  // 增加高度
+                                        color: "#2C4B77"  // 调整为更易于区分的颜色
+                                        border.color: "#5B9BD5"  // 添加边框
+                                        border.width: 1
+                                        radius: 3  // 圆角
+                                        y: parent.height - height // 直接使用y属性定位到底部
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        visible: true
+                                        
+                                        // 确保标签始终在最顶层显示
+                                        z: 20
+
+                                        Text {
+                                            id: monthLabel
+                                            // 显示年月 - 不旋转的版本
+                                            function getMonthYearText() {
+                                                var currentDate = new Date();
+                                                var baseMonth = currentDate.getMonth(); // 0-11
+                                                var baseYear = currentDate.getFullYear();
+                                                
+                                                // 计算显示的月份和年份
+                                                var monthDiff = index - (month_bars.monthlyData.length - 1);
+                                                var targetDate = new Date(baseYear, baseMonth + monthDiff, 1);
+                                                
+                                                return targetDate.getFullYear() + "-" + 
+                                                      (targetDate.getMonth() + 1).toString().padStart(2, '0');
+                                            }
+                                            
+                                            text: getMonthYearText()
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 14  // 进一步增大字体
+                                            font.bold: true  // 加粗
+                                            color: "#FFFFFF"  // 更明亮的文本颜色
+                                            anchors.centerIn: parent
+                                            horizontalAlignment: Text.AlignHCenter
+                                            z: 21
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1132,10 +1186,49 @@ Window {
                 var currentMonthQuestions = dbManager.getUserCurrentMonthQuestionCount(userId) || 0;
                 monthly_stats_value.text = currentMonthQuestions.toString();
                 
-                // 获取近一年的刷题数据（从当月向前推12个月）
-                var yearlyData = dbManager.getUserRollingYearQuestionData(userId);
-                if (yearlyData && yearlyData.length === 12) {
+                // 获取年度每月刷题数据 - 获取所有历史数据
+                var yearlyData = dbManager.getUserYearlyQuestionData(userId, 0);
+                console.log("获取到年度数据，长度: " + (yearlyData ? yearlyData.length : 0));
+                
+                if (yearlyData && yearlyData.length > 0) {
+                    // 输出调试信息
+                    console.log("年度数据明细:");
+                    for (var i = 0; i < yearlyData.length; i++) {
+                        console.log("索引 " + i + ": " + yearlyData[i]);
+                    }
+                    
+                    // 更新数据模型
                     month_bars.monthlyData = yearlyData;
+                    
+                    // 找出数据中的最大值来设置Y轴最大值
+                    var maxValue = 0;
+                    for (var i = 0; i < yearlyData.length; i++) {
+                        if (yearlyData[i] > maxValue) {
+                            maxValue = yearlyData[i];
+                        }
+                    }
+                    
+                    // 设置Y轴最大值为最大刷题数的1.2倍，向上取整到最接近的10的倍数
+                    if (maxValue > 0) {
+                        yearly_stats_rect.maxValue = Math.ceil(maxValue * 1.2 / 10) * 10;
+                    } else {
+                        yearly_stats_rect.maxValue = 100;
+                    }
+                    
+                    // 更新month_bars的宽度以适应所有月份
+                    var totalMonths = yearlyData.length;
+                    month_bars.width = Math.max(chartFlickable.width, totalMonths * (30 + month_bars.spacing));
+                    console.log("柱状图宽度设置为: " + month_bars.width + "，月份数: " + totalMonths);
+                    
+                    // 强制更新布局
+                    month_bars.height = chart_area.height;
+                    
+                    // 滚动到最新月份（最右侧）
+                    chartFlickable.contentX = chartFlickable.contentWidth - chartFlickable.width;
+                    console.log("滚动到位置: " + chartFlickable.contentX);
+                } else {
+                    console.log("未获取到年度数据或数据为空");
+                    month_bars.monthlyData = [];
                 }
                 
                 // 获取能力值数据

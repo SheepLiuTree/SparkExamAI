@@ -1796,4 +1796,354 @@ QVariantList DatabaseManager::getUserDailyPracticeData(const QString &workId, in
     }
     
     return result;
+}
+
+/**
+ * 获取用户当月刷题数量
+ * @param workId 用户工号
+ * @return 当月刷题总数
+ */
+int DatabaseManager::getUserCurrentMonthQuestionCount(const QString &workId)
+{
+    // 检查用户是否存在
+    if (!userExists(workId)) {
+        qWarning() << "用户不存在，工号：" << workId;
+        return 0;
+    }
+    
+    // 获取当前日期
+    QDate currentDate = QDate::currentDate();
+    int year = currentDate.year();
+    int month = currentDate.month();
+    
+    // 获取当月第一天和最后一天
+    QDate firstDay(year, month, 1);
+    QDate lastDay = firstDay.addMonths(1).addDays(-1);
+    
+    // 转换为ISO格式的字符串，适用于SQLite日期比较
+    QString startDate = firstDay.toString(Qt::ISODate);
+    QString endDate = lastDay.toString(Qt::ISODate);
+    
+    QSqlQuery query(m_database);
+    
+    // 查询当月完成的星火日课题目总数
+    query.prepare("SELECT SUM(total_questions) "
+                 "FROM user_answer_records "
+                 "WHERE work_id = :workId "
+                 "AND exam_type = '星火日课' "  // 限定为星火日课
+                 "AND date(created_at) >= date(:startDate) "
+                 "AND date(created_at) <= date(:endDate)");
+    query.bindValue(":workId", workId);
+    query.bindValue(":startDate", startDate);
+    query.bindValue(":endDate", endDate);
+    
+    if (query.exec() && query.next()) {
+        // 如果结果为NULL，返回0
+        return query.value(0).isNull() ? 0 : query.value(0).toInt();
+    } else {
+        qWarning() << "获取当月刷题数量失败：" << query.lastError().text();
+        return 0;
+    }
+}
+
+/**
+ * 获取用户年度刷题数据（按月统计）
+ * @param workId 用户工号
+ * @return 包含12个月刷题数量的列表
+ */
+QVariantList DatabaseManager::getUserYearlyQuestionData(const QString &workId)
+{
+    QVariantList result;
+    
+    // 检查用户是否存在
+    if (!userExists(workId)) {
+        qWarning() << "用户不存在，工号：" << workId;
+        // 返回12个月的空数据
+        for (int i = 0; i < 12; ++i) {
+            result.append(0);
+        }
+        return result;
+    }
+    
+    // 获取当前日期
+    QDate currentDate = QDate::currentDate();
+    int currentYear = currentDate.year();
+    
+    // 为每个月初始化数据为0
+    for (int i = 0; i < 12; ++i) {
+        result.append(0);
+    }
+    
+    QSqlQuery query(m_database);
+    
+    // 查询本年度每月的星火日课题目总数
+    query.prepare("SELECT strftime('%m', created_at) as month, "
+                 "SUM(total_questions) as questionCount "
+                 "FROM user_answer_records "
+                 "WHERE work_id = :workId "
+                 "AND exam_type = '星火日课' "  // 限定为星火日课
+                 "AND strftime('%Y', created_at) = :year "
+                 "GROUP BY strftime('%m', created_at) "
+                 "ORDER BY month");
+    
+    query.bindValue(":workId", workId);
+    query.bindValue(":year", QString::number(currentYear));
+    
+    if (query.exec()) {
+        while (query.next()) {
+            // 月份从1开始，所以需要减1作为索引
+            int monthIndex = query.value("month").toString().toInt() - 1;
+            int questionCount = query.value("questionCount").toInt();
+            
+            if (monthIndex >= 0 && monthIndex < 12) {
+                result[monthIndex] = questionCount;
+            }
+        }
+    } else {
+        qWarning() << "获取年度刷题数据失败：" << query.lastError().text();
+    }
+    
+    return result;
+}
+
+/**
+ * 获取用户滚动年度刷题数据（从当前月份向前12个月）
+ * @param workId 用户工号
+ * @return 包含过去12个月刷题数量的列表，按照时间顺序（最早的月份在前）
+ */
+QVariantList DatabaseManager::getUserRollingYearQuestionData(const QString &workId)
+{
+    QVariantList result;
+    
+    // 检查用户是否存在
+    if (!userExists(workId)) {
+        qWarning() << "用户不存在，工号：" << workId;
+        // 返回12个月的空数据
+        for (int i = 0; i < 12; ++i) {
+            result.append(0);
+        }
+        return result;
+    }
+    
+    // 获取当前日期
+    QDate currentDate = QDate::currentDate();
+    
+    // 计算12个月前的日期
+    QDate startDate = currentDate.addMonths(-11);
+    startDate.setDate(startDate.year(), startDate.month(), 1); // 设置为月初
+    
+    // 设置当前月的月末（这样才能包含当月数据）
+    int lastDay = QDate(currentDate.year(), currentDate.month(), 1).daysInMonth();
+    QDate endDate = QDate(currentDate.year(), currentDate.month(), lastDay);
+    
+    qDebug() << "获取从" << startDate.toString(Qt::ISODate) 
+             << "到" << endDate.toString(Qt::ISODate) << "的滚动年度数据";
+    
+    // 为12个月初始化数组
+    QMap<QString, int> monthData;
+    
+    // 生成过去12个月的年月键，从11个月前到当前月
+    for (int i = 0; i < 12; ++i) {
+        QDate month = startDate.addMonths(i);
+        // 格式必须与SQLite的strftime('%Y-%m')格式一致
+        QString yearStr = QString::number(month.year());
+        QString monthStr = QString("%1").arg(month.month(), 2, 10, QChar('0'));
+        QString key = yearStr + "-" + monthStr;
+        
+        monthData[key] = 0;
+        qDebug() << "初始化月份数据:" << key;
+    }
+    
+    QSqlQuery query(m_database);
+    
+    // 查询过去12个月的星火日课题目总数，使用精确的年月格式
+    query.prepare("SELECT strftime('%Y-%m', created_at) as yearMonth, "
+                 "SUM(total_questions) as questionCount "
+                 "FROM user_answer_records "
+                 "WHERE work_id = :workId "
+                 "AND exam_type = '星火日课' "
+                 "AND date(created_at) >= date(:startDate) "
+                 "AND date(created_at) <= date(:endDate) "
+                 "GROUP BY yearMonth "
+                 "ORDER BY yearMonth");
+    
+    query.bindValue(":workId", workId);
+    query.bindValue(":startDate", startDate.toString(Qt::ISODate));
+    query.bindValue(":endDate", endDate.toString(Qt::ISODate));
+    
+    if (query.exec()) {
+        while (query.next()) {
+            QString yearMonth = query.value("yearMonth").toString();
+            int questionCount = query.value("questionCount").toInt();
+            
+            qDebug() << "查询到月份数据:" << yearMonth << "题目数:" << questionCount;
+            
+            // 如果在我们的映射中存在该月，则更新数据
+            if (monthData.contains(yearMonth)) {
+                monthData[yearMonth] = questionCount;
+            }
+        }
+    } else {
+        qWarning() << "获取滚动年度刷题数据失败：" << query.lastError().text();
+    }
+    
+    // 按时间顺序将数据添加到结果列表（从最早的月份开始）
+    for (int i = 0; i < 12; ++i) {
+        QDate month = startDate.addMonths(i);
+        // 使用与前面相同的格式构建键
+        QString yearStr = QString::number(month.year());
+        QString monthStr = QString("%1").arg(month.month(), 2, 10, QChar('0'));
+        QString key = yearStr + "-" + monthStr;
+        
+        result.append(monthData[key]);
+        qDebug() << "添加到结果数组:" << key << "值:" << monthData[key] << "，索引:" << i;
+    }
+    
+    return result;
+}
+
+/**
+ * 获取用户能力值数据
+ * @param workId 用户工号
+ * @return 包含用户各时期能力值数据的映射
+ */
+QVariantMap DatabaseManager::getUserAbilityData(const QString &workId)
+{
+    QVariantMap result;
+    
+    // 检查用户是否存在
+    if (!userExists(workId)) {
+        qWarning() << "用户不存在，工号：" << workId;
+        return result;
+    }
+    
+    // 获取当前日期
+    QDate currentDate = QDate::currentDate();
+    
+    // 获取当前月及前两个月的数据
+    QList<QVariantList> monthlyAbilityData;
+    
+    for (int i = 0; i < 3; ++i) {
+        QVariantList abilityData;
+        // 初始化5个能力维度的数据（初始值为随机数）
+        // 实际应用中，这里应该从数据库中查询实际的能力值数据
+        
+        // 当前月减i个月
+        QDate targetDate = currentDate.addMonths(-i);
+        int year = targetDate.year();
+        int month = targetDate.month();
+        
+        // 获取月份的第一天和最后一天
+        QDate firstDay(year, month, 1);
+        QDate lastDay = firstDay.addMonths(1).addDays(-1);
+        
+        // 转换为ISO格式的字符串
+        QString startDate = firstDay.toString(Qt::ISODate);
+        QString endDate = lastDay.toString(Qt::ISODate);
+        
+        // 基于该用户在指定月份的练习数据生成能力值
+        // 这里使用一个简单算法生成模拟数据，实际应用中应根据实际需求实现
+        QSqlQuery query(m_database);
+        query.prepare("SELECT COUNT(*), SUM(correctCount), SUM(totalQuestions) "
+                     "FROM user_answer_records "
+                     "WHERE workId = :workId "
+                     "AND date(createdAt) >= date(:startDate) "
+                     "AND date(createdAt) <= date(:endDate)");
+        query.bindValue(":workId", workId);
+        query.bindValue(":startDate", startDate);
+        query.bindValue(":endDate", endDate);
+        
+        int recordCount = 0;
+        double accuracy = 0;
+        
+        if (query.exec() && query.next()) {
+            recordCount = query.value(0).toInt();
+            int correctCount = query.value(1).isNull() ? 0 : query.value(1).toInt();
+            int totalCount = query.value(2).isNull() ? 0 : query.value(2).toInt();
+            
+            if (totalCount > 0) {
+                accuracy = (double)correctCount / totalCount;
+            }
+        }
+        
+        // 使用记录数和正确率生成能力值数据
+        // 这里简单地根据做题数量和正确率生成5个维度的能力值
+        
+        // 1. 理解能力（基于做题正确率）
+        double comprehension = 30 + 70 * accuracy;
+        abilityData.append(comprehension);
+        
+        // 2. 记忆力（基于做题数量）
+        double memory = recordCount > 0 ? 40 + std::min(60.0, recordCount * 2.0) : 40;
+        abilityData.append(memory);
+        
+        // 3. 推理能力（基于正确率和做题量的综合）
+        double reasoning = 30 + 35 * accuracy + std::min(35.0, recordCount * 1.0);
+        abilityData.append(reasoning);
+        
+        // 4. 应用能力（基于正确率）
+        double application = 20 + 80 * accuracy;
+        abilityData.append(application);
+        
+        // 5. 创新能力（较难量化，这里基于做题量和正确率给一个保守估计）
+        double innovation = 20 + 40 * accuracy + std::min(40.0, recordCount * 1.5);
+        abilityData.append(innovation);
+        
+        // 存储到月度数据列表
+        monthlyAbilityData.append(abilityData);
+    }
+    
+    // 将三个月的数据添加到结果映射
+    if (monthlyAbilityData.size() >= 3) {
+        result["currentMonth"] = monthlyAbilityData[0];
+        result["lastMonth"] = monthlyAbilityData[1];
+        result["twoMonthsAgo"] = monthlyAbilityData[2];
+    }
+    
+    return result;
+}
+
+/**
+ * 获取所有用户当月最大刷题量
+ * @return 所有用户当月最大刷题量
+ */
+int DatabaseManager::getMaxMonthlyQuestionCount()
+{
+    // 获取当前日期
+    QDate currentDate = QDate::currentDate();
+    int year = currentDate.year();
+    int month = currentDate.month();
+    
+    // 获取当月第一天和最后一天
+    QDate firstDay(year, month, 1);
+    QDate lastDay = firstDay.addMonths(1).addDays(-1);
+    
+    // 转换为ISO格式的字符串，适用于SQLite日期比较
+    QString startDate = firstDay.toString(Qt::ISODate);
+    QString endDate = lastDay.toString(Qt::ISODate);
+    
+    QSqlQuery query(m_database);
+    
+    // 查询当月每个用户的星火日课题目总数，并获取最大值
+    query.prepare("SELECT work_id, SUM(total_questions) as total "
+                 "FROM user_answer_records "
+                 "WHERE exam_type = '星火日课' "
+                 "AND date(created_at) >= date(:startDate) "
+                 "AND date(created_at) <= date(:endDate) "
+                 "GROUP BY work_id "
+                 "ORDER BY total DESC "
+                 "LIMIT 1");
+    query.bindValue(":startDate", startDate);
+    query.bindValue(":endDate", endDate);
+    
+    if (query.exec() && query.next()) {
+        // 如果结果为NULL，返回默认值20
+        int maxCount = query.value("total").isNull() ? 20 : query.value("total").toInt();
+        qDebug() << "本月最大刷题量：" << maxCount;
+        return maxCount;
+    } else {
+        qWarning() << "获取最大刷题量失败：" << query.lastError().text();
+        // 如果没有记录，返回默认值20
+        return 20;
+    }
 } 
