@@ -4,13 +4,13 @@ import QtQuick.Controls 2.15
 import QtMultimedia 5.15
 
 Window {
-    // width: Screen.width
-    // height: Screen.height
-    width: 1440
-    height: 1024
+    width: Screen.width
+    height: Screen.height
+    // width: 1440
+    // height: 1024
     visible: true
-    // visibility: Window.FullScreen
-    // flags: Qt.Window | Qt.FramelessWindowHint //| Qt.WindowStaysOnTopHint
+    visibility: Window.FullScreen
+    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     title: qsTr("星火智能评测系统")
 
     Image {
@@ -884,8 +884,8 @@ Window {
                 Canvas {
                     id: radar_chart
                     anchors.centerIn: parent
-                    width: Math.min(parent.width, parent.height) * 0.8
-                    height: width
+                    width: Math.min(parent.width, parent.height) * 0.8 + 100
+                    height: width - 100
                     
                     // 示例数据 - 五个维度的值（0-1范围）
                     property var data1: [0.7, 0.9, 0.5, 0.8, 0.6]  // 当月数据
@@ -1006,14 +1006,14 @@ Window {
                     
                     // 绘制标签
                     function drawLabels(ctx, centerX, centerY, radius) {
-                        ctx.font = "14px 阿里妈妈数黑体";
+                        ctx.font = "17px 阿里妈妈数黑体";
                         ctx.fillStyle = "white";
                         ctx.textAlign = "center";
                         ctx.textBaseline = "middle";
                         
                         for (var i = 0; i < 5; i++) {
                             var angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
-                            var x = centerX + (radius + 20) * Math.cos(angle);
+                            var x = centerX + (radius + 40) * Math.cos(angle);
                             var y = centerY + (radius + 20) * Math.sin(angle);
                             
                             ctx.fillText(labels[i], x, y);
@@ -1138,22 +1138,22 @@ Window {
                     month_bars.monthlyData = yearlyData;
                 }
                 
-                // 获取能力值数据
-                var abilityData = dbManager.getUserAbilityData(userId);
-                if (abilityData) {
-                    if (abilityData.currentMonth && abilityData.currentMonth.length === 5) {
-                        radar_chart.data1 = abilityData.currentMonth;
-                    }
-                    if (abilityData.lastMonth && abilityData.lastMonth.length === 5) {
-                        radar_chart.data2 = abilityData.lastMonth;
-                    }
-                    if (abilityData.twoMonthsAgo && abilityData.twoMonthsAgo.length === 5) {
-                        radar_chart.data3 = abilityData.twoMonthsAgo;
-                    }
-                }
+                // // 获取能力值数据
+                // var abilityData = dbManager.getUserAbilityData(userId);
+                // if (abilityData) {
+                //     if (abilityData.currentMonth && abilityData.currentMonth.length === 5) {
+                //         radar_chart.data1 = abilityData.currentMonth;
+                //     }
+                //     if (abilityData.lastMonth && abilityData.lastMonth.length === 5) {
+                //         radar_chart.data2 = abilityData.lastMonth;
+                //     }
+                //     if (abilityData.twoMonthsAgo && abilityData.twoMonthsAgo.length === 5) {
+                //         radar_chart.data3 = abilityData.twoMonthsAgo;
+                //     }
+                // }
                 
                 // 刷新雷达图
-                radar_chart.requestPaint();
+                //radar_chart.requestPaint();
             }
         }
 
