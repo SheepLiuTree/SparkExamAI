@@ -165,6 +165,15 @@ public:
     
     // 获取所有答题记录
     Q_INVOKABLE QVariantList getAllAnswerRecords(int limit = 100, int offset = 0);
+    
+    // 获取用户练习数据统计
+    Q_INVOKABLE QVariantMap getUserPracticeData(const QString &workId);
+    
+    // 获取用户按月练习数据统计
+    Q_INVOKABLE QVariantList getUserMonthlyPracticeData(const QString &workId, int monthCount = 6);
+    
+    // 获取用户每日刷题数据
+    Q_INVOKABLE QVariantList getUserDailyPracticeData(const QString &workId, int year, int month);
 
 private:
     QSqlDatabase m_database;

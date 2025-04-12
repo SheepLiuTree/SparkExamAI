@@ -4,11 +4,13 @@ import QtQuick.Controls 2.15
 import QtMultimedia 5.15
 
 Window {
-    width: Screen.width
-    height: Screen.height
+    // width: Screen.width
+    // height: Screen.height
+    width: 1440
+    height: 1024
     visible: true
-    visibility: Window.FullScreen
-    flags: Qt.Window | Qt.FramelessWindowHint //| Qt.WindowStaysOnTopHint
+    // visibility: Window.FullScreen
+    // flags: Qt.Window | Qt.FramelessWindowHint //| Qt.WindowStaysOnTopHint
     title: qsTr("星火智能评测系统")
 
     Image {
@@ -16,6 +18,18 @@ Window {
         anchors.fill: parent
         source: "qrc:/images/background.png"
         fillMode: Image.PreserveAspectCrop
+    }
+    // 显示窗口尺寸
+    Text {
+        id: window_size_text
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: 10
+        text: "窗口尺寸: " + parent.width + " x " + parent.height
+        font.family: "阿里妈妈数黑体"
+        font.pixelSize: 16
+        color: "white"
+        z: 100 // 确保显示在最上层
     }
 
     Image {
@@ -45,6 +59,7 @@ Window {
             font.pixelSize: 30
             color: "white"
         }
+        
         Text {
             id: time_text
             anchors.bottom: headline_background.bottom
@@ -92,6 +107,13 @@ Window {
         color: "transparent"
         visible: false
 
+        // Component initialization
+        Component.onCompleted: {
+            // Default to showing the middle column on initial load
+            middle_column.visible = true
+            user_practice_data.visible = false
+        }
+
         Image {
             id: function_menu_background
             anchors.top: parent.top
@@ -115,6 +137,29 @@ Window {
             Column {
                 anchors.centerIn: parent
                 spacing: 25
+
+                Button {
+                    width: 200
+                    height: 70
+                    background: Image {
+                        source: "qrc:/images/button_bg.png"
+                        fillMode: Image.Stretch
+                    }
+                    contentItem: Text {
+                        text: "首  页"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 24
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("首页 clicked")
+                        // 显示中间列，隐藏个人练习数据
+                        middle_column.visible = true
+                        user_practice_data.visible = false
+                    }
+                }
 
                 Button {
                     width: 200
@@ -297,13 +342,114 @@ Window {
             anchors.right: personal_page_background.left
             anchors.horizontalCenter: parent.horizontalCenter
             color: "transparent"
+            visible: true // Default to visible
+            // 标题背景图
+            Image {      
+                id: monthly_ranking_bg_image
+                source: "qrc:/images/title_bg.png"
+                width: 350
+                height: 200
+                fillMode: Image.PreserveAspectFit
+                anchors.horizontalCenter: parent.horizontalCenter   
+                anchors.top: parent.top
+                anchors.topMargin: -70
+                // 智点速览文本
+                Text {
+                    text: "月度排行榜"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 26
+                    color: "white"
+                    anchors.centerIn: parent
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
 
+
+            Rectangle {
+                id: monthly_ranking
+                anchors.top: monthly_ranking_bg_image.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: title_bg_image.top                
+                anchors.topMargin: -30
+                color: "transparent"
+                
+                //背景
+                Image {                    
+                    source: "qrc:/images/RankingList_bg.png"
+                    width: parent.width / 4 *3
+                    height: width / 3
+                    fillMode: Image.Stretch
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: -50
+                }
+                //第一名背景
+                Image {                    
+                    source: "qrc:/images/ranking_bg.png"
+                    width: parent.width / 4
+                    height: width / 3 * 2 
+                    fillMode: Image.PreserveAspectFit
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 100
+                    Image {                    
+                        source: "qrc:/images/avatar_bg.png"
+                        width: parent.width 
+                        height: width
+                        fillMode: Image.PreserveAspectFit
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: parent.top
+                        anchors.topMargin: -width/2
+                    }
+                }
+                //第二名背景
+                Image {                    
+                    source: "qrc:/images/ranking_bg.png"
+                    width: parent.width / 4
+                    height: width / 3 * 2 
+                    fillMode: Image.PreserveAspectFit
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.horizontalCenterOffset: parent.width / 5
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 50
+                    Image {                    
+                        source: "qrc:/images/avatar_bg.png"
+                        width: parent.width
+                        height: width
+                        fillMode: Image.PreserveAspectFit
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: parent.top
+                        anchors.topMargin: -width/2
+                    }
+                }
+                //第三名背景
+                Image {                    
+                    source: "qrc:/images/ranking_bg.png"
+                    width: parent.width / 4
+                    height: width / 3 * 2 
+                    fillMode: Image.PreserveAspectFit
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.horizontalCenterOffset: -parent.width / 5
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 50
+                    Image {                    
+                        source: "qrc:/images/avatar_bg.png"
+                        width: parent.width
+                        height: width
+                        fillMode: Image.PreserveAspectFit
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: parent.top
+                        anchors.topMargin: -width/2
+                    }
+                }
+            }
             // 标题背景图
             Image {
                 id: title_bg_image
                 source: "qrc:/images/title_bg.png"
-                width: 300
-                height: 150
+                width: 350
+                height: 200
                 fillMode: Image.PreserveAspectFit
                 anchors.horizontalCenter: parent.horizontalCenter   
                 anchors.bottom: knowledge_point_bg_image.top
@@ -312,7 +458,7 @@ Window {
                 Text {
                     text: "智 点 速 览"
                     font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 24
+                    font.pixelSize: 26
                     color: "white"
                     anchors.centerIn: parent
                     anchors.verticalCenter: parent.verticalCenter
@@ -329,7 +475,7 @@ Window {
                 // fillMode: Image.PreserveAspectFit
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: -parent.height / 180
+                anchors.bottomMargin: -parent.height / 90
 
                 // 智点标题
                 Text {
@@ -442,6 +588,511 @@ Window {
             }            
         }
 
+        // 用户练习数据显示区域 (添加新组件)
+        Rectangle {
+            id: user_practice_data
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: function_menu_background.right
+            anchors.right: personal_page_background.left
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: "transparent"
+            visible: false // Default to hidden
+
+            // 标题背景图
+            Image {
+                id: practice_title_bg_image
+                source: "qrc:/images/title_bg2.png"
+                width: 200
+                height: 50
+                fillMode: Image.Stretch
+                anchors.horizontalCenter: parent.horizontalCenter   
+                anchors.top: parent.top
+                
+                // 个人数据文本
+                Text {
+                    id: personalDataTitle
+                    text: "学习智能分析"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 24
+                    color: "white"
+                    anchors.centerIn: parent
+                }
+            }
+
+            Image {
+                id: user_practice_data_bg_image
+                source: "qrc:/images/arrows.png"
+                width: 40
+                height: 18
+                fillMode: Image.Stretch
+                anchors.verticalCenter: practice_title_bg_image.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.horizontalCenterOffset: -250
+                anchors.top: parent.top
+                // 逆时针旋转90度
+                rotation: -90
+            }
+            
+            // 用户姓名 - 将Text移到Image外部，避免随Image一起旋转
+            Text {
+                id: user_name
+                text: ""
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 24
+                color: "white"
+                anchors.left: user_practice_data_bg_image.left
+                anchors.leftMargin: 60 // 调整到合适位置
+                anchors.verticalCenter: practice_title_bg_image.verticalCenter
+            }
+
+            // 月刷题统计显示
+            Rectangle {
+                id: monthly_stats_rect
+                anchors.top: practice_title_bg_image.bottom
+                anchors.topMargin: 30
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width * 0.8
+                height: 50
+                color: "#1e3a5f"
+                radius: 5
+                border.color: "#4A7CB1"
+                border.width: 1
+                
+                Text {
+                    id: monthly_stats_title
+                    text: "本月刷题数："
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 20
+                    color: "white"
+                    anchors.left: parent.left
+                    anchors.leftMargin: 20
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                
+                Text {
+                    id: monthly_stats_value
+                    text: "1234"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 24
+                    font.bold: true
+                    color: "#5B9BD5"
+                    anchors.left: monthly_stats_title.right
+                    anchors.leftMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                
+                // 进度条背景
+                Rectangle {
+                    anchors.left: monthly_stats_value.right
+                    anchors.right: parent.right
+                    anchors.leftMargin: 20
+                    anchors.rightMargin: 20
+                    anchors.verticalCenter: parent.verticalCenter
+                    height: 20
+                    color: "#2A5C91"
+                    radius: 5
+                    
+                    // 进度条
+                    Rectangle {
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        width: parent.width * 0.7 // 可以根据实际进度计算
+                        color: "#5B9BD5"
+                        radius: 5
+                    }
+                }
+            }
+
+            // 年度刷题统计图表
+            Rectangle {
+                id: yearly_stats_rect
+                anchors.top: monthly_stats_rect.bottom
+                anchors.topMargin: 20
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: parent.width * 0.1
+                anchors.rightMargin: parent.width * 0.1
+                height: parent.height * 0.3
+                color: "#1e3a5f"
+                opacity: 0.7
+                radius: 10
+                
+                Text {
+                    id: yearly_stats_title
+                    text: "2025年刷题统计"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 18
+                    color: "white"
+                    anchors.top: parent.top
+                    anchors.topMargin: 10
+                    anchors.left: parent.left
+                    anchors.leftMargin: 20
+                }
+                
+                // 图表Y轴最大值
+                property int maxValue: 200
+                
+                // 图表区域
+                Rectangle {
+                    id: chart_area
+                    anchors.top: yearly_stats_title.bottom
+                    anchors.topMargin: 10
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.leftMargin: 40
+                    anchors.rightMargin: 20
+                    anchors.bottomMargin: 30
+                    color: "transparent"
+                    
+                    // Y轴刻度线
+                    Column {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        spacing: parent.height / 4
+                        
+                        Repeater {
+                            model: 5
+                            
+                            Rectangle {
+                                width: parent.width
+                                height: 1
+                                color: "#555555"
+                                opacity: 0.5
+                                
+                                Text {
+                                    text: yearly_stats_rect.maxValue - (yearly_stats_rect.maxValue / 4 * index)
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 12
+                                    color: "#BBDEFB"
+                                    anchors.right: parent.left
+                                    anchors.rightMargin: 5
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 月份柱状图
+                    Row {
+                        id: month_bars
+                        anchors.fill: parent
+                        spacing: (parent.width - 12 * 20) / 12 // 将宽度平均分配给12个月
+                        
+                        // 12个月的数据
+                        property var monthlyData: [120, 200, 150, 80, 70, 110, 130, 200, 150, 80, 70, 110]
+                        
+                        Repeater {
+                            model: 12
+                            
+                            Rectangle {
+                                width: 20
+                                height: month_bars.monthlyData[index] / yearly_stats_rect.maxValue * parent.height
+                                y: parent.height - height
+                                color: "#5B9BD5"
+                                
+                                Text {
+                                    text: (index + 1) + "月"
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 10
+                                    color: "#BBDEFB"
+                                    anchors.top: parent.bottom
+                                    anchors.topMargin: 5
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 个人能力五边形图表
+            Rectangle {
+                id: ability_chart_rect
+                anchors.top: yearly_stats_rect.bottom
+                anchors.topMargin: 20
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.leftMargin: parent.width * 0.1
+                anchors.rightMargin: parent.width * 0.1
+                anchors.bottomMargin: 20
+                color: "#1e3a5f"
+                opacity: 0.7
+                radius: 10
+                
+                Text {
+                    id: ability_chart_title
+                    text: "个人能力五边图"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 18
+                    color: "white"
+                    anchors.top: parent.top
+                    anchors.topMargin: 10
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                
+                Canvas {
+                    id: radar_chart
+                    anchors.centerIn: parent
+                    width: Math.min(parent.width, parent.height) * 0.8
+                    height: width
+                    
+                    // 示例数据 - 五个维度的值（0-1范围）
+                    property var data1: [0.7, 0.9, 0.5, 0.8, 0.6]  // 当月数据
+                    property var data2: [0.8, 0.7, 0.6, 0.9, 0.7]  // 上月数据
+                    property var data3: [0.6, 0.8, 0.7, 0.5, 0.8]  // 上上月数据
+                    
+                    // 维度标签
+                    property var labels: ["基础认知", "安全规范", "诊断分析", "操作应用", "原理理解"]
+                    
+                    // 绘制颜色
+                    property color color1: "#5B9BD5"  // 蓝色
+                    property color color2: "#70AD47"  // 绿色
+                    property color color3: "#FFAA33"  // 黄色
+                    
+                    onPaint: {
+                        var ctx = getContext("2d");
+                        var centerX = width / 2;
+                        var centerY = height / 2;
+                        var size = Math.min(width, height) / 2 * 0.8;
+                        
+                        // 清空画布
+                        ctx.clearRect(0, 0, width, height);
+                        
+                        // 绘制背景网格
+                        drawPentagon(ctx, centerX, centerY, size, "#555555", 0.2, false);
+                        drawPentagon(ctx, centerX, centerY, size * 0.8, "#555555", 0.2, false);
+                        drawPentagon(ctx, centerX, centerY, size * 0.6, "#555555", 0.2, false);
+                        drawPentagon(ctx, centerX, centerY, size * 0.4, "#555555", 0.2, false);
+                        drawPentagon(ctx, centerX, centerY, size * 0.2, "#555555", 0.2, false);
+                        
+                        // 绘制数据多边形
+                        drawDataPolygon(ctx, centerX, centerY, size, data3, color3, 0.6);
+                        drawDataPolygon(ctx, centerX, centerY, size, data2, color2, 0.6);
+                        drawDataPolygon(ctx, centerX, centerY, size, data1, color1, 0.8);
+                        
+                        // 绘制维度轴线
+                        drawAxisLines(ctx, centerX, centerY, size, "#666666");
+                        
+                        // 绘制标签
+                        drawLabels(ctx, centerX, centerY, size);
+                    }
+                    
+                    // 绘制多边形函数
+                    function drawPentagon(ctx, centerX, centerY, radius, color, alpha, fill) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = color;
+                        ctx.fillStyle = color;
+                        ctx.globalAlpha = alpha;
+                        
+                        for (var i = 0; i < 5; i++) {
+                            var angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
+                            var x = centerX + radius * Math.cos(angle);
+                            var y = centerY + radius * Math.sin(angle);
+                            
+                            if (i === 0) {
+                                ctx.moveTo(x, y);
+                            } else {
+                                ctx.lineTo(x, y);
+                            }
+                        }
+                        
+                        ctx.closePath();
+                        if (fill) {
+                            ctx.fill();
+                        } else {
+                            ctx.stroke();
+                        }
+                        ctx.globalAlpha = 1.0;
+                    }
+                    
+                    // 绘制数据多边形
+                    function drawDataPolygon(ctx, centerX, centerY, radius, data, color, alpha) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = color;
+                        ctx.fillStyle = color;
+                        ctx.globalAlpha = alpha;
+                        ctx.lineWidth = 2;
+                        
+                        for (var i = 0; i < 5; i++) {
+                            var angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
+                            var value = data[i];
+                            var x = centerX + radius * value * Math.cos(angle);
+                            var y = centerY + radius * value * Math.sin(angle);
+                            
+                            if (i === 0) {
+                                ctx.moveTo(x, y);
+                            } else {
+                                ctx.lineTo(x, y);
+                            }
+                        }
+                        
+                        ctx.closePath();
+                        ctx.stroke();
+                        ctx.globalAlpha = 0.3;
+                        ctx.fill();
+                        ctx.globalAlpha = 1.0;
+                    }
+                    
+                    // 绘制轴线
+                    function drawAxisLines(ctx, centerX, centerY, radius, color) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = color;
+                        ctx.globalAlpha = 0.5;
+                        ctx.lineWidth = 1;
+                        
+                        for (var i = 0; i < 5; i++) {
+                            var angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
+                            var x = centerX + radius * Math.cos(angle);
+                            var y = centerY + radius * Math.sin(angle);
+                            
+                            ctx.moveTo(centerX, centerY);
+                            ctx.lineTo(x, y);
+                        }
+                        
+                        ctx.stroke();
+                        ctx.globalAlpha = 1.0;
+                    }
+                    
+                    // 绘制标签
+                    function drawLabels(ctx, centerX, centerY, radius) {
+                        ctx.font = "14px 阿里妈妈数黑体";
+                        ctx.fillStyle = "white";
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "middle";
+                        
+                        for (var i = 0; i < 5; i++) {
+                            var angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
+                            var x = centerX + (radius + 20) * Math.cos(angle);
+                            var y = centerY + (radius + 20) * Math.sin(angle);
+                            
+                            ctx.fillText(labels[i], x, y);
+                        }
+                    }
+                }
+                
+                // 图例
+                Row {
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 10
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 30
+                    
+                    Row {
+                        spacing: 5
+                        Rectangle {
+                            width: 15
+                            height: 10
+                            color: radar_chart.color1
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        Text {
+                            text: "3月"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 12
+                            color: "white"
+                        }
+                    }
+                    
+                    Row {
+                        spacing: 5
+                        Rectangle {
+                            width: 15
+                            height: 10
+                            color: radar_chart.color2
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        Text {
+                            text: "2月"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 12
+                            color: "white"
+                        }
+                    }
+                    
+                    Row {
+                        spacing: 5
+                        Rectangle {
+                            width: 15
+                            height: 10
+                            color: radar_chart.color3
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        Text {
+                            text: "1月"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 12
+                            color: "white"
+                        }
+                    }
+                }
+            }
+
+            // 当用户ID改变时，从数据库加载该用户的练习数据
+            property string currentUserId: ""
+            
+            onCurrentUserIdChanged: {
+                if (currentUserId !== "") {
+                    console.log("用户ID已更改: " + currentUserId)
+                    // 从数据库获取当前用户信息
+                    var userData = dbManager.getFaceDataByWorkId(currentUserId);
+                    if (userData && !userData.isEmpty) {
+                        // 更新用户姓名显示
+                        user_name.text = userData.name || "未知用户";
+                        console.log("已加载用户姓名: " + user_name.text);
+                        
+                        // 在这里可以加载用户的其他数据
+                        loadUserPracticeData(currentUserId);
+                    } else {
+                        user_name.text = "未知用户";
+                        console.log("无法获取用户信息");
+                    }
+                } else {
+                    // 如果ID为空，清空用户名
+                    user_name.text = "";
+                    console.log("用户ID为空，已清空用户名显示");
+                }
+            }
+            
+            // 加载用户练习数据
+            function loadUserPracticeData(userId) {
+                // 这里加载用户的练习数据并更新UI
+                console.log("加载用户练习数据，用户ID: " + userId);
+                
+                // 获取当月刷题数量
+                var currentMonthQuestions = dbManager.getUserCurrentMonthQuestionCount(userId) || 1234;
+                monthly_stats_value.text = currentMonthQuestions.toString();
+                
+                // 获取年度每月刷题数据
+                var yearlyData = dbManager.getUserYearlyQuestionData(userId);
+                if (yearlyData && yearlyData.length === 12) {
+                    month_bars.monthlyData = yearlyData;
+                }
+                
+                // 获取能力值数据
+                var abilityData = dbManager.getUserAbilityData(userId);
+                if (abilityData) {
+                    if (abilityData.currentMonth && abilityData.currentMonth.length === 5) {
+                        radar_chart.data1 = abilityData.currentMonth;
+                    }
+                    if (abilityData.lastMonth && abilityData.lastMonth.length === 5) {
+                        radar_chart.data2 = abilityData.lastMonth;
+                    }
+                    if (abilityData.twoMonthsAgo && abilityData.twoMonthsAgo.length === 5) {
+                        radar_chart.data3 = abilityData.twoMonthsAgo;
+                    }
+                }
+                
+                // 刷新雷达图
+                radar_chart.requestPaint();
+            }
+        }
+
         Image {
             id: personal_page_background
             anchors.top: parent.top
@@ -550,6 +1201,11 @@ Window {
                             }
                             onClicked: {
                                 console.log(model.name + " clicked, workId: " + model.workId)
+                                // 设置当前选中的用户ID
+                                user_practice_data.currentUserId = model.workId
+                                // 显示个人练习数据，隐藏中间列
+                                middle_column.visible = false
+                                user_practice_data.visible = true
                             }
                         }
                     }

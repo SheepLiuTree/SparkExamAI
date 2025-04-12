@@ -1554,4 +1554,246 @@ QVariantList DatabaseManager::getAllAnswerRecords(int limit, int offset)
     }
     
     return result;
+}
+
+/**
+ * 获取用户练习数据统计
+ * @param workId 用户工号
+ * @return 包含用户练习数据统计的Map
+ */
+QVariantMap DatabaseManager::getUserPracticeData(const QString &workId)
+{
+    QVariantMap result;
+    
+    // 获取基本用户信息
+    QVariantMap userInfo = getFaceDataByWorkId(workId);
+    if (userInfo.isEmpty()) {
+        qWarning() << "无法获取用户信息，工号：" << workId;
+        return result;
+    }
+    
+    result["name"] = userInfo["name"];
+    result["workId"] = workId;
+    
+    QSqlQuery query(m_database);
+    
+    // 统计总做题数
+    query.prepare("SELECT COUNT(*) FROM user_answer_records WHERE workId = :workId");
+    query.bindValue(":workId", workId);
+    
+    if (query.exec() && query.next()) {
+        result["totalQuestions"] = query.value(0).toInt();
+    } else {
+        result["totalQuestions"] = 0;
+        qWarning() << "获取总做题数失败：" << query.lastError().text();
+    }
+    
+    // 统计正确题数和正确率
+    query.prepare("SELECT SUM(correctCount), SUM(totalQuestions) FROM user_answer_records WHERE workId = :workId");
+    query.bindValue(":workId", workId);
+    
+    if (query.exec() && query.next()) {
+        int correctCount = query.value(0).toInt();
+        int totalCount = query.value(1).toInt();
+        
+        result["correctCount"] = correctCount;
+        
+        // 计算正确率
+        double accuracy = 0;
+        if (totalCount > 0) {
+            accuracy = (double)correctCount / totalCount * 100.0;
+        }
+        result["accuracy"] = QString::number(accuracy, 'f', 1) + "%";
+    } else {
+        result["correctCount"] = 0;
+        result["accuracy"] = "0%";
+        qWarning() << "获取正确题数失败：" << query.lastError().text();
+    }
+    
+    // 获取平均用时（假设有duration字段，单位为秒）
+    query.prepare("SELECT AVG(duration) FROM user_answer_records WHERE workId = :workId");
+    query.bindValue(":workId", workId);
+    
+    if (query.exec() && query.next() && !query.value(0).isNull()) {
+        double avgDuration = query.value(0).toDouble();
+        result["averageDuration"] = QString::number(avgDuration, 'f', 1) + "秒";
+    } else {
+        result["averageDuration"] = "暂无";
+        qWarning() << "获取平均用时失败：" << query.lastError().text();
+    }
+    
+    // 获取最近一次做题时间
+    query.prepare("SELECT MAX(createdAt) FROM user_answer_records WHERE workId = :workId");
+    query.bindValue(":workId", workId);
+    
+    if (query.exec() && query.next() && !query.value(0).isNull()) {
+        QDateTime lastTime = query.value(0).toDateTime();
+        result["lastPracticeTime"] = lastTime.toString("yyyy-MM-dd hh:mm:ss");
+    } else {
+        result["lastPracticeTime"] = "暂无";
+        qWarning() << "获取最近做题时间失败：" << query.lastError().text();
+    }
+    
+    return result;
+}
+
+/**
+ * 获取用户按月练习数据统计
+ * @param workId 用户工号
+ * @param monthCount 需要获取的月份数量
+ * @return 包含用户每月练习数据统计的列表
+ */
+QVariantList DatabaseManager::getUserMonthlyPracticeData(const QString &workId, int monthCount)
+{
+    QVariantList result;
+    
+    // 检查用户是否存在
+    if (!userExists(workId)) {
+        qWarning() << "用户不存在，工号：" << workId;
+        return result;
+    }
+    
+    // 获取当前日期
+    QDate currentDate = QDate::currentDate();
+    
+    // 循环处理每个月的数据
+    for (int i = 0; i < monthCount; ++i) {
+        QVariantMap monthData;
+        
+        // 计算月份，从当前月份往前推
+        QDate targetDate = currentDate.addMonths(-i);
+        int year = targetDate.year();
+        int month = targetDate.month();
+        
+        // 设置月份信息
+        monthData["year"] = year;
+        monthData["month"] = month;
+        monthData["monthName"] = QString("%1年%2月").arg(year).arg(month);
+        
+        // 获取月份第一天和最后一天
+        QDate firstDay(year, month, 1);
+        QDate lastDay = firstDay.addMonths(1).addDays(-1);
+        
+        // 转换为ISO格式的字符串，适用于SQLite日期比较
+        QString startDate = firstDay.toString(Qt::ISODate);
+        QString endDate = lastDay.toString(Qt::ISODate);
+        
+        QSqlQuery query(m_database);
+        
+        // 查询该月完成的题目数量
+        query.prepare("SELECT COUNT(*), SUM(correctCount), SUM(totalQuestions) "
+                     "FROM user_answer_records "
+                     "WHERE workId = :workId "
+                     "AND date(createdAt) >= date(:startDate) "
+                     "AND date(createdAt) <= date(:endDate)");
+        query.bindValue(":workId", workId);
+        query.bindValue(":startDate", startDate);
+        query.bindValue(":endDate", endDate);
+        
+        if (query.exec() && query.next()) {
+            int recordCount = query.value(0).toInt();
+            int correctCount = query.value(1).isNull() ? 0 : query.value(1).toInt();
+            int totalCount = query.value(2).isNull() ? 0 : query.value(2).toInt();
+            
+            // 设置月度数据
+            monthData["recordCount"] = recordCount;
+            monthData["totalQuestions"] = totalCount;
+            monthData["correctCount"] = correctCount;
+            
+            // 计算正确率
+            double accuracy = 0;
+            if (totalCount > 0) {
+                accuracy = (double)correctCount / totalCount * 100.0;
+            }
+            monthData["accuracy"] = QString::number(accuracy, 'f', 1) + "%";
+            
+            // 设置没有数据的标志
+            monthData["hasData"] = (recordCount > 0);
+        } else {
+            // 查询出错或没有数据
+            monthData["recordCount"] = 0;
+            monthData["totalQuestions"] = 0;
+            monthData["correctCount"] = 0;
+            monthData["accuracy"] = "0%";
+            monthData["hasData"] = false;
+            qWarning() << "获取月度数据失败：" << query.lastError().text();
+        }
+        
+        // 获取平均用时
+        query.prepare("SELECT AVG(duration) "
+                     "FROM user_answer_records "
+                     "WHERE workId = :workId "
+                     "AND date(createdAt) >= date(:startDate) "
+                     "AND date(createdAt) <= date(:endDate)");
+        query.bindValue(":workId", workId);
+        query.bindValue(":startDate", startDate);
+        query.bindValue(":endDate", endDate);
+        
+        if (query.exec() && query.next() && !query.value(0).isNull()) {
+            double avgDuration = query.value(0).toDouble();
+            monthData["averageDuration"] = QString::number(avgDuration, 'f', 1) + "秒";
+        } else {
+            monthData["averageDuration"] = "暂无";
+        }
+        
+        result.append(monthData);
+    }
+    
+    return result;
+}
+
+/**
+ * 获取用户每日刷题数据
+ * @param workId 用户工号
+ * @param year 年份
+ * @param month 月份
+ * @return 包含用户每日刷题数据的列表
+ */
+QVariantList DatabaseManager::getUserDailyPracticeData(const QString &workId, int year, int month)
+{
+    QVariantList result;
+    
+    // 检查用户是否存在
+    if (!userExists(workId)) {
+        qWarning() << "用户不存在，工号：" << workId;
+        return result;
+    }
+    
+    // 获取月份的第一天和最后一天
+    QDate firstDay(year, month, 1);
+    QDate lastDay = firstDay.addMonths(1).addDays(-1);
+    
+    // 转换为ISO格式的字符串，适用于SQLite日期比较
+    QString startDate = firstDay.toString(Qt::ISODate);
+    QString endDate = lastDay.toString(Qt::ISODate);
+    
+    QSqlQuery query(m_database);
+    
+    // 查询该用户在指定月份每天的做题数量
+    query.prepare("SELECT strftime('%d', createdAt) as day, "
+                 "SUM(totalQuestions) as questionCount "
+                 "FROM user_answer_records "
+                 "WHERE workId = :workId "
+                 "AND date(createdAt) >= date(:startDate) "
+                 "AND date(createdAt) <= date(:endDate) "
+                 "GROUP BY strftime('%d', createdAt) "
+                 "ORDER BY day");
+    
+    query.bindValue(":workId", workId);
+    query.bindValue(":startDate", startDate);
+    query.bindValue(":endDate", endDate);
+    
+    if (query.exec()) {
+        while (query.next()) {
+            QVariantMap dayData;
+            // 注意：day 可能有前导零，需要转换为整数
+            dayData["day"] = query.value("day").toString().toInt();
+            dayData["questionCount"] = query.value("questionCount").toInt();
+            result.append(dayData);
+        }
+    } else {
+        qWarning() << "获取每日刷题数据失败：" << query.lastError().text();
+    }
+    
+    return result;
 } 
