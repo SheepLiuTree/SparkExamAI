@@ -872,7 +872,7 @@ Window {
                 
                 Text {
                     id: ability_chart_title
-                    text: "个人能力五边图"
+                    text: "个人能力五芒图"
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 18
                     color: "white"

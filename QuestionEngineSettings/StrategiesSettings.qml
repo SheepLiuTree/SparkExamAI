@@ -236,6 +236,16 @@ Rectangle {
                                 }
                                 
                                 Text {
+                                    text: "所属分类: " + getBankCategory(modelData.id)
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 14
+                                    color: "#A5D6FF"
+                                    opacity: 0.9
+                                    Layout.preferredWidth: 150
+                                    elide: Text.ElideRight
+                                }
+                                
+                                Text {
                                     text: "题库总量: " + modelData.count + "题"
                                     font.family: "阿里妈妈数黑体"
                                     font.pixelSize: 14
@@ -585,6 +595,35 @@ Rectangle {
         console.log("已加载题库列表, 共", questionBanks.length, "个题库")
     }
     
+    // 获取题库所属分类
+    function getBankCategory(bankId) {
+        try {
+            if (!dbManager) {
+                console.error("dbManager未初始化");
+                return "未分类";
+            }
+            
+            // 获取五芒图所有点的分类设置
+            for (var i = 1; i <= 5; i++) {
+                var categoryKey = "pentagon_category_" + i;
+                var categorySetting = dbManager.getSetting(categoryKey, "{}");
+                var categoryData = JSON.parse(categorySetting);
+                
+                // 如果题库ID存在于该分类中且被选中
+                if (categoryData[bankId] === true) {
+                    // 获取该点的标题
+                    var titleKey = "pentagon_title_" + i;
+                    var title = dbManager.getSetting(titleKey, "");
+                    return title;
+                }
+            }
+            return "未分类";
+        } catch (e) {
+            console.error("获取题库分类失败:", e);
+            return "未分类";
+        }
+    }
+    
     // 获取题库分配数量
     function getBankDistribution(bankId) {
         return bankDistributions[bankId] || 0
@@ -659,6 +698,19 @@ Rectangle {
         }
     }
     
+    // 检查是否有未分类的题库被分配了题目
+    function checkUncategorizedBanks() {
+        var uncategorizedBanks = [];
+        for (var i = 0; i < questionBanks.length; i++) {
+            var bank = questionBanks[i];
+            var category = getBankCategory(bank.id);
+            if (category === "未分类" && bankDistributions[bank.id] > 0) {
+                uncategorizedBanks.push(bank.name);
+            }
+        }
+        return uncategorizedBanks;
+    }
+    
     // 保存设置
     function saveSettings() {
         if (!isDistributionValid()) {
@@ -667,6 +719,135 @@ Rectangle {
             return
         }
         
+        // 检查是否有未分类的题库被分配了题目
+        var uncategorizedBanks = checkUncategorizedBanks();
+        if (uncategorizedBanks.length > 0) {
+            // 创建警示弹窗
+            var dialog = Qt.createQmlObject('
+                import QtQuick 2.15
+                import QtQuick.Controls 2.15
+                import QtQuick.Layouts 1.15
+                
+                Dialog {
+                    id: warningDialog
+                    title: "警告"
+                    modal: true
+                    width: 400
+                    height: 200
+                    x: (parent.width - width) / 2
+                    y: (parent.height - height) / 2
+                    
+                    property var bankNames: []
+                    
+                    background: Rectangle {
+                        color: "#2c3e50"
+                        radius: 8
+                        border.color: "#e74c3c"
+                        border.width: 1
+                    }
+                    
+                    header: Rectangle {
+                        color: "#2c3e50"
+                        height: 40
+                        radius: 8
+                        border.color: "#e74c3c"
+                        border.width: 1
+                        
+                        Text {
+                            text: warningDialog.title
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 16
+                            font.bold: true
+                            color: "white"
+                            anchors.centerIn: parent
+                        }
+                    }
+                    
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 10
+                        
+                        Text {
+                            text: "以下未分类的题库被分配了题目："
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "white"
+                        }
+                        
+                        Text {
+                            text: warningDialog.bankNames.join("、")
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "#e74c3c"
+                            wrapMode: Text.Wrap
+                            Layout.fillWidth: true
+                        }
+                        
+                        Text {
+                            text: "未分类的题库不计入个人能力五芒图中！"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "white"
+                        }
+                        
+                        RowLayout {
+                            Layout.alignment: Qt.AlignRight
+                            spacing: 10
+                            
+                            Button {
+                                text: "取消"
+                                background: Rectangle {
+                                    color: "#34495e"
+                                    radius: 4
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 14
+                                    color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                onClicked: warningDialog.close()
+                            }
+                            
+                            Button {
+                                text: "继续保存"
+                                background: Rectangle {
+                                    color: "#e74c3c"
+                                    radius: 4
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 14
+                                    color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                onClicked: {
+                                    warningDialog.close()
+                                    saveSettingsToDatabase()
+                                }
+                            }
+                        }
+                    }
+                }
+            ', strategiesSettingsPage, "warningDialog");
+            
+            // 设置弹窗的bankNames属性
+            dialog.bankNames = uncategorizedBanks;
+            dialog.open();
+            return;
+        }
+        
+        // 如果没有未分类的题库，直接保存
+        saveSettingsToDatabase();
+    }
+    
+    // 保存设置到数据库
+    function saveSettingsToDatabase() {
         // 保存每日题目数量
         var countSuccess = dbManager.setSetting("daily_question_count", dailyQuestionCount.toString())
         

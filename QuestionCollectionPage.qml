@@ -956,6 +956,26 @@ Rectangle {
                             var success = dbManager.deleteQuestionBank(deleteConfirmDialog.bankId)
                             
                             if (success) {
+                                // 清理五芒图设置中该题库的归类信息
+                                try {
+                                    // 获取所有五芒图点的分类设置
+                                    for (var i = 1; i <= 5; i++) {
+                                        var categoryKey = "pentagon_category_" + i;
+                                        var categorySetting = dbManager.getSetting(categoryKey, "{}");
+                                        var categoryData = JSON.parse(categorySetting);
+                                        
+                                        // 如果该题库ID存在于分类中，则删除
+                                        if (categoryData[deleteConfirmDialog.bankId]) {
+                                            delete categoryData[deleteConfirmDialog.bankId];
+                                            // 保存更新后的分类设置
+                                            dbManager.setSetting(categoryKey, JSON.stringify(categoryData));
+                                            console.log("已清理五芒图点", i, "中的题库归类信息");
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.error("清理五芒图设置失败:", e);
+                                }
+                                
                                 // 重新加载题库列表
                                 loadQuestionBanks()
                                 

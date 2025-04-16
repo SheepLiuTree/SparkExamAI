@@ -14,12 +14,12 @@ Rectangle {
         Popup {
             id: categoryPopup
             width: 280
-            height: Math.min(350, contentColumn.implicitHeight + 40)
+            height: Math.min(360, contentColumn.implicitHeight + 50)
             x: (parent.width - width) / 2
             y: (parent.height - height) / 2
             modal: true
             padding: 15
-            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+            closePolicy: Popup.CloseOnEscape  // 只允许通过ESC键关闭
             
             property int pointIndex: 0
             
@@ -232,18 +232,14 @@ Rectangle {
                         }
                     }
                     
-                    // 底部按钮和间距
-                    Item {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 15 // 添加额外空间
-                    }
+
                     
                     Button {
                         text: "关闭"
                         Layout.alignment: Qt.AlignRight
                         Layout.preferredWidth: 100
                         Layout.preferredHeight: 36
-                        Layout.bottomMargin: 5 // 底部边距
+                        Layout.bottomMargin: 10 // 底部边距
                         background: Rectangle {
                             color: "#2980b9"
                             radius: 4
@@ -298,7 +294,7 @@ Rectangle {
             questionBanks = [];
         }
         
-        // 从数据库加载设置
+        // 从数据库加载标题设置
         try {
             loadSettings();
         } catch (e) {
@@ -312,6 +308,17 @@ Rectangle {
             console.error("加载题库失败:", e);
             questionBanks = []; // 确保至少是空数组
         }
+        
+        // 单独加载题库分类数据
+        try {
+            loadPentagonCategories();
+            console.log("已加载五芒图题库分类数据");
+        } catch (e) {
+            console.error("加载五芒图题库分类失败:", e);
+        }
+        
+        // 通知UI更新，触发题库数量的重新计算
+        pentagonCategoriesChanged();
         
         // 打印调试信息
         console.log("五芒图设置初始化完成，题库数量:", 
@@ -336,9 +343,6 @@ Rectangle {
             }
             
             console.log("已加载题库列表, 共", questionBanks.length, "个题库");
-            
-            // 加载五芒图点的题库分类
-            loadPentagonCategories();
         } catch (e) {
             console.error("加载题库失败:", e);
             // 确保题库列表至少是空数组而不是undefined
@@ -359,6 +363,7 @@ Rectangle {
                     // 确保解析结果是对象
                     if (parsed && typeof parsed === 'object') {
                         pentagonCategories[i] = parsed;
+                        console.log("已加载五芒图点", i+1, "的题库分类, 分配题库数量:", countAssignedBanks(i));
                     } else {
                         pentagonCategories[i] = {};
                     }
@@ -367,6 +372,9 @@ Rectangle {
                     pentagonCategories[i] = {};
                 }
             }
+            
+            // 通知UI更新
+            pentagonCategoriesChanged();
         } catch (e) {
             console.error("加载五芒图分类失败:", e);
             // 确保五个分类都是有效的对象
@@ -507,15 +515,36 @@ Rectangle {
         dbManager.setSetting("pentagon_title_5", pentagonTitles[4])
         
         // 保存题库分类
-        for (var i = 0; i < 5; i++) {
-            var categorySetting = JSON.stringify(pentagonCategories[i])
-            dbManager.setSetting("pentagon_category_" + (i+1), categorySetting)
+        try {
+            for (var i = 0; i < 5; i++) {
+                // 确保数据是有效的对象
+                if (!pentagonCategories[i] || typeof pentagonCategories[i] !== 'object') {
+                    pentagonCategories[i] = {};
+                }
+                
+                var categorySetting = JSON.stringify(pentagonCategories[i]);
+                var success = dbManager.setSetting("pentagon_category_" + (i+1), categorySetting);
+                console.log("保存五芒图点", i+1, "的题库分类:", success ? "成功" : "失败", 
+                          "分配题库数量:", countAssignedBanks(i));
+            }
+            
+            // 保存时间戳，用于标记最后修改时间
+            var now = new Date();
+            dbManager.setSetting("pentagon_settings_updated_time", now.toISOString());
+            
+            // 通知UI更新
+            pentagonCategoriesChanged();
+            
+            // 显示成功消息
+            statusMessage = "五芒图配置已保存"
+            isSuccess = true
+            statusUpdateTimer.restart()
+        } catch (e) {
+            console.error("保存五芒图设置失败:", e);
+            statusMessage = "保存失败，请重试"
+            isSuccess = false
+            statusUpdateTimer.restart()
         }
-        
-        // 显示成功消息
-        statusMessage = "五芒图配置已保存"
-        isSuccess = true
-        statusUpdateTimer.restart()
     }
     
     // 状态更新计时器
