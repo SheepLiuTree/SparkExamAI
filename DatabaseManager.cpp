@@ -41,37 +41,30 @@ DatabaseManager::~DatabaseManager()
 
 bool DatabaseManager::initDatabase()
 {
-    // 如果数据库连接已经存在，先关闭
-    if (m_database.isOpen()) {
-        m_database.close();
-    }
-
-    // 创建并打开数据库连接
+    // 打开数据库连接
     m_database = QSqlDatabase::addDatabase("QSQLITE");
     m_database.setDatabaseName(m_dbPath);
-
+    
     if (!m_database.open()) {
-        qDebug() << "Failed to open database:" << m_database.lastError().text();
+        qDebug() << "无法打开数据库:" << m_database.lastError().text();
         return false;
     }
-
-    // 启用外键约束
-    QSqlQuery pragmaQuery;
-    if (!pragmaQuery.exec("PRAGMA foreign_keys = ON")) {
-        qDebug() << "Failed to enable foreign keys:" << pragmaQuery.lastError().text();
-    } else {
-        qDebug() << "Foreign keys enabled successfully";
-    }
-
-    // 创建数据表
-    bool success = createTables();
     
-    // 如果表创建成功，初始化默认设置
-    if (success) {
-        initDefaultSettings();
+    // 创建表
+    if (!createTables()) {
+        return false;
     }
     
-    return success;
+    // 更新数据库架构（添加新字段）
+    if (!updateDatabaseSchema()) {
+        qDebug() << "更新数据库架构失败";
+        // 继续执行，不因此中断程序
+    }
+    
+    // 初始化默认设置
+    initDefaultSettings();
+    
+    return true;
 }
 
 bool DatabaseManager::createTables()
@@ -826,6 +819,9 @@ QVariantMap DatabaseManager::getQuestionBankById(int bankId)
 {
     QVariantMap result;
     QSqlQuery query(m_database);
+    
+    qDebug() << "获取题库信息，ID:" << bankId;
+    
     query.prepare("SELECT * FROM question_banks WHERE id = :id");
     query.bindValue(":id", bankId);
     
@@ -841,6 +837,10 @@ QVariantMap DatabaseManager::getQuestionBankById(int bankId)
             importTime.replace("T", " ");
         }
         result["importTime"] = importTime;
+        
+        qDebug() << "题库信息获取成功，名称:" << result["name"].toString() << "题目数量:" << result["count"].toInt();
+    } else {
+        qDebug() << "题库不存在或查询失败，ID:" << bankId << "错误:" << query.lastError().text();
     }
     
     return result;
@@ -1019,17 +1019,16 @@ QVariantList DatabaseManager::getQuestionsByBankId(int bankId)
     
     while (query.next()) {
         QVariantMap question;
-        int questionId = query.value("id").toInt();
-        
-        question["id"] = questionId;
+        question["id"] = query.value("id").toInt();
         question["content"] = query.value("content").toString();
         question["answer"] = query.value("answer").toString();
         question["analysis"] = query.value("analysis").toString();
+        question["bankId"] = query.value("bank_id").toInt();  // 添加题库ID信息
         
         // 获取选项
         QSqlQuery optionQuery(m_database);
         optionQuery.prepare("SELECT * FROM question_options WHERE question_id = :question_id ORDER BY option_index");
-        optionQuery.bindValue(":question_id", questionId);
+        optionQuery.bindValue(":question_id", question["id"].toInt());
         
         QStringList options;
         if (optionQuery.exec()) {
@@ -1126,6 +1125,11 @@ QVariantList DatabaseManager::getRandomQuestions(int bankId, int count)
         question["content"] = query.value("content").toString();
         question["answer"] = query.value("answer").toString();
         question["analysis"] = query.value("analysis").toString();
+        
+        // 使用传入的bankId而不是从数据库获取，因为在某些查询中可能不返回bank_id字段
+        question["bankId"] = bankId;
+        
+        qDebug() << "随机抽取题目 ID:" << question["id"].toInt() << "题库ID:" << bankId;
         
         // 处理选项
         QString optionsStr = query.value("options").toString();
@@ -1422,7 +1426,9 @@ bool DatabaseManager::saveUserAnswerRecord(const QString &workId,
                                        const QString &examType,
                                        int totalQuestions,
                                        int correctCount,
-                                       const QString &answerData)
+                                       const QString &answerData,
+                                       const QString &questionBankInfo,
+                                       const QString &pentagonType)
 {
     if (!m_database.isOpen()) {
         qDebug() << "数据库未打开，尝试重新打开";
@@ -1435,8 +1441,8 @@ bool DatabaseManager::saveUserAnswerRecord(const QString &workId,
     QSqlQuery query(m_database);
     query.prepare(
         "INSERT INTO user_answer_records "
-        "(work_id, user_name, exam_type, total_questions, correct_count, answer_data, score_percentage) "
-        "VALUES (:work_id, :user_name, :exam_type, :total_questions, :correct_count, :answer_data, :score_percentage)"
+        "(work_id, user_name, exam_type, total_questions, correct_count, answer_data, score_percentage, question_bank_info, pentagon_type) "
+        "VALUES (:work_id, :user_name, :exam_type, :total_questions, :correct_count, :answer_data, :score_percentage, :question_bank_info, :pentagon_type)"
     );
     
     query.bindValue(":work_id", workId);
@@ -1445,6 +1451,8 @@ bool DatabaseManager::saveUserAnswerRecord(const QString &workId,
     query.bindValue(":total_questions", totalQuestions);
     query.bindValue(":correct_count", correctCount);
     query.bindValue(":answer_data", answerData);
+    query.bindValue(":question_bank_info", questionBankInfo);
+    query.bindValue(":pentagon_type", pentagonType);
     
     // 计算得分百分比
     float scorePercentage = 0;
@@ -1502,6 +1510,8 @@ QVariantList DatabaseManager::getUserAnswerRecords(const QString &workId, int li
         record["answerData"] = query.value("answer_data").toString();
         record["scorePercentage"] = query.value("score_percentage").toFloat();
         record["createdAt"] = query.value("created_at").toString();
+        record["questionBankInfo"] = query.value("question_bank_info").toString();
+        record["pentagonType"] = query.value("pentagon_type").toString();
         
         result.append(record);
     }
@@ -1549,6 +1559,8 @@ QVariantList DatabaseManager::getAllAnswerRecords(int limit, int offset)
         record["answerData"] = query.value("answer_data").toString();
         record["scorePercentage"] = query.value("score_percentage").toFloat();
         record["createdAt"] = query.value("created_at").toString();
+        record["questionBankInfo"] = query.value("question_bank_info").toString();
+        record["pentagonType"] = query.value("pentagon_type").toString();
         
         result.append(record);
     }
@@ -2146,4 +2158,60 @@ int DatabaseManager::getMaxMonthlyQuestionCount()
         // 如果没有记录，返回默认值20
         return 20;
     }
+}
+
+/**
+ * 更新数据库架构，添加新的列
+ * @return 是否成功更新
+ */
+bool DatabaseManager::updateDatabaseSchema()
+{
+    if (!m_database.isOpen()) {
+        qDebug() << "数据库未打开，尝试重新打开";
+        if (!m_database.open()) {
+            qDebug() << "无法打开数据库:" << m_database.lastError().text();
+            return false;
+        }
+    }
+    
+    QSqlQuery query(m_database);
+    
+    // 检查user_answer_records表中是否存在question_bank_info列
+    query.prepare("PRAGMA table_info(user_answer_records)");
+    if (!query.exec()) {
+        qDebug() << "检查表结构失败:" << query.lastError().text();
+        return false;
+    }
+    
+    bool hasQuestionBankInfo = false;
+    bool hasPentagonType = false;
+    
+    while (query.next()) {
+        QString columnName = query.value(1).toString();
+        if (columnName == "question_bank_info") {
+            hasQuestionBankInfo = true;
+        } else if (columnName == "pentagon_type") {
+            hasPentagonType = true;
+        }
+    }
+    
+    // 添加question_bank_info列（如果不存在）
+    if (!hasQuestionBankInfo) {
+        qDebug() << "添加question_bank_info列到user_answer_records表";
+        if (!query.exec("ALTER TABLE user_answer_records ADD COLUMN question_bank_info TEXT")) {
+            qDebug() << "添加question_bank_info列失败:" << query.lastError().text();
+            // 继续执行，尝试添加下一列
+        }
+    }
+    
+    // 添加pentagon_type列（如果不存在）
+    if (!hasPentagonType) {
+        qDebug() << "添加pentagon_type列到user_answer_records表";
+        if (!query.exec("ALTER TABLE user_answer_records ADD COLUMN pentagon_type TEXT")) {
+            qDebug() << "添加pentagon_type列失败:" << query.lastError().text();
+            return false;
+        }
+    }
+    
+    return true;
 } 

@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_DatabaseManager_t {
-    QByteArrayData data[78];
-    char stringdata0[1111];
+    QByteArrayData data[80];
+    char stringdata0[1141];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -97,19 +97,21 @@ QT_MOC_LITERAL(61, 792, 8), // "examType"
 QT_MOC_LITERAL(62, 801, 14), // "totalQuestions"
 QT_MOC_LITERAL(63, 816, 12), // "correctCount"
 QT_MOC_LITERAL(64, 829, 10), // "answerData"
-QT_MOC_LITERAL(65, 840, 20), // "getUserAnswerRecords"
-QT_MOC_LITERAL(66, 861, 19), // "getAllAnswerRecords"
-QT_MOC_LITERAL(67, 881, 32), // "getUserCurrentMonthQuestionCount"
-QT_MOC_LITERAL(68, 914, 25), // "getUserYearlyQuestionData"
-QT_MOC_LITERAL(69, 940, 30), // "getUserRollingYearQuestionData"
-QT_MOC_LITERAL(70, 971, 26), // "getMaxMonthlyQuestionCount"
-QT_MOC_LITERAL(71, 998, 18), // "getUserAbilityData"
-QT_MOC_LITERAL(72, 1017, 19), // "getUserPracticeData"
-QT_MOC_LITERAL(73, 1037, 26), // "getUserMonthlyPracticeData"
-QT_MOC_LITERAL(74, 1064, 10), // "monthCount"
-QT_MOC_LITERAL(75, 1075, 24), // "getUserDailyPracticeData"
-QT_MOC_LITERAL(76, 1100, 4), // "year"
-QT_MOC_LITERAL(77, 1105, 5) // "month"
+QT_MOC_LITERAL(65, 840, 16), // "questionBankInfo"
+QT_MOC_LITERAL(66, 857, 12), // "pentagonType"
+QT_MOC_LITERAL(67, 870, 20), // "getUserAnswerRecords"
+QT_MOC_LITERAL(68, 891, 19), // "getAllAnswerRecords"
+QT_MOC_LITERAL(69, 911, 32), // "getUserCurrentMonthQuestionCount"
+QT_MOC_LITERAL(70, 944, 25), // "getUserYearlyQuestionData"
+QT_MOC_LITERAL(71, 970, 30), // "getUserRollingYearQuestionData"
+QT_MOC_LITERAL(72, 1001, 26), // "getMaxMonthlyQuestionCount"
+QT_MOC_LITERAL(73, 1028, 18), // "getUserAbilityData"
+QT_MOC_LITERAL(74, 1047, 19), // "getUserPracticeData"
+QT_MOC_LITERAL(75, 1067, 26), // "getUserMonthlyPracticeData"
+QT_MOC_LITERAL(76, 1094, 10), // "monthCount"
+QT_MOC_LITERAL(77, 1105, 24), // "getUserDailyPracticeData"
+QT_MOC_LITERAL(78, 1130, 4), // "year"
+QT_MOC_LITERAL(79, 1135, 5) // "month"
 
     },
     "DatabaseManager\0initDatabase\0\0addFaceData\0"
@@ -135,7 +137,8 @@ QT_MOC_LITERAL(77, 1105, 5) // "month"
     "importKnowledgePoints\0points\0"
     "clearAllKnowledgePoints\0saveUserAnswerRecord\0"
     "userName\0examType\0totalQuestions\0"
-    "correctCount\0answerData\0getUserAnswerRecords\0"
+    "correctCount\0answerData\0questionBankInfo\0"
+    "pentagonType\0getUserAnswerRecords\0"
     "getAllAnswerRecords\0"
     "getUserCurrentMonthQuestionCount\0"
     "getUserYearlyQuestionData\0"
@@ -153,7 +156,7 @@ static const uint qt_meta_data_DatabaseManager[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      59,   14, // methods
+      61,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -161,65 +164,67 @@ static const uint qt_meta_data_DatabaseManager[] = {
        0,       // signalCount
 
  // methods: name, argc, parameters, tag, flags
-       1,    0,  309,    2, 0x02 /* Public */,
-       3,    6,  310,    2, 0x02 /* Public */,
-       3,    5,  323,    2, 0x22 /* Public | MethodCloned */,
-      10,    1,  334,    2, 0x02 /* Public */,
-      11,    0,  337,    2, 0x02 /* Public */,
-      12,    1,  338,    2, 0x02 /* Public */,
-      13,    2,  341,    2, 0x02 /* Public */,
-      14,    1,  346,    2, 0x02 /* Public */,
-      15,    6,  349,    2, 0x02 /* Public */,
-      15,    5,  362,    2, 0x22 /* Public | MethodCloned */,
-      16,    2,  373,    2, 0x02 /* Public */,
-      19,    2,  378,    2, 0x02 /* Public */,
-      19,    1,  383,    2, 0x22 /* Public | MethodCloned */,
-      21,    1,  386,    2, 0x02 /* Public */,
-      22,    0,  389,    2, 0x02 /* Public */,
-      23,    2,  390,    2, 0x02 /* Public */,
-      23,    1,  395,    2, 0x22 /* Public | MethodCloned */,
-      23,    0,  398,    2, 0x22 /* Public | MethodCloned */,
-      26,    3,  399,    2, 0x02 /* Public */,
-      26,    2,  406,    2, 0x22 /* Public | MethodCloned */,
-      26,    1,  411,    2, 0x22 /* Public | MethodCloned */,
-      27,    1,  414,    2, 0x02 /* Public */,
-      27,    0,  417,    2, 0x22 /* Public | MethodCloned */,
-      29,    1,  418,    2, 0x02 /* Public */,
-      30,    2,  421,    2, 0x02 /* Public */,
-      32,    1,  426,    2, 0x02 /* Public */,
-      34,    0,  429,    2, 0x02 /* Public */,
-      35,    1,  430,    2, 0x02 /* Public */,
-      36,    2,  433,    2, 0x02 /* Public */,
-      37,    5,  438,    2, 0x02 /* Public */,
-      37,    4,  449,    2, 0x22 /* Public | MethodCloned */,
-      42,    1,  458,    2, 0x02 /* Public */,
-      44,    5,  461,    2, 0x02 /* Public */,
-      44,    4,  472,    2, 0x22 /* Public | MethodCloned */,
-      45,    1,  481,    2, 0x02 /* Public */,
-      46,    1,  484,    2, 0x02 /* Public */,
-      47,    2,  487,    2, 0x02 /* Public */,
-      49,    2,  492,    2, 0x02 /* Public */,
-      51,    0,  497,    2, 0x02 /* Public */,
-      52,    2,  498,    2, 0x02 /* Public */,
-      54,    1,  503,    2, 0x02 /* Public */,
-      56,    1,  506,    2, 0x02 /* Public */,
-      58,    0,  509,    2, 0x02 /* Public */,
-      59,    6,  510,    2, 0x02 /* Public */,
-      65,    3,  523,    2, 0x02 /* Public */,
-      65,    2,  530,    2, 0x22 /* Public | MethodCloned */,
-      65,    1,  535,    2, 0x22 /* Public | MethodCloned */,
-      66,    2,  538,    2, 0x02 /* Public */,
-      66,    1,  543,    2, 0x22 /* Public | MethodCloned */,
-      66,    0,  546,    2, 0x22 /* Public | MethodCloned */,
-      67,    1,  547,    2, 0x02 /* Public */,
-      68,    1,  550,    2, 0x02 /* Public */,
-      69,    1,  553,    2, 0x02 /* Public */,
-      70,    0,  556,    2, 0x02 /* Public */,
-      71,    1,  557,    2, 0x02 /* Public */,
-      72,    1,  560,    2, 0x02 /* Public */,
-      73,    2,  563,    2, 0x02 /* Public */,
-      73,    1,  568,    2, 0x22 /* Public | MethodCloned */,
-      75,    3,  571,    2, 0x02 /* Public */,
+       1,    0,  319,    2, 0x02 /* Public */,
+       3,    6,  320,    2, 0x02 /* Public */,
+       3,    5,  333,    2, 0x22 /* Public | MethodCloned */,
+      10,    1,  344,    2, 0x02 /* Public */,
+      11,    0,  347,    2, 0x02 /* Public */,
+      12,    1,  348,    2, 0x02 /* Public */,
+      13,    2,  351,    2, 0x02 /* Public */,
+      14,    1,  356,    2, 0x02 /* Public */,
+      15,    6,  359,    2, 0x02 /* Public */,
+      15,    5,  372,    2, 0x22 /* Public | MethodCloned */,
+      16,    2,  383,    2, 0x02 /* Public */,
+      19,    2,  388,    2, 0x02 /* Public */,
+      19,    1,  393,    2, 0x22 /* Public | MethodCloned */,
+      21,    1,  396,    2, 0x02 /* Public */,
+      22,    0,  399,    2, 0x02 /* Public */,
+      23,    2,  400,    2, 0x02 /* Public */,
+      23,    1,  405,    2, 0x22 /* Public | MethodCloned */,
+      23,    0,  408,    2, 0x22 /* Public | MethodCloned */,
+      26,    3,  409,    2, 0x02 /* Public */,
+      26,    2,  416,    2, 0x22 /* Public | MethodCloned */,
+      26,    1,  421,    2, 0x22 /* Public | MethodCloned */,
+      27,    1,  424,    2, 0x02 /* Public */,
+      27,    0,  427,    2, 0x22 /* Public | MethodCloned */,
+      29,    1,  428,    2, 0x02 /* Public */,
+      30,    2,  431,    2, 0x02 /* Public */,
+      32,    1,  436,    2, 0x02 /* Public */,
+      34,    0,  439,    2, 0x02 /* Public */,
+      35,    1,  440,    2, 0x02 /* Public */,
+      36,    2,  443,    2, 0x02 /* Public */,
+      37,    5,  448,    2, 0x02 /* Public */,
+      37,    4,  459,    2, 0x22 /* Public | MethodCloned */,
+      42,    1,  468,    2, 0x02 /* Public */,
+      44,    5,  471,    2, 0x02 /* Public */,
+      44,    4,  482,    2, 0x22 /* Public | MethodCloned */,
+      45,    1,  491,    2, 0x02 /* Public */,
+      46,    1,  494,    2, 0x02 /* Public */,
+      47,    2,  497,    2, 0x02 /* Public */,
+      49,    2,  502,    2, 0x02 /* Public */,
+      51,    0,  507,    2, 0x02 /* Public */,
+      52,    2,  508,    2, 0x02 /* Public */,
+      54,    1,  513,    2, 0x02 /* Public */,
+      56,    1,  516,    2, 0x02 /* Public */,
+      58,    0,  519,    2, 0x02 /* Public */,
+      59,    8,  520,    2, 0x02 /* Public */,
+      59,    7,  537,    2, 0x22 /* Public | MethodCloned */,
+      59,    6,  552,    2, 0x22 /* Public | MethodCloned */,
+      67,    3,  565,    2, 0x02 /* Public */,
+      67,    2,  572,    2, 0x22 /* Public | MethodCloned */,
+      67,    1,  577,    2, 0x22 /* Public | MethodCloned */,
+      68,    2,  580,    2, 0x02 /* Public */,
+      68,    1,  585,    2, 0x22 /* Public | MethodCloned */,
+      68,    0,  588,    2, 0x22 /* Public | MethodCloned */,
+      69,    1,  589,    2, 0x02 /* Public */,
+      70,    1,  592,    2, 0x02 /* Public */,
+      71,    1,  595,    2, 0x02 /* Public */,
+      72,    0,  598,    2, 0x02 /* Public */,
+      73,    1,  599,    2, 0x02 /* Public */,
+      74,    1,  602,    2, 0x02 /* Public */,
+      75,    2,  605,    2, 0x02 /* Public */,
+      75,    1,  610,    2, 0x22 /* Public | MethodCloned */,
+      77,    3,  613,    2, 0x02 /* Public */,
 
  // methods: parameters
     QMetaType::Bool,
@@ -265,6 +270,8 @@ static const uint qt_meta_data_DatabaseManager[] = {
     QMetaType::Bool, QMetaType::Int,   55,
     QMetaType::Bool, QMetaType::QVariantList,   57,
     QMetaType::Bool,
+    QMetaType::Bool, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::Int, QMetaType::Int, QMetaType::QString, QMetaType::QString, QMetaType::QString,    6,   60,   61,   62,   63,   64,   65,   66,
+    QMetaType::Bool, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::Int, QMetaType::Int, QMetaType::QString, QMetaType::QString,    6,   60,   61,   62,   63,   64,   65,
     QMetaType::Bool, QMetaType::QString, QMetaType::QString, QMetaType::QString, QMetaType::Int, QMetaType::Int, QMetaType::QString,    6,   60,   61,   62,   63,   64,
     QMetaType::QVariantList, QMetaType::QString, QMetaType::Int, QMetaType::Int,    6,   24,   25,
     QMetaType::QVariantList, QMetaType::QString, QMetaType::Int,    6,   24,
@@ -278,9 +285,9 @@ static const uint qt_meta_data_DatabaseManager[] = {
     QMetaType::Int,
     QMetaType::QVariantMap, QMetaType::QString,    6,
     QMetaType::QVariantMap, QMetaType::QString,    6,
-    QMetaType::QVariantList, QMetaType::QString, QMetaType::Int,    6,   74,
+    QMetaType::QVariantList, QMetaType::QString, QMetaType::Int,    6,   76,
     QMetaType::QVariantList, QMetaType::QString,    6,
-    QMetaType::QVariantList, QMetaType::QString, QMetaType::Int, QMetaType::Int,    6,   76,   77,
+    QMetaType::QVariantList, QMetaType::QString, QMetaType::Int, QMetaType::Int,    6,   78,   79,
 
        0        // eod
 };
@@ -377,37 +384,41 @@ void DatabaseManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
         case 42: { bool _r = _t->clearAllKnowledgePoints();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 43: { bool _r = _t->saveUserAnswerRecord((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5])),(*reinterpret_cast< const QString(*)>(_a[6])));
+        case 43: { bool _r = _t->saveUserAnswerRecord((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5])),(*reinterpret_cast< const QString(*)>(_a[6])),(*reinterpret_cast< const QString(*)>(_a[7])),(*reinterpret_cast< const QString(*)>(_a[8])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 44: { QVariantList _r = _t->getUserAnswerRecords((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
+        case 44: { bool _r = _t->saveUserAnswerRecord((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5])),(*reinterpret_cast< const QString(*)>(_a[6])),(*reinterpret_cast< const QString(*)>(_a[7])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 45: { bool _r = _t->saveUserAnswerRecord((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const QString(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5])),(*reinterpret_cast< const QString(*)>(_a[6])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 46: { QVariantList _r = _t->getUserAnswerRecords((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 45: { QVariantList _r = _t->getUserAnswerRecords((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+        case 47: { QVariantList _r = _t->getUserAnswerRecords((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 46: { QVariantList _r = _t->getUserAnswerRecords((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 48: { QVariantList _r = _t->getUserAnswerRecords((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 47: { QVariantList _r = _t->getAllAnswerRecords((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+        case 49: { QVariantList _r = _t->getAllAnswerRecords((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 48: { QVariantList _r = _t->getAllAnswerRecords((*reinterpret_cast< int(*)>(_a[1])));
+        case 50: { QVariantList _r = _t->getAllAnswerRecords((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 49: { QVariantList _r = _t->getAllAnswerRecords();
+        case 51: { QVariantList _r = _t->getAllAnswerRecords();
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 50: { int _r = _t->getUserCurrentMonthQuestionCount((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 52: { int _r = _t->getUserCurrentMonthQuestionCount((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 51: { QVariantList _r = _t->getUserYearlyQuestionData((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 53: { QVariantList _r = _t->getUserYearlyQuestionData((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 52: { QVariantList _r = _t->getUserRollingYearQuestionData((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 54: { QVariantList _r = _t->getUserRollingYearQuestionData((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 53: { int _r = _t->getMaxMonthlyQuestionCount();
+        case 55: { int _r = _t->getMaxMonthlyQuestionCount();
             if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
-        case 54: { QVariantMap _r = _t->getUserAbilityData((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 56: { QVariantMap _r = _t->getUserAbilityData((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariantMap*>(_a[0]) = std::move(_r); }  break;
-        case 55: { QVariantMap _r = _t->getUserPracticeData((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 57: { QVariantMap _r = _t->getUserPracticeData((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariantMap*>(_a[0]) = std::move(_r); }  break;
-        case 56: { QVariantList _r = _t->getUserMonthlyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
+        case 58: { QVariantList _r = _t->getUserMonthlyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 57: { QVariantList _r = _t->getUserMonthlyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 59: { QVariantList _r = _t->getUserMonthlyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
-        case 58: { QVariantList _r = _t->getUserDailyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
+        case 60: { QVariantList _r = _t->getUserDailyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
@@ -443,13 +454,13 @@ int DatabaseManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 59)
+        if (_id < 61)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 59;
+        _id -= 61;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 59)
+        if (_id < 61)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 59;
+        _id -= 61;
     }
     return _id;
 }

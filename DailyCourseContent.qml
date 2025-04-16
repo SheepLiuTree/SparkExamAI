@@ -477,12 +477,109 @@ Rectangle {
         var total = currentQuestions.length
         var detailedAnswers = []
         
+        // 收集题库和分类信息
+        var questionBanks = {}
+        var pentagonTypes = {}
+        
         for (var i = 0; i < currentQuestions.length; i++) {
             var question = currentQuestions[i]
             var userAnswer = userAnswers[i]
             var correctAnswer = question.answer
             var isCorrect = false
             var userAnswerStr = ""
+            
+            // 获取题库信息
+            var bankId = question.bankId
+            console.log("题目ID:", question.id, "题库ID:", bankId, "类型:", typeof bankId)
+            
+            // 确保bankId是有效值
+            if (bankId === undefined || bankId === null) {
+                console.error("题库ID无效:", bankId)
+                bankId = -1 // 使用默认值
+            }
+            
+            var bankInfo = dbManager.getQuestionBankById(bankId)
+            console.log("题库信息:", JSON.stringify(bankInfo))
+            var bankName = bankInfo && bankInfo.name ? bankInfo.name : "未知题库"
+            console.log("最终题库名称:", bankName)
+            
+            // 获取五芒图分类信息
+            var pentagonType = "未分类"
+            try {
+                // 记录题库ID的类型
+                console.log("bankId类型:", typeof bankId, "值:", bankId)
+                
+                // 尝试不同格式的题库ID
+                var bankIdStr = String(bankId)
+                var bankIdNum = parseInt(bankId)
+                
+                console.log("检查bankId不同格式:", bankIdStr, bankIdNum)
+                
+                for (var j = 1; j <= 5; j++) {
+                    var categoryKey = "pentagon_category_" + j
+                    var categorySetting = dbManager.getSetting(categoryKey, "{}")
+                    console.log("五芒图点", j, "设置:", categorySetting)
+                    
+                    try {
+                        var categoryData = JSON.parse(categorySetting)
+                        
+                        // 打印出categoryData的内容和类型
+                        console.log("五芒图点", j, "数据:", JSON.stringify(categoryData))
+                        
+                        // 尝试不同格式的bankId进行匹配
+                        var found = false
+                        
+                        if (categoryData[bankIdStr] === true) {
+                            console.log("找到匹配(字符串ID):", bankIdStr)
+                            found = true
+                        } else if (categoryData[bankIdNum] === true) {
+                            console.log("找到匹配(数字ID):", bankIdNum)
+                            found = true
+                        } else {
+                            // 遍历所有键寻找匹配
+                            for (var key in categoryData) {
+                                if (categoryData[key] === true) {
+                                    console.log("检查键:", key, "类型:", typeof key, "与bankId比较:", key == bankIdStr, key == bankIdNum)
+                                    if (key == bankIdStr || key == bankIdNum) {
+                                        console.log("通过键比较找到匹配:", key)
+                                        found = true
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (found) {
+                            // 获取该点的标题
+                            var titleKey = "pentagon_title_" + j
+                            var title = dbManager.getSetting(titleKey, "")
+                            console.log("找到分类:", title, "对应五芒图点:", j)
+                            if (title && title.length > 0) {
+                                pentagonType = title
+                                break
+                            }
+                        }
+                    } catch (e) {
+                        console.error("解析五芒图点", j, "分类数据失败:", e)
+                    }
+                }
+                console.log("最终确定的题目分类:", pentagonType)
+            } catch (e) {
+                console.error("解析五芒图分类失败:", e, "题库ID:", bankId)
+            }
+            
+            // 统计题库和分类信息
+            if (questionBanks[bankName]) {
+                questionBanks[bankName]++
+            } else {
+                questionBanks[bankName] = 1
+            }
+            
+            if (pentagonTypes[pentagonType]) {
+                pentagonTypes[pentagonType]++
+            } else {
+                pentagonTypes[pentagonType] = 1
+            }
             
             if (Array.isArray(userAnswer)) {
                 // 多选题
@@ -529,7 +626,10 @@ Rectangle {
                 "questionContent": question.content,
                 "correctAnswer": correctAnswer,
                 "userAnswer": userAnswerStr,
-                "isCorrect": isCorrect
+                "isCorrect": isCorrect,
+                "bankId": bankId,
+                "bankName": bankName,
+                "pentagonType": pentagonType
             })
         }
         
@@ -537,6 +637,68 @@ Rectangle {
         
         // 准备保存到数据库的数据
         var answerData = JSON.stringify(detailedAnswers)
+        
+        // 准备题库和五芒图分类信息
+        var questionBankInfoArray = []
+        var pentagonTypeInfoArray = []
+        
+        // 先过滤掉重复项，并记录每个类型数量、正确数量和正确率
+        var bankCounts = {}
+        var bankCorrects = {}
+        var typeCounts = {}
+        var typeCorrects = {}
+        
+        for (var i = 0; i < detailedAnswers.length; i++) {
+            var answer = detailedAnswers[i]
+            var bankName = answer.bankName || "未知题库"
+            var pentagonType = answer.pentagonType || "未分类"
+            var isCorrect = answer.isCorrect || false
+            
+            // 记录题库数量和正确数
+            if (bankCounts[bankName] === undefined) {
+                bankCounts[bankName] = 0
+                bankCorrects[bankName] = 0
+            }
+            bankCounts[bankName]++
+            if (isCorrect) {
+                bankCorrects[bankName]++
+            }
+            
+            // 记录分类数量和正确数
+            if (typeCounts[pentagonType] === undefined) {
+                typeCounts[pentagonType] = 0
+                typeCorrects[pentagonType] = 0
+            }
+            typeCounts[pentagonType]++
+            if (isCorrect) {
+                typeCorrects[pentagonType]++
+            }
+        }
+        
+        // 生成统计字符串
+        for (var bank in bankCounts) {
+            var bankTotal = bankCounts[bank]
+            var bankCorrect = bankCorrects[bank]
+            var bankRate = Math.round(bankCorrect / bankTotal * 100)
+            questionBankInfoArray.push(bank + "：" + bankTotal + "题，正确" + bankCorrect + "题，正确率" + bankRate + "%")
+        }
+        
+        for (var type in typeCounts) {
+            var typeTotal = typeCounts[type]
+            var typeCorrect = typeCorrects[type]
+            var typeRate = Math.round(typeCorrect / typeTotal * 100)
+            pentagonTypeInfoArray.push(type + "：" + typeTotal + "题，正确" + typeCorrect + "题，正确率" + typeRate + "%")
+        }
+        
+        // 排序显示（可选）
+        questionBankInfoArray.sort()
+        pentagonTypeInfoArray.sort()
+        
+        var questionBankInfoStr = questionBankInfoArray.join("，")
+        var pentagonTypeInfoStr = pentagonTypeInfoArray.join("，")
+        
+        console.log("题库分布:", questionBankInfoStr)
+        console.log("能力分布:", pentagonTypeInfoStr)
         
         // 检查用户数据是否存在
         if (!userData || !userData.workId) {
@@ -553,7 +715,9 @@ Rectangle {
             "星火日课",
             total,
             score,
-            answerData
+            answerData,
+            questionBankInfoStr,
+            pentagonTypeInfoStr
         )
         
         if (success) {
@@ -563,6 +727,8 @@ Rectangle {
             resultDialog.score = score
             resultDialog.total = total
             resultDialog.percentage = Math.round(score / total * 100)
+            resultDialog.questionBankInfo = questionBankInfoStr
+            resultDialog.pentagonTypeInfo = pentagonTypeInfoStr
             resultDialog.open()
         } else {
             console.error("保存答题记录失败")
@@ -664,6 +830,8 @@ Rectangle {
         property int score: 0
         property int total: 0
         property int percentage: 0
+        property string questionBankInfo: ""
+        property string pentagonTypeInfo: ""
         
         background: Rectangle {
             color: "#1e293b"

@@ -4,13 +4,13 @@ import QtQuick.Controls 2.15
 import QtMultimedia 5.15
 
 Window {
-    width: Screen.width
-    height: Screen.height
-    // width: 1440
-    // height: 1024
+    // width: Screen.width
+    // height: Screen.height
+    width: 1440
+    height: 1024
     visible: true
-    visibility: Window.FullScreen
-    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
+    // visibility: Window.FullScreen
+    // flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     title: qsTr("星火智能评测系统")
 
     Image {
@@ -1037,7 +1037,10 @@ Window {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         Text {
-                            text: "3月"
+                            text: {
+                                var d = new Date();
+                                return (d.getMonth() + 1) + "月";
+                            }
                             font.family: "阿里妈妈数黑体"
                             font.pixelSize: 12
                             color: "white"
@@ -1053,7 +1056,11 @@ Window {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         Text {
-                            text: "2月"
+                            text: {
+                                var d = new Date();
+                                d.setMonth(d.getMonth() - 1);
+                                return (d.getMonth() + 1) + "月";
+                            }
                             font.family: "阿里妈妈数黑体"
                             font.pixelSize: 12
                             color: "white"
@@ -1069,7 +1076,11 @@ Window {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         Text {
-                            text: "1月"
+                            text: {
+                                var d = new Date();
+                                d.setMonth(d.getMonth() - 2);
+                                return (d.getMonth() + 1) + "月";
+                            }
                             font.family: "阿里妈妈数黑体"
                             font.pixelSize: 12
                             color: "white"

@@ -158,7 +158,9 @@ public:
                                          const QString &examType,
                                          int totalQuestions,
                                          int correctCount,
-                                         const QString &answerData);
+                                         const QString &answerData,
+                                         const QString &questionBankInfo = "",
+                                         const QString &pentagonType = "");
     
     // 获取用户答题记录
     Q_INVOKABLE QVariantList getUserAnswerRecords(const QString &workId, int limit = 100, int offset = 0);
@@ -199,6 +201,9 @@ private:
     
     // 初始化默认设置
     void initDefaultSettings();
+    
+    // 更新数据库结构
+    bool updateDatabaseSchema();
 };
 
 #endif // DATABASEMANAGER_H 
