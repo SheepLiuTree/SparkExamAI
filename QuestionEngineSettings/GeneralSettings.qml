@@ -12,6 +12,7 @@ Rectangle {
     property string statusMessage: ""
     property bool isSuccess: false
     property string adminPassword: ""
+    property bool showPassword: false
     
     Component.onCompleted: {
         // 载入和应用已保存的设置
@@ -140,9 +141,6 @@ Rectangle {
                                 }
                             }
                         }
-                        
-                        // 密码显示/隐藏状态
-                        property bool showPassword: false
                         
                         // 摄像头设备设置
                         RowLayout {

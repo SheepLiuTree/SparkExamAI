@@ -7,6 +7,266 @@ Rectangle {
     id: pentagonalChartSettingsPage
     color: "transparent"
     
+    // 通用题库归类弹窗组件
+    Component {
+        id: categoryPopupComponent
+        
+        Popup {
+            id: categoryPopup
+            width: 280
+            height: Math.min(350, contentColumn.implicitHeight + 40)
+            x: (parent.width - width) / 2
+            y: (parent.height - height) / 2
+            modal: true
+            padding: 15
+            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+            
+            property int pointIndex: 0
+            
+            Component.onCompleted: {
+                // 确保pentagonCategories和questionBanks已初始化
+                if (!pentagonalChartSettingsPage.pentagonCategories || 
+                    !Array.isArray(pentagonalChartSettingsPage.pentagonCategories) || 
+                    pentagonalChartSettingsPage.pentagonCategories.length < 5) {
+                    console.warn("pentagonCategories未正确初始化，正在重置");
+                    pentagonalChartSettingsPage.pentagonCategories = [{}, {}, {}, {}, {}];
+                }
+                
+                if (!pentagonalChartSettingsPage.questionBanks) {
+                    console.warn("questionBanks未初始化，正在重置为空数组");
+                    pentagonalChartSettingsPage.questionBanks = [];
+                }
+            }
+            
+            background: Rectangle {
+                color: "#2c3e50"
+                radius: 8
+                border.color: "#3498db"
+                border.width: 1
+            }
+            
+            contentItem: Item {
+                id: dialogContent
+                implicitHeight: contentColumn.implicitHeight
+            
+                ColumnLayout {
+                    id: contentColumn
+                    anchors.fill: parent
+                    spacing: 12
+                    
+                    Text {
+                        text: {
+                            // 安全处理标题文本，避免undefined
+                            var pointLabel = "第" + (pointIndex + 1) + "点";
+                            if (!pentagonTitles || !Array.isArray(pentagonTitles) || 
+                                pointIndex < 0 || pointIndex >= pentagonTitles.length) {
+                                return "选择归类到\"" + pointLabel + "\"的题库：";
+                            }
+                            
+                            // 避免可选链操作的使用
+                            var title = null;
+                            if (pentagonTitles && pentagonTitles[pointIndex] !== undefined) {
+                                title = pentagonTitles[pointIndex];
+                            }
+                            
+                            // 确保title是字符串且不为空
+                            if (title && typeof title === 'string' && title.trim()) {
+                                return "选择归类到\"" + title + "\"的题库：";
+                            } else {
+                                return "选择归类到\"" + pointLabel + "\"的题库：";
+                            }
+                        }
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        color: "#ecf0f1"
+                        Layout.fillWidth: true
+                        Layout.bottomMargin: 4
+                    }
+                    
+                    ScrollView {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 250
+                        // 避免使用可选链
+                        ScrollBar.horizontal { policy: ScrollBar.AlwaysOff }
+                        clip: true
+                        
+                        Column {
+                            width: parent.width
+                            spacing: 10
+                            
+                            Repeater {
+                                model: questionBanks || []
+                                
+                                CheckBox {
+                                    width: parent.width
+                                    text: {
+                                        // 完全重写text属性逻辑，确保总是返回一个有效的字符串
+                                        if (!modelData) return "";
+                                        if (typeof modelData !== 'object') return String(modelData);
+                                        if (modelData.name === undefined || modelData.name === null) return "";
+                                        // 确保返回字符串类型
+                                        return String(modelData.name);
+                                    }
+                                    checked: {
+                                        // 安全处理checked状态，避免undefined
+                                        if (!modelData || !modelData.id || !pentagonCategories || 
+                                            !pentagonCategories[pointIndex]) {
+                                            return false;
+                                        }
+                                        return pentagonCategories[pointIndex][modelData.id] === true;
+                                    }
+                                    enabled: {
+                                        // 安全处理enabled状态，避免undefined
+                                        if (!modelData || !modelData.id || !pentagonCategories ||
+                                            !pentagonCategories[pointIndex]) {
+                                            return false;
+                                        }
+                                        
+                                        // 检查是否分配给其他点
+                                        var otherPoint = isBankAssignedToOtherPoint(modelData.id, pointIndex);
+                                        return otherPoint === 0; // 只有未分配给其他点时才启用
+                                    }
+                                    padding: 2
+                                    
+                                    indicator: Rectangle {
+                                        implicitWidth: 20
+                                        implicitHeight: 20
+                                        x: parent.leftPadding
+                                        y: parent.height / 2 - height / 2
+                                        radius: 3
+                                        color: parent.enabled ? (parent.checked ? "#2980b9" : "#34495e") : "#555555"
+                                        border.color: parent.enabled ? (parent.checked ? "#3498db" : "#7f8c8d") : "#7f8c8d"
+                                        
+                                        Rectangle {
+                                            visible: parent.parent.checked
+                                            color: "#ecf0f1"
+                                            radius: 1
+                                            anchors.margins: 5
+                                            anchors.fill: parent
+                                        }
+                                    }
+                                    
+                                    contentItem: Item {
+                                        anchors.fill: parent
+                                        anchors.leftMargin: parent.indicator.width + 8
+                                        anchors.rightMargin: 4
+                                        
+                                        Row {
+                                            anchors.fill: parent
+                                            spacing: 4
+                                            
+                                            // 题库名称文本
+                                            Text {
+                                                id: bankNameText
+                                                width: parent.width - assignedInfo.width - 10
+                                                height: parent.height
+                                                text: parent.parent.parent.text || ""
+                                                font.family: "阿里妈妈数黑体"
+                                                font.pixelSize: 14
+                                                color: parent.parent.parent.enabled ? "#ecf0f1" : "#95a5a6"
+                                                elide: Text.ElideRight
+                                                verticalAlignment: Text.AlignVCenter
+                                            }
+                                            
+                                            // 已分配信息区域
+                                            Item {
+                                                id: assignedInfo
+                                                width: 120
+                                                height: parent.height
+                                                visible: !parent.parent.parent.enabled
+                                                
+                                                Rectangle {
+                                                    id: assignedBadge
+                                                    visible: assignedText.text !== ""
+                                                    anchors.right: parent.right
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                    height: 22
+                                                    width: assignedText.contentWidth + 20
+                                                    color: "#e74c3c22"
+                                                    border.color: "#e74c3c"
+                                                    border.width: 1
+                                                    radius: 4
+                                                    
+                                                    Text {
+                                                        id: assignedText
+                                                        anchors.centerIn: parent
+                                                        text: {
+                                                            if (!modelData || !modelData.id) return "";
+                                                            var pointNum = isBankAssignedToOtherPoint(modelData.id, pointIndex);
+                                                            return pointNum > 0 ? "已分配给第" + pointNum + "点" : "";
+                                                        }
+                                                        font.family: "阿里妈妈数黑体"
+                                                        font.pixelSize: 12
+                                                        font.bold: true
+                                                        color: "#e74c3c"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    onCheckedChanged: {
+                                        try {
+                                            // 加强对空值的检查
+                                            if (!modelData || typeof modelData !== 'object' || 
+                                                !modelData.id || !pentagonCategories || 
+                                                !pentagonCategories[pointIndex]) {
+                                                console.warn("无法更新分类：数据不完整");
+                                                return;
+                                            }
+                                            
+                                            // 确保bankId是有效的
+                                            var bankId = String(modelData.id);
+                                            if (!bankId) {
+                                                console.warn("无法更新分类：题库ID无效");
+                                                return;
+                                            }
+                                            
+                                            updateCategory(pointIndex, bankId, checked);
+                                        } catch (e) {
+                                            console.error("更新分类时出错:", e);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 底部按钮和间距
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 15 // 添加额外空间
+                    }
+                    
+                    Button {
+                        text: "关闭"
+                        Layout.alignment: Qt.AlignRight
+                        Layout.preferredWidth: 100
+                        Layout.preferredHeight: 36
+                        Layout.bottomMargin: 5 // 底部边距
+                        background: Rectangle {
+                            color: "#2980b9"
+                            radius: 4
+                        }
+                        contentItem: Text {
+                            text: parent.text
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        onClicked: {
+                            // 通知UI更新显示已分配题库数量
+                            pentagonalChartSettingsPage.pentagonCategoriesChanged();
+                            categoryPopup.close();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     // 状态信息
     property string statusMessage: ""
     property bool isSuccess: false
@@ -14,9 +274,208 @@ Rectangle {
     // 五芒图相关属性
     property var pentagonTitles: ["基础认知", "原理理解", "操作应用", "诊断分析", "安全规范"]
     
+    // 题库分类相关属性
+    property var questionBanks: []
+    property var pentagonCategories: [{}, {}, {}, {}, {}]
+    onPentagonCategoriesChanged: {
+        console.log("五芒图分类数据已更新");
+    }
+    
+    // 添加一个标志属性来控制是否处理更新
+    property bool updatingUI: false
+    
     Component.onCompleted: {
+        console.log("五芒图设置页面初始化");
+        
+        // 确保pentagonCategories和questionBanks已初始化为有效值
+        if (!pentagonCategories || !Array.isArray(pentagonCategories) || pentagonCategories.length < 5) {
+            console.warn("初始化时发现pentagonCategories无效，正在重置");
+            pentagonCategories = [{}, {}, {}, {}, {}];
+        }
+        
+        if (!questionBanks) {
+            console.warn("初始化时发现questionBanks无效，正在重置为空数组");
+            questionBanks = [];
+        }
+        
         // 从数据库加载设置
-        loadSettings()
+        try {
+            loadSettings();
+        } catch (e) {
+            console.error("加载设置失败:", e);
+        }
+        
+        // 加载所有题库
+        try {
+            loadQuestionBanks();
+        } catch (e) {
+            console.error("加载题库失败:", e);
+            questionBanks = []; // 确保至少是空数组
+        }
+        
+        // 打印调试信息
+        console.log("五芒图设置初始化完成，题库数量:", 
+                    (questionBanks && Array.isArray(questionBanks)) ? questionBanks.length : 0);
+    }
+    
+    // 加载题库
+    function loadQuestionBanks() {
+        try {
+            // 使用try-catch包裹可能出错的操作
+            var banks = dbManager.getAllQuestionBanks();
+            
+            // 确保返回的是数组
+            if (Array.isArray(banks)) {
+                questionBanks = banks;
+            } else if (banks && typeof banks === 'object') {
+                // 如果返回了对象但不是数组，尝试转换为数组
+                questionBanks = Object.values(banks);
+            } else {
+                // 其他情况初始化为空数组
+                questionBanks = [];
+            }
+            
+            console.log("已加载题库列表, 共", questionBanks.length, "个题库");
+            
+            // 加载五芒图点的题库分类
+            loadPentagonCategories();
+        } catch (e) {
+            console.error("加载题库失败:", e);
+            // 确保题库列表至少是空数组而不是undefined
+            questionBanks = [];
+        }
+    }
+    
+    // 加载五芒图点的题库分类
+    function loadPentagonCategories() {
+        try {
+            // 初始化五个点的分类对象
+            for (var i = 0; i < 5; i++) {
+                pentagonCategories[i] = pentagonCategories[i] || {};
+                
+                var categorySetting = dbManager.getSetting("pentagon_category_" + (i+1), "{}");
+                try {
+                    var parsed = JSON.parse(categorySetting);
+                    // 确保解析结果是对象
+                    if (parsed && typeof parsed === 'object') {
+                        pentagonCategories[i] = parsed;
+                    } else {
+                        pentagonCategories[i] = {};
+                    }
+                } catch (e) {
+                    console.error("解析五芒图分类设置失败:", e);
+                    pentagonCategories[i] = {};
+                }
+            }
+        } catch (e) {
+            console.error("加载五芒图分类失败:", e);
+            // 确保五个分类都是有效的对象
+            pentagonCategories = [{}, {}, {}, {}, {}];
+        }
+    }
+    
+    // 根据题库ID检查该题库是否已被分配给除当前点外的其他点
+    function isBankAssignedToOtherPoint(bankId, currentPointIndex) {
+        try {
+            // 安全检查参数
+            if (!bankId || currentPointIndex === undefined || 
+                !pentagonCategories || !Array.isArray(pentagonCategories)) {
+                return 0;
+            }
+            
+            // 确保currentPointIndex是有效数字
+            currentPointIndex = parseInt(currentPointIndex);
+            if (isNaN(currentPointIndex) || currentPointIndex < 0 || currentPointIndex >= 5) {
+                return 0;
+            }
+            
+            // 确保bankId是字符串
+            bankId = String(bankId);
+            
+            // 检查所有点
+            for (var i = 0; i < 5; i++) {
+                // 跳过当前点
+                if (i === currentPointIndex) {
+                    continue;
+                }
+                
+                // 安全访问pentagonCategories[i]
+                if (!pentagonCategories[i] || typeof pentagonCategories[i] !== 'object') {
+                    continue;
+                }
+                
+                // 检查是否分配给了其他点
+                if (pentagonCategories[i][bankId] === true) {
+                    // 使用Number()确保结果是数字类型
+                    return Number(i + 1); // 点序号从1开始
+                }
+            }
+            
+            return 0;
+        } catch (e) {
+            console.error("检查题库分配时出错:", e);
+            return 0;
+        }
+    }
+    
+    // 更新单个题库分类
+    function updateCategory(pointIndex, bankId, checked) {
+        // 如果正在更新UI，不处理回调
+        if (updatingUI) return;
+        
+        // 开始更新UI，防止重入
+        updatingUI = true;
+        
+        // 如果要选中，需要先清除其他点的选择状态
+        if (checked) {
+            console.log("选中题库ID:", bankId, "到五芒图点:", pointIndex + 1);
+            // 清除其他点的相同bankId设置
+            for (var i = 0; i < 5; i++) {
+                if (i !== pointIndex) {
+                    if (pentagonCategories[i][bankId]) {
+                        console.log("  清除五芒图点", i + 1, "中的相同题库");
+                        pentagonCategories[i][bankId] = false;
+                    }
+                }
+            }
+        }
+        
+        // 更新当前点的设置
+        pentagonCategories[pointIndex][bankId] = checked;
+        console.log("更新五芒图点", pointIndex + 1, "的题库分类:", bankId, "=>", checked);
+        
+        // 通知UI更新，触发题库数量的重新计算
+        pentagonCategoriesChanged();
+        
+        // 完成更新
+        updatingUI = false;
+    }
+    
+    // 统计某个点已分配的题库数量
+    function countAssignedBanks(pointIndex) {
+        try {
+            // 安全检查
+            if (!pentagonCategories || !Array.isArray(pentagonCategories) || 
+                pointIndex < 0 || pointIndex >= pentagonCategories.length ||
+                !pentagonCategories[pointIndex]) {
+                return 0;
+            }
+            
+            var count = 0;
+            var categories = pentagonCategories[pointIndex];
+            
+            // 遍历分类对象的所有键，计算设为true的数量
+            for (var key in categories) {
+                if (categories.hasOwnProperty(key) && categories[key] === true) {
+                    count++;
+                }
+            }
+            
+            return count;
+        } catch (e) {
+            console.error("统计已分配题库数量时出错:", e);
+            return 0;
+        }
     }
     
     // 加载设置
@@ -46,6 +505,12 @@ Rectangle {
         dbManager.setSetting("pentagon_title_3", pentagonTitles[2])
         dbManager.setSetting("pentagon_title_4", pentagonTitles[3])
         dbManager.setSetting("pentagon_title_5", pentagonTitles[4])
+        
+        // 保存题库分类
+        for (var i = 0; i < 5; i++) {
+            var categorySetting = JSON.stringify(pentagonCategories[i])
+            dbManager.setSetting("pentagon_category_" + (i+1), categorySetting)
+        }
         
         // 显示成功消息
         statusMessage = "五芒图配置已保存"
@@ -234,7 +699,7 @@ Rectangle {
                         
                         // 输入框区域标题
                         Text {
-                            text: "设置各点标题"
+                            text: "设置各点标题及题库归类"
                             font.family: "阿里妈妈数黑体"
                             font.pixelSize: 16
                             font.bold: true
@@ -244,176 +709,409 @@ Rectangle {
                         }
                         
                         // 五个标题的设置
-                        GridLayout {
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            columns: 2
-                            rowSpacing: 8
-                            columnSpacing: 15
+                            spacing: 20
                             Layout.leftMargin: 10
                             Layout.rightMargin: 10
                             Layout.bottomMargin: 10
                             
-                            // 标题1
-                            Text {
-                                text: "第一点:"
-                                font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 16
-                                color: "white"
-                                Layout.preferredWidth: 80
-                            }
-                            
-                            Rectangle {
+                            // 第一点设置
+                            ColumnLayout {
                                 Layout.fillWidth: true
-                                height: 38
-                                color: "#22ffffff"
-                                radius: 5
+                                spacing: 5
                                 
-                                TextField {
-                                    id: titleField1
-                                    anchors.fill: parent
-                                    anchors.margins: 5
-                                    text: pentagonTitles[0]
-                                    color: "white"
-                                    font.family: "阿里妈妈数黑体"
-                                    font.pixelSize: 16
-                                    placeholderText: "请输入第一点标题"
-                                    placeholderTextColor: "#cccccc"
-                                    background: Rectangle { color: "transparent" }
-                                    onTextChanged: {
-                                        pentagonTitles[0] = text
-                                        pentagonCanvas.requestPaint()
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 15
+                                    
+                                    Text {
+                                        text: "第一点:"
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 16
+                                        color: "white"
+                                        Layout.preferredWidth: 80
+                                    }
+                                    
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        height: 38
+                                        color: "#22ffffff"
+                                        radius: 5
+                                        
+                                        TextField {
+                                            id: titleField1
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            text: pentagonTitles[0]
+                                            color: "white"
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 16
+                                            placeholderText: "请输入第一点标题"
+                                            placeholderTextColor: "#cccccc"
+                                            background: Rectangle { color: "transparent" }
+                                            onTextChanged: {
+                                                pentagonTitles[0] = text
+                                                pentagonCanvas.requestPaint()
+                                            }
+                                        }
+                                    }
+                                    
+                                    // 显示已分配题库数量
+                                    Text {
+                                        text: {
+                                            var count = countAssignedBanks(0);
+                                            return count > 0 ? "已分配" + count + "个题库" : "未分配题库";
+                                        }
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 13
+                                        color: "#cccccc"
+                                        horizontalAlignment: Text.AlignRight
+                                        Layout.preferredWidth: 120
+                                    }
+                                    
+                                    // 第一点题库归类按钮
+                                    Button {
+                                        Layout.preferredWidth: 100
+                                        Layout.preferredHeight: 38
+                                        background: Rectangle {
+                                            color: "#33ffffff"
+                                            radius: 4
+                                        }
+                                        contentItem: Text {
+                                            text: "题库归类"
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 14
+                                            color: "white"
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        onClicked: {
+                                            var popup = categoryPopupComponent.createObject(pentagonalChartSettingsPage, {
+                                                "pointIndex": 0
+                                            });
+                                            popup.open();
+                                        }
                                     }
                                 }
                             }
                             
-                            // 标题2
-                            Text {
-                                text: "第二点:"
-                                font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 16
-                                color: "white"
-                                Layout.preferredWidth: 80
-                            }
-                            
-                            Rectangle {
+                            // 第二点设置
+                            ColumnLayout {
                                 Layout.fillWidth: true
-                                height: 38
-                                color: "#22ffffff"
-                                radius: 5
+                                spacing: 5
                                 
-                                TextField {
-                                    id: titleField2
-                                    anchors.fill: parent
-                                    anchors.margins: 5
-                                    text: pentagonTitles[1]
-                                    color: "white"
-                                    font.family: "阿里妈妈数黑体"
-                                    font.pixelSize: 16
-                                    placeholderText: "请输入第二点标题"
-                                    placeholderTextColor: "#cccccc"
-                                    background: Rectangle { color: "transparent" }
-                                    onTextChanged: {
-                                        pentagonTitles[1] = text
-                                        pentagonCanvas.requestPaint()
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 15
+                                    
+                                    Text {
+                                        text: "第二点:"
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 16
+                                        color: "white"
+                                        Layout.preferredWidth: 80
+                                    }
+                                    
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        height: 38
+                                        color: "#22ffffff"
+                                        radius: 5
+                                        
+                                        TextField {
+                                            id: titleField2
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            text: pentagonTitles[1]
+                                            color: "white"
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 16
+                                            placeholderText: "请输入第二点标题"
+                                            placeholderTextColor: "#cccccc"
+                                            background: Rectangle { color: "transparent" }
+                                            onTextChanged: {
+                                                pentagonTitles[1] = text
+                                                pentagonCanvas.requestPaint()
+                                            }
+                                        }
+                                    }
+
+                                    // 显示已分配题库数量
+                                    Text {
+                                        text: {
+                                            var count = countAssignedBanks(1);
+                                            return count > 0 ? "已分配" + count + "个题库" : "未分配题库";
+                                        }
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 13
+                                        color: "#cccccc"
+                                        horizontalAlignment: Text.AlignRight
+                                        Layout.preferredWidth: 120
+                                    }
+                                    
+                                    // 第二点题库归类按钮
+                                    Button {
+                                        Layout.preferredWidth: 100
+                                        Layout.preferredHeight: 38
+                                        background: Rectangle {
+                                            color: "#33ffffff"
+                                            radius: 4
+                                        }
+                                        contentItem: Text {
+                                            text: "题库归类"
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 14
+                                            color: "white"
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        onClicked: {
+                                            var popup = categoryPopupComponent.createObject(pentagonalChartSettingsPage, {
+                                                "pointIndex": 1
+                                            });
+                                            popup.open();
+                                        }
                                     }
                                 }
                             }
                             
-                            // 标题3
-                            Text {
-                                text: "第三点:"
-                                font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 16
-                                color: "white"
-                                Layout.preferredWidth: 80
-                            }
-                            
-                            Rectangle {
+                            // 第三点设置
+                            ColumnLayout {
                                 Layout.fillWidth: true
-                                height: 38
-                                color: "#22ffffff"
-                                radius: 5
+                                spacing: 5
                                 
-                                TextField {
-                                    id: titleField3
-                                    anchors.fill: parent
-                                    anchors.margins: 5
-                                    text: pentagonTitles[2]
-                                    color: "white"
-                                    font.family: "阿里妈妈数黑体"
-                                    font.pixelSize: 16
-                                    placeholderText: "请输入第三点标题"
-                                    placeholderTextColor: "#cccccc"
-                                    background: Rectangle { color: "transparent" }
-                                    onTextChanged: {
-                                        pentagonTitles[2] = text
-                                        pentagonCanvas.requestPaint()
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 15
+                                    
+                                    Text {
+                                        text: "第三点:"
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 16
+                                        color: "white"
+                                        Layout.preferredWidth: 80
+                                    }
+                                    
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        height: 38
+                                        color: "#22ffffff"
+                                        radius: 5
+                                        
+                                        TextField {
+                                            id: titleField3
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            text: pentagonTitles[2]
+                                            color: "white"
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 16
+                                            placeholderText: "请输入第三点标题"
+                                            placeholderTextColor: "#cccccc"
+                                            background: Rectangle { color: "transparent" }
+                                            onTextChanged: {
+                                                pentagonTitles[2] = text
+                                                pentagonCanvas.requestPaint()
+                                            }
+                                        }
+                                    }
+
+                                    // 显示已分配题库数量
+                                    Text {
+                                        text: {
+                                            var count = countAssignedBanks(2);
+                                            return count > 0 ? "已分配" + count + "个题库" : "未分配题库";
+                                        }
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 13
+                                        color: "#cccccc"
+                                        horizontalAlignment: Text.AlignRight
+                                        Layout.preferredWidth: 120
+                                    }
+                                    
+                                    // 第三点题库归类按钮
+                                    Button {
+                                        Layout.preferredWidth: 100
+                                        Layout.preferredHeight: 38
+                                        background: Rectangle {
+                                            color: "#33ffffff"
+                                            radius: 4
+                                        }
+                                        contentItem: Text {
+                                            text: "题库归类"
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 14
+                                            color: "white"
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        onClicked: {
+                                            var popup = categoryPopupComponent.createObject(pentagonalChartSettingsPage, {
+                                                "pointIndex": 2
+                                            });
+                                            popup.open();
+                                        }
                                     }
                                 }
                             }
                             
-                            // 标题4
-                            Text {
-                                text: "第四点:"
-                                font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 16
-                                color: "white"
-                                Layout.preferredWidth: 80
-                            }
-                            
-                            Rectangle {
+                            // 第四点设置
+                            ColumnLayout {
                                 Layout.fillWidth: true
-                                height: 38
-                                color: "#22ffffff"
-                                radius: 5
+                                spacing: 5
                                 
-                                TextField {
-                                    id: titleField4
-                                    anchors.fill: parent
-                                    anchors.margins: 5
-                                    text: pentagonTitles[3]
-                                    color: "white"
-                                    font.family: "阿里妈妈数黑体"
-                                    font.pixelSize: 16
-                                    placeholderText: "请输入第四点标题"
-                                    placeholderTextColor: "#cccccc"
-                                    background: Rectangle { color: "transparent" }
-                                    onTextChanged: {
-                                        pentagonTitles[3] = text
-                                        pentagonCanvas.requestPaint()
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 15
+                                    
+                                    Text {
+                                        text: "第四点:"
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 16
+                                        color: "white"
+                                        Layout.preferredWidth: 80
+                                    }
+                                    
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        height: 38
+                                        color: "#22ffffff"
+                                        radius: 5
+                                        
+                                        TextField {
+                                            id: titleField4
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            text: pentagonTitles[3]
+                                            color: "white"
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 16
+                                            placeholderText: "请输入第四点标题"
+                                            placeholderTextColor: "#cccccc"
+                                            background: Rectangle { color: "transparent" }
+                                            onTextChanged: {
+                                                pentagonTitles[3] = text
+                                                pentagonCanvas.requestPaint()
+                                            }
+                                        }
+                                    }
+
+                                    // 显示已分配题库数量
+                                    Text {
+                                        text: {
+                                            var count = countAssignedBanks(3);
+                                            return count > 0 ? "已分配" + count + "个题库" : "未分配题库";
+                                        }
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 13
+                                        color: "#cccccc"
+                                        horizontalAlignment: Text.AlignRight
+                                        Layout.preferredWidth: 120
+                                    }
+                                    
+                                    // 第四点题库归类按钮
+                                    Button {
+                                        Layout.preferredWidth: 100
+                                        Layout.preferredHeight: 38
+                                        background: Rectangle {
+                                            color: "#33ffffff"
+                                            radius: 4
+                                        }
+                                        contentItem: Text {
+                                            text: "题库归类"
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 14
+                                            color: "white"
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        onClicked: {
+                                            var popup = categoryPopupComponent.createObject(pentagonalChartSettingsPage, {
+                                                "pointIndex": 3
+                                            });
+                                            popup.open();
+                                        }
                                     }
                                 }
                             }
                             
-                            // 标题5
-                            Text {
-                                text: "第五点:"
-                                font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 16
-                                color: "white"
-                                Layout.preferredWidth: 80
-                            }
-                            
-                            Rectangle {
+                            // 第五点设置
+                            ColumnLayout {
                                 Layout.fillWidth: true
-                                height: 38
-                                color: "#22ffffff"
-                                radius: 5
+                                spacing: 5
                                 
-                                TextField {
-                                    id: titleField5
-                                    anchors.fill: parent
-                                    anchors.margins: 5
-                                    text: pentagonTitles[4]
-                                    color: "white"
-                                    font.family: "阿里妈妈数黑体"
-                                    font.pixelSize: 16
-                                    placeholderText: "请输入第五点标题"
-                                    placeholderTextColor: "#cccccc"
-                                    background: Rectangle { color: "transparent" }
-                                    onTextChanged: {
-                                        pentagonTitles[4] = text
-                                        pentagonCanvas.requestPaint()
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 15
+                                    
+                                    Text {
+                                        text: "第五点:"
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 16
+                                        color: "white"
+                                        Layout.preferredWidth: 80
+                                    }
+                                    
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        height: 38
+                                        color: "#22ffffff"
+                                        radius: 5
+                                        
+                                        TextField {
+                                            id: titleField5
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            text: pentagonTitles[4]
+                                            color: "white"
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 16
+                                            placeholderText: "请输入第五点标题"
+                                            placeholderTextColor: "#cccccc"
+                                            background: Rectangle { color: "transparent" }
+                                            onTextChanged: {
+                                                pentagonTitles[4] = text
+                                                pentagonCanvas.requestPaint()
+                                            }
+                                        }
+                                    }
+
+                                    // 显示已分配题库数量
+                                    Text {
+                                        text: {
+                                            var count = countAssignedBanks(4);
+                                            return count > 0 ? "已分配" + count + "个题库" : "未分配题库";
+                                        }
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 13
+                                        color: "#cccccc"
+                                        horizontalAlignment: Text.AlignRight
+                                        Layout.preferredWidth: 120
+                                    }
+                                    
+                                    // 第五点题库归类按钮
+                                    Button {
+                                        Layout.preferredWidth: 100
+                                        Layout.preferredHeight: 38
+                                        background: Rectangle {
+                                            color: "#33ffffff"
+                                            radius: 4
+                                        }
+                                        contentItem: Text {
+                                            text: "题库归类"
+                                            font.family: "阿里妈妈数黑体"
+                                            font.pixelSize: 14
+                                            color: "white"
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        onClicked: {
+                                            var popup = categoryPopupComponent.createObject(pentagonalChartSettingsPage, {
+                                                "pointIndex": 4
+                                            });
+                                            popup.open();
+                                        }
                                     }
                                 }
                             }
@@ -468,4 +1166,4 @@ Rectangle {
             }
         }
     }
-} 
+}

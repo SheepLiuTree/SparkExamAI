@@ -9,6 +9,13 @@ Rectangle {
     property var currentQuestions: []  // 当前题目列表
     property int currentQuestionIndex: 0  // 当前题目索引
     property var userAnswers: ({})  // 用户答案记录
+    property var categoryStats: [
+        {total: 0, correct: 0}, // 第一点
+        {total: 0, correct: 0}, // 第二点
+        {total: 0, correct: 0}, // 第三点
+        {total: 0, correct: 0}, // 第四点
+        {total: 0, correct: 0}  // 第五点
+    ]
     
     // 从数据库加载今日题目
     Component.onCompleted: {
@@ -22,13 +29,70 @@ Rectangle {
         var distributionsStr = dbManager.getSetting("question_bank_distributions", "{}")
         var distributions = JSON.parse(distributionsStr)
         
+        // 获取五芒图点的题库分类
+        var pentagonCategories = []
+        for (var i = 0; i < 5; i++) {
+            var categorySetting = dbManager.getSetting("pentagon_category_" + (i+1), "{}")
+            try {
+                pentagonCategories.push(JSON.parse(categorySetting))
+            } catch (e) {
+                console.error("解析五芒图分类设置失败:", e)
+                pentagonCategories.push({})
+            }
+        }
+        
+        // 获取五芒图点的标题
+        var pentagonTitles = []
+        for (var i = 0; i < 5; i++) {
+            var title = dbManager.getSetting("pentagon_title_" + (i+1), "")
+            pentagonTitles.push(title)
+        }
+        
         // 从各个题库中抽取题目
         currentQuestions = []
+        
+        // 记录各五芒图点的题库ID列表
+        var pentagonBankIds = [[], [], [], [], []]
+        
+        // 将题库按照五芒图分类
         for (var bankId in distributions) {
             var count = distributions[bankId]
             if (count > 0) {
-                var questions = dbManager.getRandomQuestions(bankId, count)
-                currentQuestions = currentQuestions.concat(questions)
+                // 检查该题库属于哪些五芒图点
+                var assigned = false
+                for (var i = 0; i < 5; i++) {
+                    if (pentagonCategories[i][bankId] === true) {
+                        pentagonBankIds[i].push({
+                            bankId: bankId,
+                            count: count
+                        })
+                        assigned = true
+                    }
+                }
+                
+                // 如果没有分配到任何五芒图点，则按原样获取题目
+                if (!assigned) {
+                    var questions = dbManager.getRandomQuestions(bankId, count)
+                    for (var j = 0; j < questions.length; j++) {
+                        questions[j].category = "未分类"
+                        currentQuestions.push(questions[j])
+                    }
+                }
+            }
+        }
+        
+        // 从各个五芒图点的题库中获取题目
+        for (var i = 0; i < 5; i++) {
+            if (pentagonBankIds[i].length > 0) {
+                for (var j = 0; j < pentagonBankIds[i].length; j++) {
+                    var bankData = pentagonBankIds[i][j]
+                    var questions = dbManager.getRandomQuestions(bankData.bankId, bankData.count)
+                    for (var k = 0; k < questions.length; k++) {
+                        questions[k].category = pentagonTitles[i]
+                        questions[k].categoryIndex = i
+                        currentQuestions.push(questions[k])
+                    }
+                }
             }
         }
         
@@ -139,6 +203,22 @@ Rectangle {
                             }
                             
                             Item { Layout.fillWidth: true }
+                            
+                            // 添加题目分类信息
+                            Text {
+                                text: {
+                                    if (!currentQuestions[currentQuestionIndex]) return ""
+                                    return "分类: " + (currentQuestions[currentQuestionIndex].category || "未分类")
+                                }
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: {
+                                    if (!currentQuestions[currentQuestionIndex]) return "white"
+                                    var categoryIndex = currentQuestions[currentQuestionIndex].categoryIndex
+                                    var colors = ["#2c70b7", "#e67e22", "#27ae60", "#8e44ad", "#e74c3c"]
+                                    return categoryIndex >= 0 && categoryIndex < 5 ? colors[categoryIndex] : "white"
+                                }
+                            }
                         }
                     }
                     
@@ -440,135 +520,70 @@ Rectangle {
         }
     }
     
-    // 提交答案
-    function submitAnswers() {
-        // 检查是否所有题目都已作答
-        var unanswered = []
-        for (var i = 0; i < currentQuestions.length; i++) {
-            if (userAnswers[i] === undefined || 
-                (Array.isArray(userAnswers[i]) && userAnswers[i].length === 0)) {
-                unanswered.push(i + 1)
-            }
+    // 计算各类别的正确率统计
+    function calculateCategoryStats() {
+        // 重置统计数据
+        for (var i = 0; i < 5; i++) {
+            categoryStats[i] = {total: 0, correct: 0}
         }
         
-        if (unanswered.length > 0) {
-            // 显示未答题提示
-            var message = ""
-            
-            if (unanswered.length <= 5) {
-                message = "您有题目尚未作答：\n第 " + unanswered.join("、") + " 题"
-            } else {
-                // 如果未答题目较多，只显示数量和题号
-                message = "您有 " + unanswered.length + " 道题目尚未作答：\n第 "
-                
-                // 所有题号一起显示，用顿号分隔
-                message += unanswered.join("、") + " 题"
-            }
-            
-            console.log(message)
-            // 显示提示对话框
-            messageDialog.messageText = message
-            messageDialog.open()
-            return
-        }
-        
-        // 计算得分
-        var score = 0
-        var total = currentQuestions.length
-        var detailedAnswers = []
-        
+        // 统计各类别题目的正确率
         for (var i = 0; i < currentQuestions.length; i++) {
             var question = currentQuestions[i]
-            var userAnswer = userAnswers[i]
-            var correctAnswer = question.answer
-            var isCorrect = false
-            var userAnswerStr = ""
+            var categoryIndex = question.categoryIndex
             
-            if (Array.isArray(userAnswer)) {
-                // 多选题
-                userAnswerStr = userAnswer.map(function(index) {
-                    return String.fromCharCode(65 + index)
-                }).join('')
+            // 只统计已分类的题目
+            if (categoryIndex !== undefined && categoryIndex >= 0 && categoryIndex < 5) {
+                categoryStats[categoryIndex].total++
                 
-                // 对多选题，比较选项内容是否相同，忽略顺序
-                if (userAnswerStr.length === correctAnswer.length) {
-                    // 检查用户答案中的每个字符是否都在正确答案中
-                    var allFound = true
-                    for (var j = 0; j < userAnswerStr.length; j++) {
-                        if (correctAnswer.indexOf(userAnswerStr[j]) === -1) {
-                            allFound = false
-                            break
-                        }
-                    }
-                    // 检查正确答案中的每个字符是否都在用户答案中
-                    if (allFound) {
-                        for (var j = 0; j < correctAnswer.length; j++) {
-                            if (userAnswerStr.indexOf(correctAnswer[j]) === -1) {
-                                allFound = false
-                                break
-                            }
-                        }
-                    }
-                    isCorrect = allFound
-                } else {
-                    isCorrect = false
+                // 检查是否回答正确
+                var userAnswer = userAnswers[i]
+                if (userAnswer && userAnswer.toLowerCase() === question.answer.toLowerCase()) {
+                    categoryStats[categoryIndex].correct++
                 }
-            } else {
-                // 单选题或判断题
-                userAnswerStr = String.fromCharCode(65 + userAnswer)
-                isCorrect = (userAnswerStr === correctAnswer)
             }
-            
-            if (isCorrect) {
-                score++
-            }
-            
-            // 记录详细答题数据
-            detailedAnswers.push({
-                "questionId": question.id,
-                "questionContent": question.content,
-                "correctAnswer": correctAnswer,
-                "userAnswer": userAnswerStr,
-                "isCorrect": isCorrect
-            })
         }
         
-        console.log("得分：" + score + "/" + total)
-        
-        // 准备保存到数据库的数据
-        var answerData = JSON.stringify(detailedAnswers)
-        
-        // 检查用户数据是否存在
-        if (!userData || !userData.workId) {
-            console.error("用户数据不存在，无法保存答题记录")
-            messageDialog.messageText = "用户数据不存在，无法保存答题记录"
-            messageDialog.open()
-            return
+        console.log("分类统计完成:", JSON.stringify(categoryStats))
+    }
+    
+    // 在提交答案前添加统计计算
+    function submitAnswers() {
+        // 计算正确率
+        var correctCount = 0
+        for (var i = 0; i < currentQuestions.length; i++) {
+            var userAnswer = userAnswers[i] || ""
+            var correctAnswer = currentQuestions[i].answer
+            
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                correctCount++
+            }
         }
         
-        // 保存到数据库
-        var success = dbManager.saveUserAnswerRecord(
+        // 计算各分类的统计信息
+        calculateCategoryStats()
+        
+        // 显示成绩和解析
+        pentagonResultDialog.correctCount = correctCount
+        pentagonResultDialog.totalCount = currentQuestions.length
+        pentagonResultDialog.open()
+        
+        // 保存答题记录到数据库
+        var answerDataObj = {
+            questions: currentQuestions,
+            answers: userAnswers
+        }
+        
+        var saveSuccess = dbManager.saveUserAnswerRecord(
             userData.workId,
             userData.name,
             "星火日课",
-            total,
-            score,
-            answerData
+            currentQuestions.length,
+            correctCount,
+            JSON.stringify(answerDataObj)
         )
         
-        if (success) {
-            console.log("答题记录已保存到数据库")
-            
-            // 显示得分结果
-            resultDialog.score = score
-            resultDialog.total = total
-            resultDialog.percentage = Math.round(score / total * 100)
-            resultDialog.open()
-        } else {
-            console.error("保存答题记录失败")
-            messageDialog.messageText = "保存答题记录失败，请重试"
-            messageDialog.open()
-        }
+        console.log("保存答题记录:", saveSuccess)
     }
     
     // 获取错题列表
@@ -654,223 +669,229 @@ Rectangle {
     
     // 结果对话框
     Dialog {
-        id: resultDialog
-        anchors.centerIn: parent
-        width: 500
-        height: 360
+        id: pentagonResultDialog
+        title: "答题结果"
         modal: true
         closePolicy: Popup.CloseOnEscape
+        anchors.centerIn: Overlay.overlay
+        width: Math.min(parent.width * 0.8, 600)
         
-        property int score: 0
-        property int total: 0
-        property int percentage: 0
+        property int correctCount: 0
+        property int totalCount: 0
         
         background: Rectangle {
-            color: "#1e293b"
-            radius: 12
-            border.color: "#2c70b7"
-            border.width: 2
+            color: "#2a2a2a"
+            radius: 10
+            border.color: "#3a3a3a"
+            border.width: 1
         }
         
-        contentItem: Rectangle {
-            color: "transparent"
-            anchors.fill: parent
+        header: Rectangle {
+            color: "#333333"
+            height: 50
+            radius: 10
             
-            Column {
+            Text {
+                text: "答题结果"
                 anchors.centerIn: parent
-                spacing: 20
-                width: parent.width - 60
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 20
+                color: "white"
+            }
+        }
+        
+        contentItem: ColumnLayout {
+            spacing: 20
+            width: parent.width
+            
+            // 总体成绩
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 100
+                color: "#3c3c3c"
+                radius: 8
                 
-                // 标题装饰图案
-                Rectangle {
-                    width: parent.width
-                    height: 50
-                    radius: 8
-                    color: "#2c70b7"
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    spacing: 5
                     
                     Text {
-                        text: "✨ 星火日课结果 ✨"
+                        text: "您答对了 " + pentagonResultDialog.correctCount + " / " + pentagonResultDialog.totalCount + " 道题目"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 22
-                        font.bold: true
                         color: "white"
-                        anchors.centerIn: parent
-                    }
-                }
-                
-                Text {
-                    text: "恭喜完成本次学习任务！"
-                    font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 20
-                    color: "#f0f9ff"
-                    width: parent.width
-                    horizontalAlignment: Text.AlignHCenter
-                }
-                
-                // 分数展示区域
-                Rectangle {
-                    width: parent.width
-                    height: 80
-                    radius: 8
-                    color: "#0c4a82"
-                    
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 15
-                        
-                        Column {
-                            spacing: 5
-                            
-                            Text {
-                                text: "得分"
-                                font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 16
-                                color: "#a5f3fc"
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                            
-                            Text {
-                                text: resultDialog.score + "/" + resultDialog.total
-                                font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 24
-                                font.bold: true
-                                color: "#ffffff"
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                        }
-                        
-                        Rectangle {
-                            width: 1
-                            height: 50
-                            color: "#4d84b8"
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        
-                        Column {
-                            spacing: 5
-                            
-                            Text {
-                                text: "正确率"
-                                font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 16
-                                color: "#a5f3fc"
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                            
-                            Text {
-                                text: resultDialog.percentage + "%"
-                                font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 24
-                                font.bold: true
-                                color: {
-                                    var percent = resultDialog.percentage
-                                    if (percent >= 90) return "#4ade80"
-                                    else if (percent >= 80) return "#22d3ee"
-                                    else if (percent >= 60) return "#fcd34d"
-                                    else return "#f87171"
-                                }
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                        }
-                    }
-                }
-                
-                // 评价显示
-                Rectangle {
-                    width: parent.width
-                    height: 50
-                    radius: 8
-                    color: {
-                        var percent = resultDialog.percentage
-                        if (percent >= 90) return "#064e3b"
-                        else if (percent >= 80) return "#065f46"
-                        else if (percent >= 60) return "#854d0e"
-                        else return "#7f1d1d"
+                        Layout.alignment: Qt.AlignHCenter
                     }
                     
                     Text {
-                        anchors.centerIn: parent
-                        text: {
-                            var percent = resultDialog.percentage
-                            if (percent >= 90) return "评价：优秀，继续保持！🏆"
-                            else if (percent >= 80) return "评价：良好，再接再厉！👍"
-                            else if (percent >= 60) return "评价：及格，需要更多努力！💪"
-                            else return "评价：需要加强复习，不要气馁！📚"
-                        }
+                        text: "正确率: " + Math.round(pentagonResultDialog.correctCount / pentagonResultDialog.totalCount * 100) + "%"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 18
-                        color: "#ffffff"
-                        width: parent.width - 20
-                        horizontalAlignment: Text.AlignHCenter
+                        color: "#2ecc71"
+                        Layout.alignment: Qt.AlignHCenter
                     }
                 }
+            }
+            
+            // 五芒图分类统计
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 200
+                color: "#3c3c3c"
+                radius: 8
                 
-                // 按钮行
-                Row {
-                    spacing: 20
-                    anchors.horizontalCenter: parent.horizontalCenter
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 15
+                    spacing: 10
                     
-                    // 退出按钮
-                    Button {
-                        width: 150
-                        height: 45
-                        background: Rectangle {
-                            radius: 8
-                            gradient: Gradient {
-                                GradientStop { position: 0.0; color: "#64748b" }
-                                GradientStop { position: 1.0; color: "#475569" }
-                            }
-                        }
-                        contentItem: Text {
-                            text: "退出"
-                            font.family: "阿里妈妈数黑体"
-                            font.pixelSize: 18
-                            font.bold: true
-                            color: "white"
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        onClicked: {
-                            confirmDialog.dialogTitle = "退出确认"
-                            confirmDialog.dialogMessage = "确定要退出星火日课吗？"
-                            confirmDialog.confirmAction = function() {
-                                resultDialog.close()
-                                stackView.pop()
-                            }
-                            confirmDialog.open()
-                        }
+                    Text {
+                        text: "五芒图各点答题统计"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 18
+                        color: "white"
+                        font.bold: true
                     }
                     
-                    // 查看错题按钮
-                    Button {
-                        width: 150
-                        height: 45
-                        background: Rectangle {
-                            radius: 8
-                            gradient: Gradient {
-                                GradientStop { position: 0.0; color: "#2563eb" }
-                                GradientStop { position: 1.0; color: "#1d4ed8" }
+                    ListView {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        model: 5
+                        clip: true
+                        
+                        delegate: Rectangle {
+                            width: ListView.view.width
+                            height: 30
+                            color: "transparent"
+                            
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: 10
+                                
+                                Rectangle {
+                                    width: 12
+                                    height: 12
+                                    radius: 6
+                                    
+                                    // 五芒图各点颜色
+                                    color: {
+                                        var colors = ["#2c70b7", "#e67e22", "#27ae60", "#8e44ad", "#e74c3c"]
+                                        return colors[index]
+                                    }
+                                }
+                                
+                                Text {
+                                    text: {
+                                        var titles = []
+                                        for (var i = 0; i < 5; i++) {
+                                            var title = dbManager.getSetting("pentagon_title_" + (i+1), "")
+                                            titles.push(title || "未设置")
+                                        }
+                                        return titles[index]
+                                    }
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 14
+                                    color: "white"
+                                    Layout.preferredWidth: 100
+                                }
+                                
+                                Item { Layout.fillWidth: true }
+                                
+                                Text {
+                                    text: {
+                                        var stats = categoryStats[index]
+                                        if (stats.total === 0) return "无题目"
+                                        return stats.correct + " / " + stats.total
+                                    }
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 14
+                                    color: "white"
+                                }
+                                
+                                Text {
+                                    text: {
+                                        var stats = categoryStats[index]
+                                        if (stats.total === 0) return ""
+                                        return Math.round(stats.correct / stats.total * 100) + "%"
+                                    }
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 14
+                                    color: {
+                                        var stats = categoryStats[index]
+                                        if (stats.total === 0) return "white"
+                                        var rate = stats.correct / stats.total
+                                        if (rate >= 0.8) return "#2ecc71" // 绿色
+                                        else if (rate >= 0.6) return "#f39c12" // 黄色
+                                        else return "#e74c3c" // 红色
+                                    }
+                                    Layout.preferredWidth: 50
+                                    horizontalAlignment: Text.AlignRight
+                                }
                             }
-                        }
-                        contentItem: Text {
-                            text: "查看错题"
-                            font.family: "阿里妈妈数黑体"
-                            font.pixelSize: 18
-                            font.bold: true
-                            color: "white"
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        onClicked: {
-                            resultDialog.close()
-                            wrongQuestionsDialog.open()
                         }
                     }
                 }
             }
+            
+            // 按钮区域
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: 10
+                spacing: 20
+                
+                Item { Layout.fillWidth: true }
+                
+                Button {
+                    text: "查看详情"
+                    Layout.preferredWidth: 120
+                    Layout.preferredHeight: 40
+                    
+                    background: Rectangle {
+                        color: parent.hovered ? "#2980b9" : "#3498db"
+                        radius: 5
+                    }
+                    
+                    contentItem: Text {
+                        text: parent.text
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    onClicked: {
+                        pentagonResultDialog.close()
+                        analysisDialog.open()
+                    }
+                }
+                
+                Button {
+                    text: "完成"
+                    Layout.preferredWidth: 120
+                    Layout.preferredHeight: 40
+                    
+                    background: Rectangle {
+                        color: parent.hovered ? "#16a085" : "#1abc9c"
+                        radius: 5
+                    }
+                    
+                    contentItem: Text {
+                        text: parent.text
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    onClicked: {
+                        pentagonResultDialog.close()
+                        stackView.pop()
+                    }
+                }
+            }
         }
-        
-        footer: null
     }
     
     // 错题对话框
@@ -1232,7 +1253,7 @@ Rectangle {
                     }
                     onClicked: {
                         wrongQuestionsDialog.close()
-                        resultDialog.open()
+                        pentagonResultDialog.open()
                     }
                 }
             }
