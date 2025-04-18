@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_DatabaseManager_t {
-    QByteArrayData data[80];
-    char stringdata0[1141];
+    QByteArrayData data[81];
+    char stringdata0[1161];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -111,7 +111,8 @@ QT_MOC_LITERAL(75, 1067, 26), // "getUserMonthlyPracticeData"
 QT_MOC_LITERAL(76, 1094, 10), // "monthCount"
 QT_MOC_LITERAL(77, 1105, 24), // "getUserDailyPracticeData"
 QT_MOC_LITERAL(78, 1130, 4), // "year"
-QT_MOC_LITERAL(79, 1135, 5) // "month"
+QT_MOC_LITERAL(79, 1135, 5), // "month"
+QT_MOC_LITERAL(80, 1141, 19) // "getUserPentagonData"
 
     },
     "DatabaseManager\0initDatabase\0\0addFaceData\0"
@@ -146,7 +147,8 @@ QT_MOC_LITERAL(79, 1135, 5) // "month"
     "getMaxMonthlyQuestionCount\0"
     "getUserAbilityData\0getUserPracticeData\0"
     "getUserMonthlyPracticeData\0monthCount\0"
-    "getUserDailyPracticeData\0year\0month"
+    "getUserDailyPracticeData\0year\0month\0"
+    "getUserPentagonData"
 };
 #undef QT_MOC_LITERAL
 
@@ -156,7 +158,7 @@ static const uint qt_meta_data_DatabaseManager[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      61,   14, // methods
+      62,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -164,67 +166,68 @@ static const uint qt_meta_data_DatabaseManager[] = {
        0,       // signalCount
 
  // methods: name, argc, parameters, tag, flags
-       1,    0,  319,    2, 0x02 /* Public */,
-       3,    6,  320,    2, 0x02 /* Public */,
-       3,    5,  333,    2, 0x22 /* Public | MethodCloned */,
-      10,    1,  344,    2, 0x02 /* Public */,
-      11,    0,  347,    2, 0x02 /* Public */,
-      12,    1,  348,    2, 0x02 /* Public */,
-      13,    2,  351,    2, 0x02 /* Public */,
-      14,    1,  356,    2, 0x02 /* Public */,
-      15,    6,  359,    2, 0x02 /* Public */,
-      15,    5,  372,    2, 0x22 /* Public | MethodCloned */,
-      16,    2,  383,    2, 0x02 /* Public */,
-      19,    2,  388,    2, 0x02 /* Public */,
-      19,    1,  393,    2, 0x22 /* Public | MethodCloned */,
-      21,    1,  396,    2, 0x02 /* Public */,
-      22,    0,  399,    2, 0x02 /* Public */,
-      23,    2,  400,    2, 0x02 /* Public */,
-      23,    1,  405,    2, 0x22 /* Public | MethodCloned */,
-      23,    0,  408,    2, 0x22 /* Public | MethodCloned */,
-      26,    3,  409,    2, 0x02 /* Public */,
-      26,    2,  416,    2, 0x22 /* Public | MethodCloned */,
-      26,    1,  421,    2, 0x22 /* Public | MethodCloned */,
-      27,    1,  424,    2, 0x02 /* Public */,
-      27,    0,  427,    2, 0x22 /* Public | MethodCloned */,
-      29,    1,  428,    2, 0x02 /* Public */,
-      30,    2,  431,    2, 0x02 /* Public */,
-      32,    1,  436,    2, 0x02 /* Public */,
-      34,    0,  439,    2, 0x02 /* Public */,
-      35,    1,  440,    2, 0x02 /* Public */,
-      36,    2,  443,    2, 0x02 /* Public */,
-      37,    5,  448,    2, 0x02 /* Public */,
-      37,    4,  459,    2, 0x22 /* Public | MethodCloned */,
-      42,    1,  468,    2, 0x02 /* Public */,
-      44,    5,  471,    2, 0x02 /* Public */,
-      44,    4,  482,    2, 0x22 /* Public | MethodCloned */,
-      45,    1,  491,    2, 0x02 /* Public */,
-      46,    1,  494,    2, 0x02 /* Public */,
-      47,    2,  497,    2, 0x02 /* Public */,
-      49,    2,  502,    2, 0x02 /* Public */,
-      51,    0,  507,    2, 0x02 /* Public */,
-      52,    2,  508,    2, 0x02 /* Public */,
-      54,    1,  513,    2, 0x02 /* Public */,
-      56,    1,  516,    2, 0x02 /* Public */,
-      58,    0,  519,    2, 0x02 /* Public */,
-      59,    8,  520,    2, 0x02 /* Public */,
-      59,    7,  537,    2, 0x22 /* Public | MethodCloned */,
-      59,    6,  552,    2, 0x22 /* Public | MethodCloned */,
-      67,    3,  565,    2, 0x02 /* Public */,
-      67,    2,  572,    2, 0x22 /* Public | MethodCloned */,
-      67,    1,  577,    2, 0x22 /* Public | MethodCloned */,
-      68,    2,  580,    2, 0x02 /* Public */,
-      68,    1,  585,    2, 0x22 /* Public | MethodCloned */,
-      68,    0,  588,    2, 0x22 /* Public | MethodCloned */,
-      69,    1,  589,    2, 0x02 /* Public */,
-      70,    1,  592,    2, 0x02 /* Public */,
-      71,    1,  595,    2, 0x02 /* Public */,
-      72,    0,  598,    2, 0x02 /* Public */,
-      73,    1,  599,    2, 0x02 /* Public */,
-      74,    1,  602,    2, 0x02 /* Public */,
-      75,    2,  605,    2, 0x02 /* Public */,
-      75,    1,  610,    2, 0x22 /* Public | MethodCloned */,
-      77,    3,  613,    2, 0x02 /* Public */,
+       1,    0,  324,    2, 0x02 /* Public */,
+       3,    6,  325,    2, 0x02 /* Public */,
+       3,    5,  338,    2, 0x22 /* Public | MethodCloned */,
+      10,    1,  349,    2, 0x02 /* Public */,
+      11,    0,  352,    2, 0x02 /* Public */,
+      12,    1,  353,    2, 0x02 /* Public */,
+      13,    2,  356,    2, 0x02 /* Public */,
+      14,    1,  361,    2, 0x02 /* Public */,
+      15,    6,  364,    2, 0x02 /* Public */,
+      15,    5,  377,    2, 0x22 /* Public | MethodCloned */,
+      16,    2,  388,    2, 0x02 /* Public */,
+      19,    2,  393,    2, 0x02 /* Public */,
+      19,    1,  398,    2, 0x22 /* Public | MethodCloned */,
+      21,    1,  401,    2, 0x02 /* Public */,
+      22,    0,  404,    2, 0x02 /* Public */,
+      23,    2,  405,    2, 0x02 /* Public */,
+      23,    1,  410,    2, 0x22 /* Public | MethodCloned */,
+      23,    0,  413,    2, 0x22 /* Public | MethodCloned */,
+      26,    3,  414,    2, 0x02 /* Public */,
+      26,    2,  421,    2, 0x22 /* Public | MethodCloned */,
+      26,    1,  426,    2, 0x22 /* Public | MethodCloned */,
+      27,    1,  429,    2, 0x02 /* Public */,
+      27,    0,  432,    2, 0x22 /* Public | MethodCloned */,
+      29,    1,  433,    2, 0x02 /* Public */,
+      30,    2,  436,    2, 0x02 /* Public */,
+      32,    1,  441,    2, 0x02 /* Public */,
+      34,    0,  444,    2, 0x02 /* Public */,
+      35,    1,  445,    2, 0x02 /* Public */,
+      36,    2,  448,    2, 0x02 /* Public */,
+      37,    5,  453,    2, 0x02 /* Public */,
+      37,    4,  464,    2, 0x22 /* Public | MethodCloned */,
+      42,    1,  473,    2, 0x02 /* Public */,
+      44,    5,  476,    2, 0x02 /* Public */,
+      44,    4,  487,    2, 0x22 /* Public | MethodCloned */,
+      45,    1,  496,    2, 0x02 /* Public */,
+      46,    1,  499,    2, 0x02 /* Public */,
+      47,    2,  502,    2, 0x02 /* Public */,
+      49,    2,  507,    2, 0x02 /* Public */,
+      51,    0,  512,    2, 0x02 /* Public */,
+      52,    2,  513,    2, 0x02 /* Public */,
+      54,    1,  518,    2, 0x02 /* Public */,
+      56,    1,  521,    2, 0x02 /* Public */,
+      58,    0,  524,    2, 0x02 /* Public */,
+      59,    8,  525,    2, 0x02 /* Public */,
+      59,    7,  542,    2, 0x22 /* Public | MethodCloned */,
+      59,    6,  557,    2, 0x22 /* Public | MethodCloned */,
+      67,    3,  570,    2, 0x02 /* Public */,
+      67,    2,  577,    2, 0x22 /* Public | MethodCloned */,
+      67,    1,  582,    2, 0x22 /* Public | MethodCloned */,
+      68,    2,  585,    2, 0x02 /* Public */,
+      68,    1,  590,    2, 0x22 /* Public | MethodCloned */,
+      68,    0,  593,    2, 0x22 /* Public | MethodCloned */,
+      69,    1,  594,    2, 0x02 /* Public */,
+      70,    1,  597,    2, 0x02 /* Public */,
+      71,    1,  600,    2, 0x02 /* Public */,
+      72,    0,  603,    2, 0x02 /* Public */,
+      73,    1,  604,    2, 0x02 /* Public */,
+      74,    1,  607,    2, 0x02 /* Public */,
+      75,    2,  610,    2, 0x02 /* Public */,
+      75,    1,  615,    2, 0x22 /* Public | MethodCloned */,
+      77,    3,  618,    2, 0x02 /* Public */,
+      80,    1,  625,    2, 0x02 /* Public */,
 
  // methods: parameters
     QMetaType::Bool,
@@ -288,6 +291,7 @@ static const uint qt_meta_data_DatabaseManager[] = {
     QMetaType::QVariantList, QMetaType::QString, QMetaType::Int,    6,   76,
     QMetaType::QVariantList, QMetaType::QString,    6,
     QMetaType::QVariantList, QMetaType::QString, QMetaType::Int, QMetaType::Int,    6,   78,   79,
+    QMetaType::QVariantMap, QMetaType::QString,    6,
 
        0        // eod
 };
@@ -420,6 +424,8 @@ void DatabaseManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
         case 60: { QVariantList _r = _t->getUserDailyPracticeData((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])));
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 61: { QVariantMap _r = _t->getUserPentagonData((*reinterpret_cast< const QString(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< QVariantMap*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
     }
@@ -454,13 +460,13 @@ int DatabaseManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 61)
+        if (_id < 62)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 61;
+        _id -= 62;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 61)
+        if (_id < 62)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 61;
+        _id -= 62;
     }
     return _id;
 }

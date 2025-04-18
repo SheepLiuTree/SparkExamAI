@@ -192,6 +192,9 @@ public:
     // 获取用户每日刷题数据
     Q_INVOKABLE QVariantList getUserDailyPracticeData(const QString &workId, int year, int month);
 
+    // 获取用户的五芒图数据（当月、上月、上上月）
+    Q_INVOKABLE QVariantMap getUserPentagonData(const QString &workId);
+
 private:
     QSqlDatabase m_database;
     QString m_dbPath;

@@ -13,6 +13,19 @@ Window {
     // flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     title: qsTr("星火智能评测系统")
 
+    // 提供一个全局函数用于更新用户数据
+    function updateUserData(workId) {
+        if (workId && mainPage && mainPage.user_practice_data) {
+            console.log("全局函数：更新用户数据，工号: " + workId)
+            // 先清空ID然后设置ID以确保触发变更
+            mainPage.user_practice_data.currentUserId = ""
+            mainPage.user_practice_data.currentUserId = workId
+            mainPage.user_practice_data.loadUserPracticeData(workId)
+            return true
+        }
+        return false
+    }
+
     Image {
         id: background
         anchors.fill: parent
@@ -106,6 +119,7 @@ Window {
         id: mainPage
         color: "transparent"
         visible: false
+        objectName: "mainPage"
 
         // Component initialization
         Component.onCompleted: {
@@ -598,6 +612,71 @@ Window {
             anchors.horizontalCenter: parent.horizontalCenter
             color: "transparent"
             visible: false // Default to hidden
+            objectName: "user_practice_data"
+            
+            // 当用户ID改变时，从数据库加载该用户的练习数据
+            property string currentUserId: ""
+            
+            onCurrentUserIdChanged: {
+                if (currentUserId !== "") {
+                    console.log("用户ID已更改: " + currentUserId)
+                    // 从数据库获取当前用户信息
+                    var userData = dbManager.getFaceDataByWorkId(currentUserId);
+                    if (userData && !userData.isEmpty) {
+                        // 更新用户姓名显示
+                        user_name.text = userData.name || "未知用户";
+                        console.log("已加载用户姓名: " + user_name.text);
+                        
+                        // 在这里可以加载用户的其他数据
+                        loadUserPracticeData(currentUserId);
+                    } else {
+                        user_name.text = "未知用户";
+                        console.log("无法获取用户信息");
+                    }
+                } else {
+                    // 如果ID为空，清空用户名
+                    user_name.text = "";
+                    console.log("用户ID为空，已清空用户名显示");
+                }
+            }
+            
+            // 加载用户练习数据
+            function loadUserPracticeData(userId) {
+                // 这里加载用户的练习数据并更新UI
+                console.log("加载用户练习数据，用户ID: " + userId);
+                
+                // 获取所有用户最大刷题量
+                var maxMonthlyCount = dbManager.getMaxMonthlyQuestionCount();
+                
+                // 计算目标值为最大刷题量的1.2倍，如果没有数据则使用每日题目数乘以天数
+                var targetCount = 0;
+                if (maxMonthlyCount <= 0) {
+                    // 如果没有刷题记录，使用每日题目数乘以天数作为目标
+                    var dailyQuestionCount = parseInt(dbManager.getSetting("daily_question_count", "20"));
+                    var currentDate = new Date();
+                    var daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+                    targetCount = dailyQuestionCount * daysInMonth;
+                } else {
+                    // 使用最大值的1.2倍
+                    targetCount = Math.ceil(maxMonthlyCount * 1.2);
+                }
+                
+                // 更新进度条目标值
+                progress_bar.targetQuestions = targetCount;
+                
+                // 获取当月刷题数量
+                var currentMonthQuestions = dbManager.getUserCurrentMonthQuestionCount(userId) || 0;
+                monthly_stats_value.text = currentMonthQuestions.toString();
+                
+                // 获取近一年的刷题数据（从当月向前推12个月）
+                var yearlyData = dbManager.getUserRollingYearQuestionData(userId);
+                if (yearlyData && yearlyData.length === 12) {
+                    month_bars.monthlyData = yearlyData;
+                }
+                
+                // 加载五芒图数据
+                radar_chart.loadUserPentagonData();
+            }
 
             // 标题背景图
             Image {
@@ -883,27 +962,172 @@ Window {
                 
                 Canvas {
                     id: radar_chart
-                    anchors.centerIn: parent
-                    width: Math.min(parent.width, parent.height) * 0.8 + 100
-                    height: width - 100
+                    anchors.fill: parent
                     
-                    // 示例数据 - 五个维度的值（0-1范围）
-                    property var data1: [0.7, 0.9, 0.5, 0.8, 0.6]  // 当月数据
-                    property var data2: [0.8, 0.7, 0.6, 0.9, 0.7]  // 上月数据
-                    property var data3: [0.6, 0.8, 0.7, 0.5, 0.8]  // 上上月数据
+                    // 五个维度的标签
+                    property var labels: ["基础认知", "原理理解", "操作应用", "诊断分析", "安全规范"]
                     
-                    // 维度标签
-                    property var labels: ["基础认知", "安全规范", "诊断分析", "操作应用", "原理理解"]
-                    
-                    // 绘制颜色
+                    // 定义颜色
                     property color color1: "#5B9BD5"  // 蓝色
                     property color color2: "#70AD47"  // 绿色
                     property color color3: "#FFAA33"  // 黄色
                     
+                    // 月份名称
+                    property var currentMonthName: {
+                        var d = new Date();
+                        return (d.getMonth() + 1) + "月";
+                    }
+                    
+                    property var lastMonthName: {
+                        var d = new Date();
+                        d.setMonth(d.getMonth() - 1);
+                        return (d.getMonth() + 1) + "月";
+                    }
+                    
+                    property var twoMonthsAgoName: {
+                        var d = new Date();
+                        d.setMonth(d.getMonth() - 2);
+                        return (d.getMonth() + 1) + "月";
+                    }
+                    
+                    // 存储标签位置和当前悬停的标签索引
+                    property var labelPositions: [{x:0, y:0, width:0, height:0}, 
+                                                 {x:0, y:0, width:0, height:0}, 
+                                                 {x:0, y:0, width:0, height:0}, 
+                                                 {x:0, y:0, width:0, height:0}, 
+                                                 {x:0, y:0, width:0, height:0}]
+                    
+                    // 当前鼠标悬停的标签索引
+                    property int hoverIndex: -1
+                    
+                    // 示例数据 - 五个维度的值（0-1范围）
+                    property var data1: [0.8, 0.6, 0.9, 0.7, 0.5]  // 当月数据
+                    property var data2: [0.6, 0.5, 0.7, 0.6, 0.4]  // 上月数据
+                    property var data3: [0.4, 0.3, 0.5, 0.4, 0.2]  // 上上月数据
+                    
+                    // 数据标签（显示具体百分比）
+                    property var data1Labels: ["80%", "60%", "90%", "70%", "50%"]  // 当月数据标签
+                    property var data2Labels: ["60%", "50%", "70%", "60%", "40%"]  // 上月数据标签
+                    property var data3Labels: ["40%", "30%", "50%", "40%", "20%"]  // 上上月数据标签
+                    
+                    // 加载用户五芒图数据的函数
+                    function loadUserPentagonData() {
+                        if (user_practice_data.currentUserId && user_practice_data.currentUserId !== "") {
+                            var pentagonData = dbManager.getUserPentagonData(user_practice_data.currentUserId);
+                            
+                            // 输出五芒图数据到控制台
+                            console.log("===== 用户五芒图数据 =====");
+                            console.log("用户ID: " + user_practice_data.currentUserId);
+                            
+                            // 输出原始数据结构
+                            console.log("\n----- 原始数据结构 -----");
+                            console.log("当月数据: " + JSON.stringify(pentagonData.currentMonth));
+                            console.log("上月数据: " + JSON.stringify(pentagonData.lastMonth));
+                            console.log("上上月数据: " + JSON.stringify(pentagonData.twoMonthsAgo));
+                            
+                            // 输出当月数据
+                            console.log("\n----- 当月数据 -----");
+                            if (pentagonData.currentMonth) {
+                                var currentMonthData = [0, 0, 0, 0, 0];
+                                var currentMonthLabels = ["0%", "0%", "0%", "0%", "0%"];
+                                for (var i = 0; i < labels.length; i++) {
+                                    var typeName = labels[i];
+                                    var typeData = pentagonData.currentMonth[typeName];
+                                    if (typeData && typeof typeData === 'object') {
+                                        currentMonthData[i] = typeData.accuracy;
+                                        // 计算百分比标签
+                                        var percent = Math.round(typeData.accuracy * 100);
+                                        currentMonthLabels[i] = percent + "%";
+                                        
+                                        // 输出到控制台
+                                        console.log(typeName + ": 答题总数 = " + typeData.totalQuestions + 
+                                                   ", 正确数量 = " + typeData.correctCount + 
+                                                   ", 正确率 = " + percent + "%");
+                                    } else {
+                                        console.log(typeName + ": 无数据");
+                                    }
+                                }
+                                data1 = currentMonthData;
+                                data1Labels = currentMonthLabels;
+                            } else {
+                                console.log("无当月数据");
+                            }
+                            
+                            // 输出上月数据
+                            console.log("\n----- 上月数据 -----");
+                            if (pentagonData.lastMonth) {
+                                var lastMonthData = [0, 0, 0, 0, 0];
+                                var lastMonthLabels = ["0%", "0%", "0%", "0%", "0%"];
+                                for (var i = 0; i < labels.length; i++) {
+                                    var typeName = labels[i];
+                                    var typeData = pentagonData.lastMonth[typeName];
+                                    if (typeData && typeof typeData === 'object') {
+                                        lastMonthData[i] = typeData.accuracy;
+                                        // 计算百分比标签
+                                        var percent = Math.round(typeData.accuracy * 100);
+                                        lastMonthLabels[i] = percent + "%";
+                                        
+                                        // 输出到控制台
+                                        console.log(typeName + ": 答题总数 = " + typeData.totalQuestions + 
+                                                   ", 正确数量 = " + typeData.correctCount + 
+                                                   ", 正确率 = " + percent + "%");
+                                    } else {
+                                        console.log(typeName + ": 无数据");
+                                    }
+                                }
+                                data2 = lastMonthData;
+                                data2Labels = lastMonthLabels;
+                            } else {
+                                console.log("无上月数据");
+                            }
+                            
+                            // 输出上上月数据
+                            console.log("\n----- 上上月数据 -----");
+                            if (pentagonData.twoMonthsAgo) {
+                                var twoMonthsAgoData = [0, 0, 0, 0, 0];
+                                var twoMonthsAgoLabels = ["0%", "0%", "0%", "0%", "0%"];
+                                for (var i = 0; i < labels.length; i++) {
+                                    var typeName = labels[i];
+                                    var typeData = pentagonData.twoMonthsAgo[typeName];
+                                    if (typeData && typeof typeData === 'object') {
+                                        twoMonthsAgoData[i] = typeData.accuracy;
+                                        // 计算百分比标签
+                                        var percent = Math.round(typeData.accuracy * 100);
+                                        twoMonthsAgoLabels[i] = percent + "%";
+                                        
+                                        // 输出到控制台
+                                        console.log(typeName + ": 答题总数 = " + typeData.totalQuestions + 
+                                                   ", 正确数量 = " + typeData.correctCount + 
+                                                   ", 正确率 = " + percent + "%");
+                                    } else {
+                                        console.log(typeName + ": 无数据");
+                                    }
+                                }
+                                data3 = twoMonthsAgoData;
+                                data3Labels = twoMonthsAgoLabels;
+                            } else {
+                                console.log("无上上月数据");
+                            }
+                            
+                            // 输出结束标识
+                            console.log("\n===== 五芒图数据输出结束 =====");
+                            
+                            // 重绘图表
+                            radar_chart.requestPaint();
+                        } else {
+                            console.log("用户ID为空，无法获取五芒图数据");
+                        }
+                    }
+                    
+                    Component.onCompleted: {
+                        // 初始加载数据
+                        loadUserPentagonData();
+                    }
+                    
                     onPaint: {
                         var ctx = getContext("2d");
                         var centerX = width / 2;
-                        var centerY = height / 2;
+                        var centerY = height / 2 + 15; // 向下移动15个像素
                         var size = Math.min(width, height) / 2 * 0.8;
                         
                         // 清空画布
@@ -924,8 +1148,11 @@ Window {
                         // 绘制维度轴线
                         drawAxisLines(ctx, centerX, centerY, size, "#666666");
                         
-                        // 绘制标签
+                        // 绘制标签和数据点值
                         drawLabels(ctx, centerX, centerY, size);
+                        
+                        // 显示月份图例
+                        drawLegend(ctx, centerX, centerY, size);
                     }
                     
                     // 绘制多边形函数
@@ -958,213 +1185,326 @@ Window {
                     
                     // 绘制数据多边形
                     function drawDataPolygon(ctx, centerX, centerY, radius, data, color, alpha) {
-                        ctx.beginPath();
+                        // 开始绘制
                         ctx.strokeStyle = color;
                         ctx.fillStyle = color;
                         ctx.globalAlpha = alpha;
                         ctx.lineWidth = 2;
                         
+                        // 计算所有点的位置和信息
+                        var points = [];
                         for (var i = 0; i < 5; i++) {
                             var angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
-                            var value = data[i];
-                            var x = centerX + radius * value * Math.cos(angle);
-                            var y = centerY + radius * value * Math.sin(angle);
+                            var value = Math.max(0, Math.min(1, data[i])); // 确保值在0-1范围内
                             
-                            if (i === 0) {
-                                ctx.moveTo(x, y);
-                            } else {
-                                ctx.lineTo(x, y);
+                            // 计算点的位置
+                            points.push({
+                                x: centerX + radius * value * Math.cos(angle),
+                                y: centerY + radius * value * Math.sin(angle),
+                                value: value,
+                                angle: angle,
+                                index: i
+                            });
+                        }
+                        
+                        // 先绘制所有为0的点
+                        for (var i = 0; i < 5; i++) {
+                            if (points[i].value < 0.01) {
+                                ctx.beginPath();
+                                ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+                                ctx.fill();
                             }
                         }
                         
-                        ctx.closePath();
-                        ctx.stroke();
-                        ctx.globalAlpha = 0.3;
-                        ctx.fill();
+                        // 检查是否所有点都是0
+                        var allZero = true;
+                        for (var i = 0; i < 5; i++) {
+                            if (points[i].value > 0.01) {
+                                allZero = false;
+                                break;
+                            }
+                        }
+                        
+                        // 如果所有点都是0，不绘制多边形
+                        if (allZero) {
+                            return;
+                        }
+                        
+                        // 为每相邻的两个点分别绘制，避免连成一个闭合路径
+                        // 这样可以防止在有些点为0、有些不为0的情况下形成奇怪的图形
+                        for (var i = 0; i < 5; i++) {
+                            var current = points[i];
+                            var next = points[(i + 1) % 5];
+                            
+                            // 只有当两个点都不为0时才连线
+                            if (current.value > 0.01 && next.value > 0.01) {
+                                ctx.beginPath();
+                                ctx.moveTo(current.x, current.y);
+                                ctx.lineTo(next.x, next.y);
+                                ctx.stroke();
+                            }
+                        }
+                        
+                        // 计算有效区域，用于填充
+                        var validPoints = points.filter(function(p) {
+                            return p.value > 0.01;
+                        });
+                        
+                        // 如果有2个以上有效点，才绘制填充区域
+                        if (validPoints.length >= 3) {
+                            // 按原始索引排序
+                            validPoints.sort(function(a, b) {
+                                return a.index - b.index;
+                            });
+                            
+                            // 绘制填充区域
+                            ctx.beginPath();
+                            ctx.moveTo(validPoints[0].x, validPoints[0].y);
+                            
+                            for (var i = 1; i < validPoints.length; i++) {
+                                ctx.lineTo(validPoints[i].x, validPoints[i].y);
+                            }
+                            
+                            ctx.closePath();
+                            ctx.globalAlpha = 0.3;
+                            ctx.fill();
+                            ctx.globalAlpha = alpha;
+                        }
+                        
+                        // 绘制非0值点
+                        for (var i = 0; i < 5; i++) {
+                            if (points[i].value > 0.01) {
+                                ctx.beginPath();
+                                ctx.arc(points[i].x, points[i].y, 3, 0, Math.PI * 2);
+                                ctx.fill();
+                            }
+                        }
+                        
                         ctx.globalAlpha = 1.0;
                     }
                     
                     // 绘制轴线
                     function drawAxisLines(ctx, centerX, centerY, radius, color) {
-                        ctx.beginPath();
                         ctx.strokeStyle = color;
-                        ctx.globalAlpha = 0.5;
                         ctx.lineWidth = 1;
                         
                         for (var i = 0; i < 5; i++) {
                             var angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
-                            var x = centerX + radius * Math.cos(angle);
-                            var y = centerY + radius * Math.sin(angle);
-                            
+                            ctx.beginPath();
                             ctx.moveTo(centerX, centerY);
-                            ctx.lineTo(x, y);
+                            ctx.lineTo(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle));
+                            ctx.stroke();
                         }
-                        
-                        ctx.stroke();
-                        ctx.globalAlpha = 1.0;
                     }
                     
-                    // 绘制标签
+                    // 绘制标签和数据点值
                     function drawLabels(ctx, centerX, centerY, radius) {
-                        ctx.font = "17px 阿里妈妈数黑体";
                         ctx.fillStyle = "white";
+                        ctx.font = "15px 阿里妈妈数黑体";
                         ctx.textAlign = "center";
                         ctx.textBaseline = "middle";
                         
+                        // 重置标签位置数组
+                        labelPositions = [];
+                        
                         for (var i = 0; i < 5; i++) {
                             var angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
-                            var x = centerX + (radius + 40) * Math.cos(angle);
-                            var y = centerY + (radius + 20) * Math.sin(angle);
                             
+                            // 标签位置调整 - 为每个位置单独设置半径和位置偏移
+                            var labelRadius = radius * 1.1; // 默认外部偏移
+                            var offsetX = 0;
+                            var offsetY = 0;
+                            
+                            // 为每个方向单独调整
+                            if (i === 0) { // 顶部
+                                labelRadius = radius * 1.2;
+                                offsetY = 20;
+                            } else if (i === 1) { // 右上
+                                labelRadius = radius * 1.2;
+                                offsetX = 10;
+                                offsetY = 5;
+                            } else if (i === 2) { // 右下
+                                labelRadius = radius * 1.2;
+                                offsetX = 10;
+                                offsetY = -10;
+                            } else if (i === 3) { // 左下
+                                labelRadius = radius * 1.2;
+                                offsetX = -10;
+                                offsetY = -10;
+                            } else if (i === 4) { // 左上
+                                labelRadius = radius * 1.2;
+                                offsetX = -10;
+                                offsetY = 5;
+                            }
+                            
+                            var x = centerX + labelRadius * Math.cos(angle) + offsetX;
+                            var y = centerY + labelRadius * Math.sin(angle) + offsetY;
+                            
+                            // 存储标签位置用于鼠标悬停检测 - 调整大小为更准确的匹配
+                            var labelWidth = ctx.measureText(labels[i]).width + 20; // 添加一些边距
+                            labelPositions.push({
+                                x: x - labelWidth/2,
+                                y: y - 15,
+                                width: labelWidth,
+                                height: 30
+                            });
+                            
+                            // 绘制标签
+                            ctx.fillStyle = (i === hoverIndex) ? "#FFFF00" : "white"; // 悬停时黄色
                             ctx.fillText(labels[i], x, y);
-                        }
-                    }
-                }
-                
-                // 图例
-                Row {
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 10
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 30
-                    
-                    Row {
-                        spacing: 5
-                        Rectangle {
-                            width: 15
-                            height: 10
-                            color: radar_chart.color1
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        Text {
-                            text: {
-                                var d = new Date();
-                                return (d.getMonth() + 1) + "月";
+                            ctx.fillStyle = "white";
+                            
+                            // 当鼠标悬停时，绘制百分比信息
+                            if (i === hoverIndex) {
+                                // 绘制悬停提示框 - 调整位置以避免超出边界
+                                var tooltipWidth = 150;
+                                var tooltipHeight = 80;
+                                
+                                // 计算提示框位置，确保不会超出可视区域
+                                var tooltipX = x;
+                                var tooltipY = y - 50; // 默认在标签上方显示
+                                
+                                // 调整X轴位置，防止提示框超出左右边界
+                                if (tooltipX - tooltipWidth/2 < 0) {
+                                    tooltipX = tooltipWidth/2 + 10; // 左边界保持一定距离
+                                } else if (tooltipX + tooltipWidth/2 > width) {
+                                    tooltipX = width - tooltipWidth/2 - 10; // 右边界保持一定距离
+                                }
+                                
+                                // 调整Y轴位置，防止提示框超出上下边界
+                                if (tooltipY - tooltipHeight/2 < 0) {
+                                    tooltipY = tooltipHeight/2 + 55; // 上边界保持一定距离
+                                } else if (tooltipY + tooltipHeight/2 > height) {
+                                    tooltipY = y - 20; // 如果下方空间不足，将提示框移到标签上方
+                                }
+                                
+                                // 绘制背景
+                                ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+                                
+                                // 绘制圆角矩形背景
+                                var cornerRadius = 8; // 圆角半径
+                                ctx.beginPath();
+                                ctx.moveTo(tooltipX - tooltipWidth/2 + cornerRadius, tooltipY - tooltipHeight/2);
+                                ctx.lineTo(tooltipX + tooltipWidth/2 - cornerRadius, tooltipY - tooltipHeight/2);
+                                ctx.quadraticCurveTo(tooltipX + tooltipWidth/2, tooltipY - tooltipHeight/2, tooltipX + tooltipWidth/2, tooltipY - tooltipHeight/2 + cornerRadius);
+                                ctx.lineTo(tooltipX + tooltipWidth/2, tooltipY + tooltipHeight/2 - cornerRadius);
+                                ctx.quadraticCurveTo(tooltipX + tooltipWidth/2, tooltipY + tooltipHeight/2, tooltipX + tooltipWidth/2 - cornerRadius, tooltipY + tooltipHeight/2);
+                                ctx.lineTo(tooltipX - tooltipWidth/2 + cornerRadius, tooltipY + tooltipHeight/2);
+                                ctx.quadraticCurveTo(tooltipX - tooltipWidth/2, tooltipY + tooltipHeight/2, tooltipX - tooltipWidth/2, tooltipY + tooltipHeight/2 - cornerRadius);
+                                ctx.lineTo(tooltipX - tooltipWidth/2, tooltipY - tooltipHeight/2 + cornerRadius);
+                                ctx.quadraticCurveTo(tooltipX - tooltipWidth/2, tooltipY - tooltipHeight/2, tooltipX - tooltipWidth/2 + cornerRadius, tooltipY - tooltipHeight/2);
+                                ctx.closePath();
+                                ctx.fill();
+                                
+                                // 绘制文本
+                                ctx.fillStyle = color1;
+                                ctx.fillText(currentMonthName + ": " + data1Labels[i], tooltipX, tooltipY - 20);
+                                
+                                ctx.fillStyle = color2;
+                                ctx.fillText(lastMonthName + ": " + data2Labels[i], tooltipX, tooltipY);
+                                
+                                ctx.fillStyle = color3;
+                                ctx.fillText(twoMonthsAgoName + ": " + data3Labels[i], tooltipX, tooltipY + 20);
+                                
+                                ctx.fillStyle = "white";
                             }
-                            font.family: "阿里妈妈数黑体"
-                            font.pixelSize: 12
-                            color: "white"
                         }
                     }
                     
-                    Row {
-                        spacing: 5
-                        Rectangle {
-                            width: 15
-                            height: 10
-                            color: radar_chart.color2
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        Text {
-                            text: {
-                                var d = new Date();
-                                d.setMonth(d.getMonth() - 1);
-                                return (d.getMonth() + 1) + "月";
-                            }
-                            font.family: "阿里妈妈数黑体"
-                            font.pixelSize: 12
-                            color: "white"
-                        }
+                    // 绘制图例函数
+                    function drawLegend(ctx, centerX, centerY, size) {
+                        // 图例放在底部，不使用ctx绘制而是使用QML组件
+                        // 这是一个空函数，实际的图例显示由QML的Row组件实现
+                        // 保留这个函数调用以保持代码一致性
                     }
                     
-                    Row {
-                        spacing: 5
-                        Rectangle {
-                            width: 15
-                            height: 10
-                            color: radar_chart.color3
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        Text {
-                            text: {
-                                var d = new Date();
-                                d.setMonth(d.getMonth() - 2);
-                                return (d.getMonth() + 1) + "月";
-                            }
-                            font.family: "阿里妈妈数黑体"
-                            font.pixelSize: 12
-                            color: "white"
-                        }
-                    }
-                }
-            }
-
-            // 当用户ID改变时，从数据库加载该用户的练习数据
-            property string currentUserId: ""
-            
-            onCurrentUserIdChanged: {
-                if (currentUserId !== "") {
-                    console.log("用户ID已更改: " + currentUserId)
-                    // 从数据库获取当前用户信息
-                    var userData = dbManager.getFaceDataByWorkId(currentUserId);
-                    if (userData && !userData.isEmpty) {
-                        // 更新用户姓名显示
-                        user_name.text = userData.name || "未知用户";
-                        console.log("已加载用户姓名: " + user_name.text);
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
                         
-                        // 在这里可以加载用户的其他数据
-                        loadUserPracticeData(currentUserId);
-                    } else {
-                        user_name.text = "未知用户";
-                        console.log("无法获取用户信息");
+                        onPositionChanged: {
+                            var foundIndex = -1;
+                            
+                            // 检查鼠标是否在任何标签上
+                            for (var i = 0; i < radar_chart.labelPositions.length; i++) {
+                                var pos = radar_chart.labelPositions[i];
+                                if (mouseX >= pos.x && mouseX <= pos.x + pos.width &&
+                                    mouseY >= pos.y && mouseY <= pos.y + pos.height) {
+                                    foundIndex = i;
+                                    break;
+                                }
+                            }
+                            
+                            if (radar_chart.hoverIndex !== foundIndex) {
+                                radar_chart.hoverIndex = foundIndex;
+                                radar_chart.requestPaint(); // 重绘画布
+                            }
+                        }
+                        
+                        onExited: {
+                            radar_chart.hoverIndex = -1;
+                            radar_chart.requestPaint(); // 重绘画布
+                        }
                     }
-                } else {
-                    // 如果ID为空，清空用户名
-                    user_name.text = "";
-                    console.log("用户ID为空，已清空用户名显示");
+                    
+                    // 图例
+                    Row {
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 10
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        spacing: 30
+                        
+                        Row {
+                            spacing: 5
+                            Rectangle {
+                                width: 15
+                                height: 10
+                                color: radar_chart.color1
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                text: radar_chart.currentMonthName
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 12
+                                color: "white"
+                            }
+                        }
+                        
+                        Row {
+                            spacing: 5
+                            Rectangle {
+                                width: 15
+                                height: 10
+                                color: radar_chart.color2
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                text: radar_chart.lastMonthName
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 12
+                                color: "white"
+                            }
+                        }
+                        
+                        Row {
+                            spacing: 5
+                            Rectangle {
+                                width: 15
+                                height: 10
+                                color: radar_chart.color3
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                text: radar_chart.twoMonthsAgoName
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 12
+                                color: "white"
+                            }
+                        }
+                    }
                 }
-            }
-            
-            // 加载用户练习数据
-            function loadUserPracticeData(userId) {
-                // 这里加载用户的练习数据并更新UI
-                console.log("加载用户练习数据，用户ID: " + userId);
                 
-                // 获取所有用户最大刷题量
-                var maxMonthlyCount = dbManager.getMaxMonthlyQuestionCount();
-                
-                // 计算目标值为最大刷题量的1.2倍，如果没有数据则使用每日题目数乘以天数
-                var targetCount = 0;
-                if (maxMonthlyCount <= 0) {
-                    // 如果没有刷题记录，使用每日题目数乘以天数作为目标
-                    var dailyQuestionCount = parseInt(dbManager.getSetting("daily_question_count", "20"));
-                    var currentDate = new Date();
-                    var daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-                    targetCount = dailyQuestionCount * daysInMonth;
-                } else {
-                    // 使用最大值的1.2倍
-                    targetCount = Math.ceil(maxMonthlyCount * 1.2);
-                }
-                
-                // 更新进度条目标值
-                progress_bar.targetQuestions = targetCount;
-                
-                // 获取当月刷题数量
-                var currentMonthQuestions = dbManager.getUserCurrentMonthQuestionCount(userId) || 0;
-                monthly_stats_value.text = currentMonthQuestions.toString();
-                
-                // 获取近一年的刷题数据（从当月向前推12个月）
-                var yearlyData = dbManager.getUserRollingYearQuestionData(userId);
-                if (yearlyData && yearlyData.length === 12) {
-                    month_bars.monthlyData = yearlyData;
-                }
-                
-                // // 获取能力值数据
-                // var abilityData = dbManager.getUserAbilityData(userId);
-                // if (abilityData) {
-                //     if (abilityData.currentMonth && abilityData.currentMonth.length === 5) {
-                //         radar_chart.data1 = abilityData.currentMonth;
-                //     }
-                //     if (abilityData.lastMonth && abilityData.lastMonth.length === 5) {
-                //         radar_chart.data2 = abilityData.lastMonth;
-                //     }
-                //     if (abilityData.twoMonthsAgo && abilityData.twoMonthsAgo.length === 5) {
-                //         radar_chart.data3 = abilityData.twoMonthsAgo;
-                //     }
-                // }
-                
-                // 刷新雷达图
-                //radar_chart.requestPaint();
+                // 当用户ID改变时，从数据库加载该用户的练习数据
             }
         }
 
@@ -2182,4 +2522,5 @@ Window {
             }
         }
     }
+
 }

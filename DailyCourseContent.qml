@@ -48,6 +48,22 @@ Rectangle {
         return "填空题";
     }
     
+    // 辅助函数：查找mainPage组件
+    function findMainPage(parent) {
+        if (!parent) return null
+        for (var i = 0; i < parent.children.length; i++) {
+            var child = parent.children[i]
+            if (child.objectName === "mainPage") {
+                return child
+            }
+            
+            // 递归搜索子项的子项
+            var result = findMainPage(child)
+            if (result) return result
+        }
+        return null
+    }
+    
     // 顶部导航栏
     Rectangle {
         id: topBar
@@ -81,6 +97,49 @@ Rectangle {
                 confirmDialog.dialogTitle = "返回确认"
                 confirmDialog.dialogMessage = "确定要返回上一页吗？\n当前进度将不会保存。"
                 confirmDialog.confirmAction = function() {
+                    // 如果有用户数据，更新练习数据
+                    if (userData && userData.workId) {
+                        console.log("返回时准备更新用户数据，工号: " + userData.workId)
+                        
+                        try {
+                            // 获取应用程序窗口并调用全局更新函数
+                            var rootWindow = Qt.application.activeWindow
+                            if (rootWindow && typeof rootWindow.updateUserData === "function") {
+                                var success = rootWindow.updateUserData(userData.workId)
+                                console.log("通过全局函数更新用户数据：" + (success ? "成功" : "失败"))
+                            } else {
+                                console.error("无法获取根窗口或更新函数不存在")
+                                
+                                // 备用方法：尝试手动查找组件
+                                var mainPageItem = findMainPage(stackView)
+                                
+                                if (mainPageItem) {
+                                    console.log("成功找到mainPage")
+                                    // 找到user_practice_data
+                                    var practiceDataItem = null
+                                    for (var i = 0; i < mainPageItem.children.length; i++) {
+                                        var child = mainPageItem.children[i]
+                                        if (child.objectName === "user_practice_data") {
+                                            practiceDataItem = child
+                                            break
+                                        }
+                                    }
+                                    
+                                    if (practiceDataItem) {
+                                        console.log("成功找到user_practice_data")
+                                        // 先清空ID然后设置ID以确保触发变更
+                                        practiceDataItem.currentUserId = ""
+                                        practiceDataItem.currentUserId = userData.workId
+                                        practiceDataItem.loadUserPracticeData(userData.workId)
+                                        console.log("已直接调用更新用户练习数据函数，工号：" + userData.workId)
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.error("更新用户数据时发生错误:", e)
+                        }
+                    }
+                    
                     stackView.pop()
                 }
                 confirmDialog.open()
@@ -1002,7 +1061,53 @@ Rectangle {
                             confirmDialog.dialogTitle = "退出确认"
                             confirmDialog.dialogMessage = "确定要退出星火日课吗？"
                             confirmDialog.confirmAction = function() {
+                                // 关闭结果对话框
                                 resultDialog.close()
+                                
+                                // 如果有用户数据，更新练习数据
+                                if (userData && userData.workId) {
+                                    console.log("准备更新用户数据，工号: " + userData.workId)
+                                    
+                                    try {
+                                        // 获取应用程序窗口并调用全局更新函数
+                                        var rootWindow = Qt.application.activeWindow
+                                        if (rootWindow && typeof rootWindow.updateUserData === "function") {
+                                            var success = rootWindow.updateUserData(userData.workId)
+                                            console.log("通过全局函数更新用户数据：" + (success ? "成功" : "失败"))
+                                        } else {
+                                            console.error("无法获取根窗口或更新函数不存在")
+                                            
+                                            // 备用方法：尝试手动查找组件
+                                            var mainPageItem = findMainPage(stackView)
+                                            
+                                            if (mainPageItem) {
+                                                console.log("成功找到mainPage")
+                                                // 找到user_practice_data
+                                                var practiceDataItem = null
+                                                for (var i = 0; i < mainPageItem.children.length; i++) {
+                                                    var child = mainPageItem.children[i]
+                                                    if (child.objectName === "user_practice_data") {
+                                                        practiceDataItem = child
+                                                        break
+                                                    }
+                                                }
+                                                
+                                                if (practiceDataItem) {
+                                                    console.log("成功找到user_practice_data")
+                                                    // 先清空ID然后设置ID以确保触发变更
+                                                    practiceDataItem.currentUserId = ""
+                                                    practiceDataItem.currentUserId = userData.workId
+                                                    practiceDataItem.loadUserPracticeData(userData.workId)
+                                                    console.log("已直接调用更新用户练习数据函数，工号：" + userData.workId)
+                                                }
+                                            }
+                                        }
+                                    } catch (e) {
+                                        console.error("更新用户数据时发生错误:", e)
+                                    }
+                                }
+                                
+                                // 退出到主界面
                                 stackView.pop()
                             }
                             confirmDialog.open()

@@ -2214,4 +2214,196 @@ bool DatabaseManager::updateDatabaseSchema()
     }
     
     return true;
+}
+
+/**
+ * 获取用户的五芒图数据（当月、上月、上上月）
+ * @param workId 用户工号
+ * @return 包含用户五芒图数据的Map
+ */
+QVariantMap DatabaseManager::getUserPentagonData(const QString &workId)
+{
+    QVariantMap result;
+    
+    // 初始化结果结构
+    QVariantMap currentMonthData;  // 当月数据
+    QVariantMap lastMonthData;     // 上月数据
+    QVariantMap twoMonthsAgoData;  // 上上月数据
+    
+    // 检查用户是否存在
+    if (!userExists(workId)) {
+        qWarning() << "用户不存在，工号：" << workId;
+        return result;
+    }
+    
+    // 获取当前日期
+    QDate currentDate = QDate::currentDate();
+    
+    // 计算当月、上月和上上月的日期范围
+    QList<QPair<QDate, QDate>> dateRanges;
+    
+    for (int i = 0; i < 3; ++i) {
+        QDate targetDate = currentDate.addMonths(-i);
+        int year = targetDate.year();
+        int month = targetDate.month();
+        
+        // 获取月份的第一天和最后一天
+        QDate firstDay(year, month, 1);
+        QDate lastDay = firstDay.addMonths(1).addDays(-1);
+        
+        dateRanges.append(qMakePair(firstDay, lastDay));
+    }
+    
+    // 五芒图的维度类型列表
+    QStringList pentagonTypes;
+    pentagonTypes << "基础认知" << "原理理解" << "操作应用" << "诊断分析" << "安全规范";
+    
+    // 存储当月、上月、上上月的数据集
+    QList<QVariantMap*> dataSets;
+    dataSets << &currentMonthData << &lastMonthData << &twoMonthsAgoData;
+    
+    // 为每个月初始化五芒图各维度的数据结构
+    for (int i = 0; i < dataSets.size(); ++i) {
+        for (const QString &type : pentagonTypes) {
+            QVariantMap typeData;
+            typeData["totalQuestions"] = 0;
+            typeData["correctCount"] = 0;
+            typeData["accuracy"] = 0.0;
+            (*dataSets[i])[type] = typeData;
+        }
+    }
+    
+    // 从数据库查询每个月的记录
+    for (int i = 0; i < dateRanges.size(); ++i) {
+        QDate firstDay = dateRanges[i].first;
+        QDate lastDay = dateRanges[i].second;
+        
+        // 转换为ISO格式的字符串
+        QString startDate = firstDay.toString(Qt::ISODate);
+        QString endDate = lastDay.toString(Qt::ISODate);
+        
+        QSqlQuery query(m_database);
+        
+        // 查询该用户在指定月份的所有答题记录
+        query.prepare("SELECT pentagon_type FROM user_answer_records "
+                     "WHERE work_id = :workId "
+                     "AND date(created_at) >= date(:startDate) "
+                     "AND date(created_at) <= date(:endDate)");
+        
+        query.bindValue(":workId", workId);
+        query.bindValue(":startDate", startDate);
+        query.bindValue(":endDate", endDate);
+        
+        if (query.exec()) {
+            qDebug() << "查询" << (i == 0 ? "当月" : (i == 1 ? "上月" : "上上月")) << "数据成功，日期范围:" 
+                     << startDate << "至" << endDate;
+            
+            int recordCount = 0;
+            while (query.next()) {
+                recordCount++;
+                QString pentagonTypeStr = query.value("pentagon_type").toString();
+                qDebug() << "解析第" << recordCount << "条五芒图数据: " << pentagonTypeStr;
+                
+                // 解析pentagon_type字段
+                // 格式示例: "原理理解：1题，正确1题，正确率100%，基础认知：1题，正确0题，正确率0%，..."
+                QStringList typeEntries = pentagonTypeStr.split("，");
+                qDebug() << "分割后的条目数量: " << typeEntries.size();
+                
+                // 测试输出每个分割后的条目
+                for (int d = 0; d < typeEntries.size(); d++) {
+                    qDebug() << "  条目" << (d+1) << ": " << typeEntries[d];
+                }
+                
+                // 新的解析逻辑：采用更直接的方式解析每个部分
+                for (int idx = 0; idx < typeEntries.size(); ++idx) {
+                    QString entry = typeEntries[idx];
+                    
+                    // 跳过空条目
+                    if (entry.trimmed().isEmpty()) continue;
+                    
+                    // 检查条目格式
+                    if (!entry.contains("：")) {
+                        qDebug() << "  条目格式不正确，跳过: " << entry;
+                        continue;
+                    }
+                    
+                    // 拆分类型名称和数据部分
+                    QString typeName = entry.section("：", 0, 0);
+                    QString dataPart = entry.section("：", 1);
+                    
+                    qDebug() << "  类型名称: " << typeName << ", 数据部分: " << dataPart;
+                    
+                    // 如果这个类型不在我们关注的五芒图类型中，跳过
+                    if (!pentagonTypes.contains(typeName)) {
+                        qDebug() << "  不在关注的类型列表中，跳过";
+                        continue;
+                    }
+                    
+                    // 提取题目数量 - "X题"
+                    QString totalPart = dataPart;
+                    if (totalPart.contains("题"))
+                        totalPart = totalPart.left(totalPart.indexOf("题"));
+                    
+                    int totalQuestions = totalPart.toInt();
+                    qDebug() << "  题目总数: " << totalQuestions;
+                    
+                    // 查找下一个条目获取正确数量
+                    int correctCount = 0;
+                    QString correctPart;
+                    
+                    // 寻找包含"正确"的下一个条目
+                    if (idx + 1 < typeEntries.size() && typeEntries[idx + 1].startsWith("正确")) {
+                        correctPart = typeEntries[idx + 1];
+                        idx++; // 跳过这个已经处理的条目
+                        
+                        // 解析正确题数 - "正确X题"
+                        if (correctPart.contains("题"))
+                            correctPart = correctPart.left(correctPart.indexOf("题"));
+                        
+                        correctPart.remove("正确");
+                        correctCount = correctPart.toInt();
+                        qDebug() << "  正确题数: " << correctCount;
+                    } else {
+                        qDebug() << "  没有找到正确题数信息，默认为0";
+                    }
+                    
+                    // 更新数据集
+                    QVariantMap typeData = (*dataSets[i])[typeName].toMap();
+                    typeData["totalQuestions"] = typeData["totalQuestions"].toInt() + totalQuestions;
+                    typeData["correctCount"] = typeData["correctCount"].toInt() + correctCount;
+                    
+                    // 重新计算正确率
+                    double accuracy = 0.0;
+                    if (typeData["totalQuestions"].toInt() > 0) {
+                        accuracy = (double)typeData["correctCount"].toInt() / typeData["totalQuestions"].toInt();
+                    }
+                    typeData["accuracy"] = accuracy;
+                    
+                    // 更新数据集
+                    (*dataSets[i])[typeName] = typeData;
+                    
+                    qDebug() << "  更新" << (i == 0 ? "当月" : (i == 1 ? "上月" : "上上月")) 
+                             << typeName << "数据: 累计题数=" << typeData["totalQuestions"].toInt() 
+                             << ", 累计正确=" << typeData["correctCount"].toInt() 
+                             << ", 正确率=" << (accuracy * 100) << "%";
+                    
+                    // 如果还有"正确率"部分，跳过它
+                    if (idx + 1 < typeEntries.size() && typeEntries[idx + 1].startsWith("正确率")) {
+                        idx++; // 跳过正确率条目
+                    }
+                }
+            }
+            qDebug() << "共处理了" << recordCount << "条记录";
+        } else {
+            qWarning() << "获取" << (i == 0 ? "当月" : (i == 1 ? "上月" : "上上月")) 
+                       << "五芒图数据失败：" << query.lastError().text();
+        }
+    }
+    
+    // 构建最终结果
+    result["currentMonth"] = currentMonthData;
+    result["lastMonth"] = lastMonthData;
+    result["twoMonthsAgo"] = twoMonthsAgoData;
+    
+    return result;
 } 
