@@ -668,10 +668,38 @@ Window {
                 var currentMonthQuestions = dbManager.getUserCurrentMonthQuestionCount(userId) || 0;
                 monthly_stats_value.text = currentMonthQuestions.toString();
                 
+                // 设置进度条的初始值为0，然后通过动画更新到实际值
+                progress_bar.currentValue = 0;
+                progressAnimation.to = parseInt(monthly_stats_value.text);
+                progressAnimation.start();
+                
                 // 获取近一年的刷题数据（从当月向前推12个月）
                 var yearlyData = dbManager.getUserRollingYearQuestionData(userId);
                 if (yearlyData && yearlyData.length === 12) {
+                    // 找出最大值来调整Y轴刻度
+                    var maxQuestionCount = 0;
+                    for (var i = 0; i < yearlyData.length; i++) {
+                        if (yearlyData[i] > maxQuestionCount) {
+                            maxQuestionCount = yearlyData[i];
+                        }
+                    }
+                    
+                    // 设置Y轴最大值为最大刷题数的1.2倍，确保柱状图有足够空间
+                    // 如果最大值太小，则使用默认值100确保图表看起来美观
+                    if (maxQuestionCount > 0) {
+                        yearly_stats_rect.maxValue = Math.max(100, Math.ceil(maxQuestionCount * 1.2));
+                    } else {
+                        yearly_stats_rect.maxValue = 100;
+                    }
+                    
+                    console.log("设置Y轴最大值为: " + yearly_stats_rect.maxValue);
+                    
+                    // 更新数据，这会触发monthlyDataChanged信号，启动动画
                     month_bars.monthlyData = yearlyData;
+                    
+                    // 启动柱状图动画
+                    resetBarAnimation.stop();
+                    resetBarAnimation.start();
                 }
                 
                 // 加载五芒图数据
@@ -776,15 +804,33 @@ Window {
                     Rectangle {
                         id: progress_bar
                         property int targetQuestions: 300 // 月目标题数
+                        property int currentValue: 0 // 当前显示的值
                         anchors.left: parent.left
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
-                        // 根据实际完成的题目数与目标题数的比例计算宽度，最大为100%
-                        width: Math.min(parent.width * (parseInt(monthly_stats_value.text) / progress_bar.targetQuestions), parent.width)
+                        // 使用currentValue进行动画过渡
+                        width: Math.min(parent.width * (currentValue / progress_bar.targetQuestions), parent.width)
                         color: "#5B9BD5"
                         radius: 5
+                        
+                        // 动画效果
+                        Behavior on width {
+                            NumberAnimation {
+                                duration: 1000 // 与柱状图保持一致的动画时长
+                                easing.type: Easing.OutQuad
+                            }
+                        }
                     }
                 }
+            }
+
+            // 数值更新时的动画
+            NumberAnimation {
+                id: progressAnimation
+                target: progress_bar
+                property: "currentValue"
+                duration: 1000 // 与其他动画保持一致
+                easing.type: Easing.OutQuad
             }
 
             // 年度刷题统计图表
@@ -870,7 +916,48 @@ Window {
                         // 12个月的数据
                         property var monthlyData: [120, 200, 150, 80, 70, 110, 130, 200, 150, 80, 70, 110]
                         
+                        // 监听数据变化，触发动画重绘
+                        onMonthlyDataChanged: {
+                            // 数据变化时重新触发柱状图动画
+                            resetBarAnimation.start()
+                        }
+                        
+                        // 重置柱状图高度以便重新触发动画
+                        function resetBars() {
+                            console.log("更新柱状图动画 - 直接过渡到新值");
+                            for (var i = 0; i < barRepeater.count; i++) {
+                                var barItem = barRepeater.itemAt(i)
+                                if (barItem && barItem.children && barItem.children.length > 0) {
+                                    var bar = barItem.children[0] // monthBar
+                                    if (bar) {
+                                        // 重新计算目标高度
+                                        if (typeof bar.updateTargetHeight === 'function') {
+                                            bar.updateTargetHeight();
+                                        }
+                                        
+                                        // 直接使用动画过渡到目标高度，不先归零
+                                        if (typeof bar.startAnimation === 'function') {
+                                            // 使用不同的延迟创建波浪效果
+                                            var delay = 150 + (i * 80); // 匹配startAnimation中的延迟设置
+                                            bar.startAnimation(delay);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // 用于重置柱状图动画的定时器
+                        Timer {
+                            id: resetBarAnimation
+                            interval: 100 // 增加延迟，确保数据已完全更新
+                            repeat: false
+                            onTriggered: month_bars.resetBars()
+                        }
+                        
+                        // 用于延迟恢复动画状态的定时器 - 被移除
+                        
                         Repeater {
+                            id: barRepeater
                             model: 12
                             
                             Item {
@@ -880,16 +967,71 @@ Window {
                                 Rectangle {
                                     id: monthBar
                                     width: 30 // 柱子宽度
-                                    // 计算高度，确保即使值为0也至少有1像素高度
-                                    height: {
+                                    // 设置动画初始高度为0
+                                    property int targetHeight: {
                                         var value = month_bars.monthlyData[index];
-                                        // 如果值为0，使用一个非常小但可见的高度
-                                        return value > 0 ? (value / yearly_stats_rect.maxValue * parent.height) : 1;
+                                        // 如果值为0，不显示柱子
+                                        return value > 0 ? (value / yearly_stats_rect.maxValue * parent.height) : 0;
                                     }
+                                    height: targetHeight // 初始高度设置为目标高度
                                     anchors.bottom: parent.bottom // 从底部向上增长
                                     // 当前月使用不同颜色突出显示
                                     color: index === 11 ? "#78C1FF" : "#5B9BD5"
-                                    visible: true // 确保始终可见，即使数据为0
+                                    visible: month_bars.monthlyData[index] > 0 // 只有值大于0时才显示
+                                    
+                                    // 添加更新目标高度的函数
+                                    function updateTargetHeight() {
+                                        var value = month_bars.monthlyData[index];
+                                        targetHeight = value > 0 ? (value / yearly_stats_rect.maxValue * parent.height) : 0;
+                                    }
+                                    
+                                    // 添加安全的动画启动函数
+                                    function startAnimation(delay) {
+                                        // 停止可能正在运行的计时器
+                                        if (delayTimer.running) {
+                                            delayTimer.stop();
+                                        }
+                                        
+                                        // 更新目标高度
+                                        updateTargetHeight();
+                                        
+                                        // 直接设置高度为目标高度，让Behavior动画处理过渡
+                                        height = targetHeight;
+                                        
+                                        // 延迟显示标签
+                                        delayTimer.interval = delay || 150 + (index * 80);
+                                        delayTimer.start();
+                                    }
+                                    
+                                    // 添加动画效果
+                                    Behavior on height {
+                                        NumberAnimation {
+                                            duration: 1000 // 动画时长增加到1000毫秒，使动画更流畅
+                                            easing.type: Easing.OutQuad // 改用OutQuad缓动效果，使动画更自然
+                                        }
+                                    }
+                                    
+                                    // 用于延迟启动动画的计时器
+                                    Timer {
+                                        id: delayTimer
+                                        interval: 100 + (index * 50)
+                                        repeat: false
+                                        onTriggered: {
+                                            // 仅处理标签淡入效果
+                                            if (month_bars.monthlyData[index] > 0 && labelFadeIn && !labelFadeIn.running) {
+                                                labelFadeIn.start();
+                                            }
+                                        }
+                                    }
+                                    
+                                    Component.onCompleted: {
+                                        // 组件加载完成后只启动标签动画，高度已经设置好了
+                                        if (delayTimer && !delayTimer.running) {
+                                            delayTimer.start();
+                                        }
+                                    }
+                                    
+                                    // 移除旧的Timer，改用delayTimer
                                     
                                     // 添加数值标签
                                     Text {
@@ -900,11 +1042,21 @@ Window {
                                         anchors.bottom: parent.top
                                         anchors.bottomMargin: 5
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                        visible: month_bars.monthlyData[index] > 0
+                                        visible: month_bars.monthlyData[index] > 0 // 只有值大于0时才显示数值
+                                        opacity: 0 // 初始透明度为0
+                                        
+                                        // 添加淡入动画
+                                        NumberAnimation on opacity {
+                                            id: labelFadeIn
+                                            to: 1
+                                            duration: 800 // 延长淡入时间
+                                            easing.type: Easing.OutCubic // 更平滑的淡入效果
+                                            running: false
+                                        }
                                     }
                                 }
                                 
-                                // 月份标签
+                                // 月份标签 - 确保始终可见
                                 Text {
                                     // 显示从现在起前12个月的月份标签
                                     text: {
@@ -927,6 +1079,8 @@ Window {
                                     anchors.topMargin: 10 // 距离底部的距离
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     horizontalAlignment: Text.AlignHCenter
+                                    // 确保始终可见
+                                    visible: true
                                 }
                             }
                         }
@@ -1005,10 +1159,44 @@ Window {
                     property var data2: [0.6, 0.5, 0.7, 0.6, 0.4]  // 上月数据
                     property var data3: [0.4, 0.3, 0.5, 0.4, 0.2]  // 上上月数据
                     
+                    // 真实数据 - 用于存储实际值
+                    property var realData1: [0.8, 0.6, 0.9, 0.7, 0.5]  // 当月实际数据
+                    property var realData2: [0.6, 0.5, 0.7, 0.6, 0.4]  // 上月实际数据
+                    property var realData3: [0.4, 0.3, 0.5, 0.4, 0.2]  // 上上月实际数据
+                    
+                    // 动画系数 - 用于控制动画进度 (0.0-1.0)
+                    property real animProgress: 0.0
+                    
                     // 数据标签（显示具体百分比）
                     property var data1Labels: ["80%", "60%", "90%", "70%", "50%"]  // 当月数据标签
                     property var data2Labels: ["60%", "50%", "70%", "60%", "40%"]  // 上月数据标签
                     property var data3Labels: ["40%", "30%", "50%", "40%", "20%"]  // 上上月数据标签
+                    
+                    // 动画定时器
+                    Timer {
+                        id: radarAnimTimer
+                        interval: 16  // 约60fps
+                        repeat: true
+                        running: false
+                        onTriggered: {
+                            if (radar_chart.animProgress < 1.0) {
+                                radar_chart.animProgress += 0.04
+                                if (radar_chart.animProgress > 1.0) {
+                                    radar_chart.animProgress = 1.0
+                                    radarAnimTimer.stop()
+                                }
+                                
+                                // 根据动画进度更新显示数据
+                                for (var i = 0; i < 5; i++) {
+                                    radar_chart.data1[i] = radar_chart.realData1[i] * radar_chart.animProgress
+                                    radar_chart.data2[i] = radar_chart.realData2[i] * radar_chart.animProgress
+                                    radar_chart.data3[i] = radar_chart.realData3[i] * radar_chart.animProgress
+                                }
+                                
+                                radar_chart.requestPaint()
+                            }
+                        }
+                    }
                     
                     // 加载用户五芒图数据的函数
                     function loadUserPentagonData() {
@@ -1025,7 +1213,10 @@ Window {
                             console.log("上月数据: " + JSON.stringify(pentagonData.lastMonth));
                             console.log("上上月数据: " + JSON.stringify(pentagonData.twoMonthsAgo));
                             
-                            // 输出当月数据
+                            // 重置动画
+                            radar_chart.animProgress = 0.0
+                            
+                            // 处理当月数据
                             console.log("\n----- 当月数据 -----");
                             if (pentagonData.currentMonth) {
                                 var currentMonthData = [0, 0, 0, 0, 0];
@@ -1047,13 +1238,17 @@ Window {
                                         console.log(typeName + ": 无数据");
                                     }
                                 }
-                                data1 = currentMonthData;
+                                // 保存实际数据到realData1，初始显示数据设为0
+                                realData1 = currentMonthData.slice();
+                                data1 = [0, 0, 0, 0, 0];
                                 data1Labels = currentMonthLabels;
                             } else {
                                 console.log("无当月数据");
+                                realData1 = [0, 0, 0, 0, 0];
+                                data1 = [0, 0, 0, 0, 0];
                             }
                             
-                            // 输出上月数据
+                            // 处理上月数据
                             console.log("\n----- 上月数据 -----");
                             if (pentagonData.lastMonth) {
                                 var lastMonthData = [0, 0, 0, 0, 0];
@@ -1075,13 +1270,17 @@ Window {
                                         console.log(typeName + ": 无数据");
                                     }
                                 }
-                                data2 = lastMonthData;
+                                // 保存实际数据到realData2，初始显示数据设为0
+                                realData2 = lastMonthData.slice();
+                                data2 = [0, 0, 0, 0, 0];
                                 data2Labels = lastMonthLabels;
                             } else {
                                 console.log("无上月数据");
+                                realData2 = [0, 0, 0, 0, 0];
+                                data2 = [0, 0, 0, 0, 0];
                             }
                             
-                            // 输出上上月数据
+                            // 处理上上月数据
                             console.log("\n----- 上上月数据 -----");
                             if (pentagonData.twoMonthsAgo) {
                                 var twoMonthsAgoData = [0, 0, 0, 0, 0];
@@ -1103,17 +1302,21 @@ Window {
                                         console.log(typeName + ": 无数据");
                                     }
                                 }
-                                data3 = twoMonthsAgoData;
+                                // 保存实际数据到realData3，初始显示数据设为0
+                                realData3 = twoMonthsAgoData.slice();
+                                data3 = [0, 0, 0, 0, 0];
                                 data3Labels = twoMonthsAgoLabels;
                             } else {
                                 console.log("无上上月数据");
+                                realData3 = [0, 0, 0, 0, 0];
+                                data3 = [0, 0, 0, 0, 0];
                             }
                             
                             // 输出结束标识
                             console.log("\n===== 五芒图数据输出结束 =====");
                             
-                            // 重绘图表
-                            radar_chart.requestPaint();
+                            // 开始动画
+                            radarAnimTimer.start();
                         } else {
                             console.log("用户ID为空，无法获取五芒图数据");
                         }
