@@ -1264,11 +1264,24 @@ QVariantList DatabaseManager::getRandomQuestions(int bankId, int count)
             QStringList options = optionsStr.split("|");
             QStringList indices = indicesStr.split("|");
             
+            // 创建选项与索引的映射
+            QList<QPair<int, QString>> optionPairs;
+            for (int i = 0; i < options.length() && i < indices.length(); ++i) {
+                optionPairs.append(qMakePair(indices[i].toInt(), options[i]));
+            }
+            
+            // 根据选项索引排序
+            std::sort(optionPairs.begin(), optionPairs.end(), 
+                     [](const QPair<int, QString> &a, const QPair<int, QString> &b) {
+                         return a.first < b.first;
+                     });
+            
+            // 创建排序后的选项列表
             QVariantList optionsList;
-            for (int i = 0; i < options.length(); i++) {
+            for (int i = 0; i < optionPairs.size(); ++i) {
                 QVariantMap option;
-                option["text"] = options[i];
-                option["index"] = indices[i].toInt();
+                option["text"] = optionPairs[i].second;
+                option["index"] = i;  // 重新分配连续的索引
                 optionsList.append(option);
             }
             question["options"] = optionsList;
