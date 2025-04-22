@@ -528,6 +528,9 @@ void DatabaseManager::initDefaultSettings()
         // 默认摄像头设置 - 使用特殊值"auto"表示自动检测
         setSetting("camera_device", "auto");
         
+        // 首页排序设置 - 默认为"本月个人能力排序"(1)
+        setSetting("home_sort_option", "1");
+        
         // 五芒图默认标题设置
         setSetting("pentagon_title_1", "基础认知");
         setSetting("pentagon_title_2", "原理理解");

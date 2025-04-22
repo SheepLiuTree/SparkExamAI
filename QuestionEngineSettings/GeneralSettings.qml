@@ -13,6 +13,7 @@ Rectangle {
     property bool isSuccess: false
     property string adminPassword: ""
     property bool showPassword: false
+    property int homeSortOption: 1
     
     Component.onCompleted: {
         // 载入和应用已保存的设置
@@ -35,6 +36,11 @@ Rectangle {
                 }
             }
         }
+        
+        // 载入首页排序设置
+        var savedSortOption = parseInt(dbManager.getSetting("home_sort_option", "1"))
+        homeSortOption = savedSortOption
+        sortOptionGroup.checkedButton = savedSortOption === 1 ? sortOption1 : sortOption2
     }
     
     ColumnLayout {
@@ -55,7 +61,7 @@ Rectangle {
                 
                 Rectangle {
                     Layout.fillWidth: true
-                    height: 220
+                    height: 320
                     color: "#44ffffff"
                     radius: 10
                     
@@ -193,6 +199,121 @@ Rectangle {
                             }
                         }
                         
+                        // 首页排序设置
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 10
+                            
+                            Text {
+                                text: "首页排序设置:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredHeight: 30
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 50
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 10
+                                    spacing: 5
+                                    
+                                    ButtonGroup {
+                                        id: sortOptionGroup
+                                        onCheckedButtonChanged: {
+                                            if (checkedButton === sortOption1) {
+                                                homeSortOption = 1
+                                            } else if (checkedButton === sortOption2) {
+                                                homeSortOption = 0
+                                            }
+                                        }
+                                    }
+                                    
+                                    RadioButton {
+                                        id: sortOption1
+                                        text: "本月个人能力排序"
+                                        checked: homeSortOption === 1
+                                        ButtonGroup.group: sortOptionGroup
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 16
+                                        padding: 0
+                                        
+                                        indicator: Rectangle {
+                                            implicitWidth: 16
+                                            implicitHeight: 16
+                                            x: sortOption1.leftPadding
+                                            y: parent.height / 2 - height / 2
+                                            radius: width / 2
+                                            border.color: "white"
+                                            border.width: 1
+                                            color: "transparent"
+                                            
+                                            Rectangle {
+                                                width: 8
+                                                height: 8
+                                                anchors.centerIn: parent
+                                                radius: width / 2
+                                                color: "white"
+                                                visible: sortOption1.checked
+                                            }
+                                        }
+                                        
+                                        contentItem: Text {
+                                            text: sortOption1.text
+                                            font: sortOption1.font
+                                            color: "white"
+                                            verticalAlignment: Text.AlignVCenter
+                                            leftPadding: sortOption1.indicator.width + 8
+                                        }
+                                    }
+                                    
+                                    RadioButton {
+                                        id: sortOption2
+                                        text: "本月刷题数排序"
+                                        checked: homeSortOption === 0
+                                        ButtonGroup.group: sortOptionGroup
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 16
+                                        padding: 0
+                                        
+                                        indicator: Rectangle {
+                                            implicitWidth: 16
+                                            implicitHeight: 16
+                                            x: sortOption2.leftPadding
+                                            y: parent.height / 2 - height / 2
+                                            radius: width / 2
+                                            border.color: "white"
+                                            border.width: 1
+                                            color: "transparent"
+                                            
+                                            Rectangle {
+                                                width: 8
+                                                height: 8
+                                                anchors.centerIn: parent
+                                                radius: width / 2
+                                                color: "white"
+                                                visible: sortOption2.checked
+                                            }
+                                        }
+                                        
+                                        contentItem: Text {
+                                            text: sortOption2.text
+                                            font: sortOption2.font
+                                            color: "white"
+                                            verticalAlignment: Text.AlignVCenter
+                                            leftPadding: sortOption2.indicator.width + 8
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
                         // 保存按钮
                         Item {
                             Layout.fillWidth: true
@@ -279,18 +400,21 @@ Rectangle {
             }
         }
         
+        // 保存首页排序设置
+        var sortSuccess = dbManager.setSetting("home_sort_option", homeSortOption.toString())
+        console.log("首页排序设置已更新: " + (homeSortOption === 1 ? "本月个人能力排序" : "本月刷题数排序"))
+        
         // 显示结果消息
-        if (passwordSuccess && cameraSuccess) {
+        if (passwordSuccess && cameraSuccess && sortSuccess) {
             statusMessage = "所有设置已保存成功"
             isSuccess = true
-        } else if (passwordSuccess) {
-            statusMessage = "密码已保存，但摄像头设置失败"
-            isSuccess = false
-        } else if (cameraSuccess) {
-            statusMessage = "摄像头已保存，但密码设置失败"
-            isSuccess = false
         } else {
-            statusMessage = "保存设置失败，请重试"
+            let failedSettings = [];
+            if (!passwordSuccess) failedSettings.push("密码");
+            if (!cameraSuccess) failedSettings.push("摄像头");
+            if (!sortSuccess) failedSettings.push("首页排序");
+            
+            statusMessage = "保存失败的设置: " + failedSettings.join(", ") + "，请重试"
             isSuccess = false
         }
     }
