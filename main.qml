@@ -5,13 +5,13 @@ import QtMultimedia 5.15
 import QtGraphicalEffects 1.15
 
 Window {
-    // width: Screen.width
-    // height: Screen.height
-    width: 1440
-    height: 1024
+    width: Screen.width
+    height: Screen.height
+    // width: 1440
+    // height: 1024
     visible: true
-    // visibility: Window.FullScreen
-    // flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
+    visibility: Window.FullScreen
+    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     title: qsTr("星火智能评测系统")
 
     // 提供一个全局函数用于更新用户数据
@@ -55,17 +55,17 @@ Window {
         fillMode: Image.PreserveAspectCrop
     }
     // 显示窗口尺寸
-    Text {
-        id: window_size_text
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.margins: 10
-        text: "窗口尺寸: " + parent.width + " x " + parent.height
-        font.family: "阿里妈妈数黑体"
-        font.pixelSize: 16
-        color: "white"
-        z: 100 // 确保显示在最上层
-    }
+    // Text {
+    //     id: window_size_text
+    //     anchors.top: parent.top
+    //     anchors.right: parent.right
+    //     anchors.margins: 10
+    //     text: "窗口尺寸: " + parent.width + " x " + parent.height
+    //     font.family: "阿里妈妈数黑体"
+    //     font.pixelSize: 16
+    //     color: "white"
+    //     z: 100 // 确保显示在最上层
+    // }
 
     Image {
         id: headline_background
