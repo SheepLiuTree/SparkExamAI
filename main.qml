@@ -668,10 +668,8 @@ Window {
                 var currentMonthQuestions = dbManager.getUserCurrentMonthQuestionCount(userId) || 0;
                 monthly_stats_value.text = currentMonthQuestions.toString();
                 
-                // 设置进度条的初始值为0，然后通过动画更新到实际值
-                progress_bar.currentValue = 0;
-                progressAnimation.to = parseInt(monthly_stats_value.text);
-                progressAnimation.start();
+                // 直接设置进度条的当前值，让Behavior动画处理过渡
+                progress_bar.currentValue = parseInt(monthly_stats_value.text);
                 
                 // 获取近一年的刷题数据（从当月向前推12个月）
                 var yearlyData = dbManager.getUserRollingYearQuestionData(userId);
@@ -824,15 +822,6 @@ Window {
                 }
             }
 
-            // 数值更新时的动画
-            NumberAnimation {
-                id: progressAnimation
-                target: progress_bar
-                property: "currentValue"
-                duration: 1000 // 与其他动画保持一致
-                easing.type: Easing.OutQuad
-            }
-
             // 年度刷题统计图表
             Rectangle {
                 id: yearly_stats_rect
@@ -954,8 +943,6 @@ Window {
                             onTriggered: month_bars.resetBars()
                         }
                         
-                        // 用于延迟恢复动画状态的定时器 - 被移除
-                        
                         Repeater {
                             id: barRepeater
                             model: 12
@@ -1030,8 +1017,6 @@ Window {
                                             delayTimer.start();
                                         }
                                     }
-                                    
-                                    // 移除旧的Timer，改用delayTimer
                                     
                                     // 添加数值标签
                                     Text {
