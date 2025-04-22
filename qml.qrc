@@ -31,5 +31,8 @@
         <file>images/ranking_bg.png</file>
         <file>images/avatar_bg.png</file>
         <file>images/arrows.png</file>
+        <file>images/goldMedal.png</file>
+        <file>images/silverMedal.png</file>
+        <file>images/bronzeMedal.png</file>
     </qresource>
 </RCC>

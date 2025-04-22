@@ -15,6 +15,22 @@ Rectangle {
     property bool showPassword: false
     property int homeSortOption: 1
     
+    // 定义信号
+    signal sortOptionUpdated()
+    
+    // 连接到信号以更新首页用户列表
+    onSortOptionUpdated: {
+        // 调用主窗口提供的全局函数更新用户列表排序
+        var success = Qt.callLater(function() {
+            if (typeof window.updateUserListSorting === "function") {
+                window.updateUserListSorting()
+                console.log("已通知主窗口更新用户列表排序")
+            } else {
+                console.log("未找到主窗口更新用户列表排序的函数")
+            }
+        })
+    }
+    
     Component.onCompleted: {
         // 载入和应用已保存的设置
         var savedPassword = dbManager.getSetting("admin_password", "123456")
@@ -38,9 +54,23 @@ Rectangle {
         }
         
         // 载入首页排序设置
-        var savedSortOption = parseInt(dbManager.getSetting("home_sort_option", "1"))
-        homeSortOption = savedSortOption
-        sortOptionGroup.checkedButton = savedSortOption === 1 ? sortOption1 : sortOption2
+        var savedSortOption = dbManager.getSetting("home_sort_option", "1").toString().trim()
+        console.log("从数据库获取的排序设置原始值: [" + savedSortOption + "]");
+        
+        // 确保有效的排序选项值 - 只有当值明确为"0"时才使用刷题数排序，其他情况使用能力排序
+        var useAbilitySort = (savedSortOption !== "0");
+        homeSortOption = useAbilitySort ? 1 : 0;
+        
+        console.log("最终应用的排序设置: " + (useAbilitySort ? "个人能力排序(1)" : "刷题数排序(0)"));
+        
+        // 设置对应的单选按钮选中状态 - 通过属性绑定，避免触发事件
+        if (useAbilitySort) {
+            sortOption1.checked = true;
+            sortOption2.checked = false;
+        } else {
+            sortOption1.checked = false;
+            sortOption2.checked = true;
+        }
     }
     
     ColumnLayout {
@@ -226,12 +256,33 @@ Rectangle {
                                     
                                     ButtonGroup {
                                         id: sortOptionGroup
+                                        property bool initialized: false
+                                        
+                                        Component.onCompleted: {
+                                            // 初始化完成后设置标志
+                                            initialized = true
+                                        }
+                                        
                                         onCheckedButtonChanged: {
+                                            // 只有初始化完成后才处理变更，避免在加载时错误地覆盖设置
+                                            if (!initialized) {
+                                                console.log("ButtonGroup初始化中，忽略选择变更")
+                                                return
+                                            }
+                                            
                                             if (checkedButton === sortOption1) {
                                                 homeSortOption = 1
                                             } else if (checkedButton === sortOption2) {
                                                 homeSortOption = 0
                                             }
+                                            
+                                            // 立即保存排序设置到数据库
+                                            var sortSuccess = dbManager.setSetting("home_sort_option", homeSortOption.toString())
+                                            console.log("立即保存首页排序设置: " + (homeSortOption === 1 ? "本月个人能力排序" : "本月刷题数排序") + 
+                                                       " (home_sort_option=" + homeSortOption.toString() + ")")
+                                            
+                                            // 发送排序选项变更信号
+                                            generalSettingsPage.sortOptionUpdated()
                                         }
                                     }
                                     
@@ -400,9 +451,21 @@ Rectangle {
             }
         }
         
-        // 保存首页排序设置
+        // 保存首页排序设置 - 再次确保设置正确保存
         var sortSuccess = dbManager.setSetting("home_sort_option", homeSortOption.toString())
-        console.log("首页排序设置已更新: " + (homeSortOption === 1 ? "本月个人能力排序" : "本月刷题数排序"))
+        console.log("首页排序设置已保存: " + (homeSortOption === 1 ? "本月个人能力排序(1)" : "本月刷题数排序(0)") + 
+                   " (home_sort_option=" + homeSortOption.toString() + ")")
+        
+        // 使用延迟调用确保数据库操作完成后再更新UI
+        Qt.callLater(function() {
+            // 再次从数据库读取设置确保保存成功
+            var savedOption = dbManager.getSetting("home_sort_option", "1")
+            console.log("验证首页排序设置: [" + savedOption + "] " + 
+                      " (" + (savedOption.trim() === "1" ? "本月个人能力排序" : "本月刷题数排序") + ")")
+            
+            // 更新首页用户列表
+            sortOptionUpdated()
+        })
         
         // 显示结果消息
         if (passwordSuccess && cameraSuccess && sortSuccess) {

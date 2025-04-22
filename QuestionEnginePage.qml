@@ -350,6 +350,14 @@ Rectangle {
                         verticalAlignment: Text.AlignVCenter
                     }
                     onClicked: {
+                        // 返回前确保首页用户列表会重新加载以应用新的排序设置
+                        var mainPage = stackView.get(0)
+                        console.log("返回前尝试刷新首页用户列表");
+                        if (mainPage && mainPage.personal_page_column) {
+                            console.log("找到首页personal_page_column，调用loadUserListFromDatabase");
+                            mainPage.personal_page_column.loadUserListFromDatabase();
+                        }
+                        
                         // 返回到主界面
                         stackView.pop(null)
                         

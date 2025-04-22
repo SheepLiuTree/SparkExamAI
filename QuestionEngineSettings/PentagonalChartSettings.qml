@@ -92,7 +92,7 @@ Rectangle {
                         
                         Column {
                             width: parent.width
-                            spacing: 10
+                            spacing: 5
                             
                             Repeater {
                                 model: questionBanks || []
@@ -562,10 +562,34 @@ Rectangle {
         spacing: 15
         
         Flickable {
+            id: settingsFlickable
             Layout.fillWidth: true
             Layout.fillHeight: true
-            contentHeight: settingsColumn.height
+            contentHeight: settingsColumn.height // 增加额外的底部空间
             clip: true
+            boundsBehavior: Flickable.StopAtBounds // 防止过度滚动
+            
+            // 修改鼠标滚轮处理方式
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.NoButton
+                onWheel: function(wheel) {
+                    // 增加滚动速度
+                    var delta = wheel.angleDelta.y / 120 * 60;
+                    
+                    // 使用flickableItem.flick替代直接设置contentY
+                    if (delta < 0) {
+                        // 向下滚动
+                        settingsFlickable.flick(0, -500);
+                    } else {
+                        // 向上滚动
+                        settingsFlickable.flick(0, 500);
+                    }
+                    
+                    wheel.accepted = true;
+                }
+                propagateComposedEvents: true
+            }
             
             ColumnLayout {
                 id: settingsColumn
@@ -575,11 +599,12 @@ Rectangle {
                 // 五芒图设置区域
                 Rectangle {
                     Layout.fillWidth: true
-                    height: 630
+                    height: contentLayout.implicitHeight + 20 // 从固定高度改为自适应高度
                     color: "#44ffffff"
                     radius: 10
                     
                     ColumnLayout {
+                        id: contentLayout // 添加id以便引用
                         anchors.fill: parent
                         anchors.margins: 15
                         spacing: 8
@@ -740,7 +765,7 @@ Rectangle {
                         // 五个标题的设置
                         ColumnLayout {
                             Layout.fillWidth: true
-                            spacing: 20
+                            spacing: 10
                             Layout.leftMargin: 10
                             Layout.rightMargin: 10
                             Layout.bottomMargin: 10
@@ -1146,11 +1171,12 @@ Rectangle {
                             }
                         }
                         
-                        // 保存按钮
+                        // 保存按钮放回五芒图设置内部
                         Item {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 40
-                            Layout.bottomMargin: 0
+                            Layout.topMargin: 5
+                            Layout.bottomMargin: 5
                             
                             Button {
                                 anchors.right: parent.right
@@ -1183,6 +1209,7 @@ Rectangle {
                     color: isSuccess ? "#3366cc33" : "#33cc3333"
                     radius: 4
                     visible: statusMessage !== ""
+                    Layout.bottomMargin: 20 // 添加底部边距
                     
                     Text {
                         anchors.centerIn: parent
@@ -1192,6 +1219,16 @@ Rectangle {
                         color: "white"
                     }
                 }
+            }
+            
+            // 添加滚动指示器
+            ScrollBar.vertical: ScrollBar {
+                id: vScrollBar
+                active: true
+                visible: settingsFlickable.contentHeight > settingsFlickable.height
+                policy: ScrollBar.AlwaysOn
+                anchors.right: parent.right
+                anchors.rightMargin: 2
             }
         }
     }

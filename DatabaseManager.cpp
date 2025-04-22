@@ -273,6 +273,128 @@ QVariantList DatabaseManager::getAllFaceData()
     return result;
 }
 
+QVariantList DatabaseManager::getAllFaceDataSorted()
+{
+    QVariantList result;
+    
+    // 从设置中获取排序方式
+    QString sortOption = getSetting("home_sort_option", "1");
+    // 添加更多调试信息，检查排序选项的实际值并清除可能的空白
+    QString trimmedOption = sortOption.trimmed();
+    qDebug() << "排序选项原始值: [" << sortOption << "], 长度: " << sortOption.length() 
+             << ", 清除空白后: [" << trimmedOption << "], 长度: " << trimmedOption.length();
+    
+    // 确保将字符串转换为整数进行比较，只有明确为"0"的值才视为刷题数排序
+    bool byAbility = (trimmedOption != "0");
+    
+    qDebug() << "排序方式最终决定: " << (byAbility ? "按个人能力排序" : "按本月刷题数排序") << " (home_sort_option=" << sortOption << ")";
+    
+    // 获取所有用户的基本信息
+    QSqlQuery query("SELECT * FROM users");
+    QList<QVariantMap> users;
+    
+    while (query.next()) {
+        QVariantMap row;
+        row["id"] = query.value("id").toInt();
+        row["name"] = query.value("name").toString();
+        row["gender"] = query.value("gender").toString();
+        row["workId"] = query.value("work_id").toString();
+        row["faceImage"] = query.value("face_image_path").toString();
+        row["avatarPath"] = query.value("avatar_path").toString();
+        row["isAdmin"] = query.value("is_admin").toBool();
+        row["createdAt"] = query.value("created_at").toString();
+        
+        users.append(row);
+    }
+    
+    qDebug() << "从数据库获取到 " << users.size() << " 个用户";
+    
+    // 获取当前日期
+    QDate currentDate = QDate::currentDate();
+    int year = currentDate.year();
+    int month = currentDate.month();
+    
+    // 获取当月第一天和最后一天
+    QDate firstDay(year, month, 1);
+    QDate lastDay = firstDay.addMonths(1).addDays(-1);
+    
+    // 转换为ISO格式的字符串，适用于SQLite日期比较
+    QString startDate = firstDay.toString(Qt::ISODate);
+    QString endDate = lastDay.toString(Qt::ISODate);
+    
+    qDebug() << "当前日期: " << currentDate.toString("yyyy-MM-dd") 
+             << ", 本月日期范围: " << startDate << " 至 " << endDate;
+    
+    // 为每个用户计算排序值
+    QList<QPair<QVariantMap, double>> sortedUsers;
+    
+    for (const QVariantMap &user : users) {
+        QString workId = user["workId"].toString();
+        QString name = user["name"].toString();
+        double sortValue = 0;
+        
+        if (byAbility) {
+            // 按个人能力五芒图中的正确率之和排序
+            QVariantMap pentagonData = getUserPentagonData(workId);
+            
+            qDebug() << "===== 用户 " << name << " (工号: " << workId << ") 的五芒图数据 =====";
+            
+            if (pentagonData.contains("currentMonth")) {
+                QVariantMap currentMonthData = pentagonData["currentMonth"].toMap();
+                double totalAccuracy = 0;
+                int count = 0;
+                
+                // 遍历五芒图各项能力数据，计算正确率总和
+                QStringList types = currentMonthData.keys();
+                for (const QString &type : types) {
+                    QVariantMap typeData = currentMonthData[type].toMap();
+                    if (typeData.contains("accuracy")) {
+                        double accuracy = typeData["accuracy"].toDouble();
+                        totalAccuracy += accuracy;
+                        count++;
+                        
+                        qDebug() << "  " << type << ": 总题数=" << typeData["totalQuestions"].toInt() 
+                                 << ", 正确=" << typeData["correctCount"].toInt()
+                                 << ", 正确率=" << (accuracy * 100) << "%";
+                    }
+                }
+                
+                if (count > 0) {
+                    sortValue = totalAccuracy;
+                    qDebug() << "  五芒图正确率总和: " << totalAccuracy << " (平均: " << (totalAccuracy/count*100) << "%)";
+                } else {
+                    qDebug() << "  没有五芒图数据，默认排序值为0";
+                }
+            } else {
+                qDebug() << "  没有当月数据，默认排序值为0";
+            }
+        } else {
+            // 按本月刷题数排序
+            sortValue = getUserCurrentMonthQuestionCount(workId);
+            qDebug() << "用户 " << name << " (工号: " << workId << ") 本月刷题数: " << sortValue;
+        }
+        
+        sortedUsers.append(qMakePair(user, sortValue));
+    }
+    
+    // 根据计算的值进行排序（降序）
+    std::sort(sortedUsers.begin(), sortedUsers.end(), 
+              [](const QPair<QVariantMap, double> &a, const QPair<QVariantMap, double> &b) {
+                  return a.second > b.second;
+              });
+    
+    // 转换排序后的结果为QVariantList
+    qDebug() << "===== 排序后的用户列表 =====";
+    for (const auto &pair : sortedUsers) {
+        result.append(pair.first);
+        qDebug() << "  " << pair.first["name"].toString() 
+                 << " (工号: " << pair.first["workId"].toString() << ")"
+                 << " - 排序值: " << pair.second;
+    }
+    
+    return result;
+}
+
 QVariantMap DatabaseManager::getFaceDataByWorkId(const QString &workId)
 {
     QVariantMap result;

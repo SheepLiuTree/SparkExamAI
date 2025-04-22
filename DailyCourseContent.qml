@@ -107,6 +107,12 @@ Rectangle {
                             if (rootWindow && typeof rootWindow.updateUserData === "function") {
                                 var success = rootWindow.updateUserData(userData.workId)
                                 console.log("通过全局函数更新用户数据：" + (success ? "成功" : "失败"))
+                                
+                                // 同时更新首页排序
+                                if (typeof rootWindow.updateUserListSorting === "function") {
+                                    var sortUpdateSuccess = rootWindow.updateUserListSorting()
+                                    console.log("通过全局函数更新首页排序：" + (sortUpdateSuccess ? "成功" : "失败"))
+                                }
                             } else {
                                 console.error("无法获取根窗口或更新函数不存在")
                                 
@@ -132,6 +138,15 @@ Rectangle {
                                         practiceDataItem.currentUserId = userData.workId
                                         practiceDataItem.loadUserPracticeData(userData.workId)
                                         console.log("已直接调用更新用户练习数据函数，工号：" + userData.workId)
+                                        
+                                        // 手动更新首页排序
+                                        if (mainPageItem.personal_page_column) {
+                                            console.log("尝试手动更新首页排序")
+                                            Qt.callLater(function() {
+                                                mainPageItem.personal_page_column.loadUserListFromDatabase()
+                                                console.log("已手动调用首页排序更新")
+                                            })
+                                        }
                                     }
                                 }
                             }
@@ -1074,6 +1089,12 @@ Rectangle {
                                         if (rootWindow && typeof rootWindow.updateUserData === "function") {
                                             var success = rootWindow.updateUserData(userData.workId)
                                             console.log("通过全局函数更新用户数据：" + (success ? "成功" : "失败"))
+                                            
+                                            // 同时更新首页排序
+                                            if (typeof rootWindow.updateUserListSorting === "function") {
+                                                var sortUpdateSuccess = rootWindow.updateUserListSorting()
+                                                console.log("通过全局函数更新首页排序：" + (sortUpdateSuccess ? "成功" : "失败"))
+                                            }
                                         } else {
                                             console.error("无法获取根窗口或更新函数不存在")
                                             
@@ -1099,6 +1120,15 @@ Rectangle {
                                                     practiceDataItem.currentUserId = userData.workId
                                                     practiceDataItem.loadUserPracticeData(userData.workId)
                                                     console.log("已直接调用更新用户练习数据函数，工号：" + userData.workId)
+                                                }
+                                                
+                                                // 手动更新首页排序
+                                                if (mainPageItem.personal_page_column) {
+                                                    console.log("尝试手动更新首页排序")
+                                                    Qt.callLater(function() {
+                                                        mainPageItem.personal_page_column.loadUserListFromDatabase()
+                                                        console.log("已手动调用首页排序更新")
+                                                    })
                                                 }
                                             }
                                         }

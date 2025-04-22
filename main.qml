@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtMultimedia 5.15
+import QtGraphicalEffects 1.15
 
 Window {
     // width: Screen.width
@@ -24,6 +25,27 @@ Window {
             return true
         }
         return false
+    }
+    
+    // 提供一个全局函数用于更新首页用户列表排序
+    function updateUserListSorting() {
+        if (mainPage && mainPage.personal_page_column) {
+            console.log("全局函数：更新首页用户列表排序");
+            
+            // 使用延迟调用确保设置已保存到数据库
+            Qt.callLater(function() {
+                // 重新从数据库读取设置值
+                var sortOption = dbManager.getSetting("home_sort_option", "1");
+                console.log("从数据库读取排序设置: " + sortOption + 
+                          " (" + (sortOption === "1" ? "本月个人能力排序" : "本月刷题数排序") + ")");
+                
+                // 重新加载用户列表
+                mainPage.personal_page_column.loadUserListFromDatabase();
+            });
+            
+            return true;
+        }
+        return false;
     }
 
     Image {
@@ -120,12 +142,26 @@ Window {
         color: "transparent"
         visible: false
         objectName: "mainPage"
+        
+        // 将个人主页用户列表列暴露为属性
+        property alias personal_page_column: personal_page_column
 
         // Component initialization
         Component.onCompleted: {
             // Default to showing the middle column on initial load
             middle_column.visible = true
             user_practice_data.visible = false
+        }
+        
+        // 当主页面变为可见时重新加载用户列表（例如从其他页面返回时）
+        onVisibleChanged: {
+            if (visible && personal_page_column) {
+                console.log("主页变为可见，刷新用户列表")
+                // 使用延迟调用避免界面卡顿
+                Qt.callLater(function() {
+                    personal_page_column.loadUserListFromDatabase()
+                })
+            }
         }
 
         Image {
@@ -415,10 +451,50 @@ Window {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: parent.top
                         anchors.topMargin: -width/2
+                        //第一名头像
+                        Rectangle {
+                            id: firstPlaceAvatarContainer
+                            anchors.centerIn: parent  // 改为居中对齐
+                            width: parent.width * 0.6  // 再次减小尺寸为父容器的70%
+                            height: width  // 保持宽高比
+                            radius: width / 2
+                            clip: true
+                            color: "transparent"
+                            
+                            Image {
+                                id: firstPlaceAvatar
+                                anchors.fill: parent
+                                source: ""  // 初始设为空
+                                fillMode: Image.PreserveAspectCrop
+                                cache: false // 禁用缓存，确保每次都重新加载图片
+                                asynchronous: true // 异步加载图片
+                                layer.enabled: true
+                                layer.effect: OpacityMask {
+                                    maskSource: Rectangle {
+                                        width: firstPlaceAvatar.width
+                                        height: firstPlaceAvatar.height
+                                        radius: Math.min(width, height) / 2
+                                        visible: false
+                                    }
+                                }
+                                
+                                // 状态监控
+                                onStatusChanged: {
+                                    if (status === Image.Error) {
+                                        console.log("第一名头像加载错误:", source)
+                                        source = "" // 加载错误时不设置默认头像
+                                    } else if (status === Image.Ready) {
+                                        console.log("第一名头像加载成功")
+                                    } else if (status === Image.Loading) {
+                                        console.log("第一名头像正在加载...")
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 //第二名背景
-                Image {                    
+                        Image {
                     source: "qrc:/images/ranking_bg.png"
                     width: parent.width / 4
                     height: width / 3 * 2 
@@ -435,6 +511,46 @@ Window {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: parent.top
                         anchors.topMargin: -width/2
+                        //第二名头像
+                        Rectangle {
+                            id: secondPlaceAvatarContainer
+                            anchors.centerIn: parent  // 改为居中对齐
+                            width: parent.width * 0.6  // 减小尺寸为父容器的70%
+                            height: width  // 保持宽高比
+                            radius: width / 2
+                            clip: true
+                            color: "transparent"
+                            
+                            Image {
+                                id: secondPlaceAvatar
+                                anchors.fill: parent
+                                source: ""  // 初始设为空
+                                fillMode: Image.PreserveAspectCrop
+                                cache: false // 禁用缓存，确保每次都重新加载图片
+                                asynchronous: true // 异步加载图片
+                                layer.enabled: true
+                                layer.effect: OpacityMask {
+                                    maskSource: Rectangle {
+                                        width: secondPlaceAvatar.width
+                                        height: secondPlaceAvatar.height
+                                        radius: Math.min(width, height) / 2
+                                        visible: false
+                                    }
+                                }
+                                
+                                // 状态监控
+                                onStatusChanged: {
+                                    if (status === Image.Error) {
+                                        console.log("第二名头像加载错误:", source)
+                                        source = "" // 加载错误时不设置默认头像
+                                    } else if (status === Image.Ready) {
+                                        console.log("第二名头像加载成功")
+                                    } else if (status === Image.Loading) {
+                                        console.log("第二名头像正在加载...")
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 //第三名背景
@@ -455,6 +571,46 @@ Window {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: parent.top
                         anchors.topMargin: -width/2
+                        //第三名头像
+                        Rectangle {
+                            id: thirdPlaceAvatarContainer
+                            anchors.centerIn: parent  // 改为居中对齐
+                            width: parent.width * 0.6  // 减小尺寸为父容器的70%
+                            height: width  // 保持宽高比
+                            radius: width / 2
+                            clip: true
+                            color: "transparent"
+                            
+                            Image {
+                                id: thirdPlaceAvatar
+                                anchors.fill: parent
+                                source: ""  // 初始设为空
+                                fillMode: Image.PreserveAspectCrop
+                                cache: false // 禁用缓存，确保每次都重新加载图片
+                                asynchronous: true // 异步加载图片
+                                layer.enabled: true
+                                layer.effect: OpacityMask {
+                                    maskSource: Rectangle {
+                                        width: thirdPlaceAvatar.width
+                                        height: thirdPlaceAvatar.height
+                                        radius: Math.min(width, height) / 2
+                                        visible: false
+                                    }
+                                }
+                                
+                                // 状态监控
+                                onStatusChanged: {
+                                    if (status === Image.Error) {
+                                        console.log("第三名头像加载错误:", source)
+                                        source = "" // 加载错误时不设置默认头像
+                                    } else if (status === Image.Ready) {
+                                        console.log("第三名头像加载成功")
+                                    } else if (status === Image.Loading) {
+                                        console.log("第三名头像正在加载...")
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -492,11 +648,11 @@ Window {
                 anchors.bottomMargin: -parent.height / 90
 
                 // 智点标题
-                Text {
+                        Text {
                     id: knowledge_point_title
                     anchors.top: parent.top
                     anchors.topMargin: 20
-                    anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
                     text: "加载中..."
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 24
@@ -513,9 +669,9 @@ Window {
                     anchors.leftMargin: parent.width / 10
                     anchors.rightMargin: parent.width / 10
                     text: "正在加载智点内容..."
-                    font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 20
-                    color: "white"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 20
+                            color: "white"
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
                 }
@@ -705,7 +861,7 @@ Window {
             }
 
             // 标题背景图
-            Image {
+                Image {                    
                 id: practice_title_bg_image
                 source: "qrc:/images/title_bg2.png"
                 width: 200
@@ -1752,11 +1908,24 @@ Window {
                     // 从数据库加载用户列表的函数
                     function loadUserListFromDatabase() {
                         console.log("开始加载用户列表...");
+                        
+                        // 获取当前排序选项
+                        var sortOption = dbManager.getSetting("home_sort_option", "1");
+                        console.log("当前排序选项: " + sortOption + 
+                                   " (" + (sortOption === "1" ? "本月个人能力排序" : "本月刷题数排序") + ")");
+                        
+                        // 确保排序选项为有效值（如果为空或非法值则使用默认值'1'）
+                        if (sortOption !== "0" && sortOption !== "1") {
+                            console.log("检测到无效的排序选项: " + sortOption + "，使用默认值'1'（个人能力排序）");
+                            sortOption = "1";
+                            dbManager.setSetting("home_sort_option", sortOption);
+                        }
+                        
                         console.log("当前用户列表项数: " + userButtonModel.count);
                         
-                        // 从数据库获取所有人脸数据
-                        var userList = dbManager.getAllFaceData();
-                        console.log("从数据库获取到 " + userList.length + " 个用户");
+                        // 从数据库获取所有人脸数据（按照设置排序）
+                        var userList = dbManager.getAllFaceDataSorted();
+                        console.log("从数据库获取到 " + userList.length + " 个用户（已排序）");
                         
                         // 清空现有模型
                         userButtonModel.clear();
@@ -1769,15 +1938,90 @@ Window {
                                 "workId": userList[j].workId,
                                 "avatarPath": userList[j].avatarPath
                             });
-                            console.log("添加用户: " + userList[j].name + " (工号: " + userList[j].workId + ")");
+                            console.log("添加用户 #" + (j+1) + ": " + userList[j].name + " (工号: " + userList[j].workId + ")");
                         }
                         
                         console.log("用户列表更新完成，共加载 " + userList.length + " 个用户");
+                        
+                        // 更新排行榜头像
+                        updateRankingAvatars();
+                    }
+                    
+                    // 更新排行榜头像的函数
+                    function updateRankingAvatars() {
+                        console.log("更新排行榜头像");
+                        
+                        try {
+                            // 调用辅助函数，设置默认头像
+                            refreshRankingImages();
+                            
+                            // 输出诊断信息
+                            if (userButtonModel.count > 0) {
+                                console.log("第一名用户:", 
+                                    userButtonModel.get(0).name,
+                                    "工号:", userButtonModel.get(0).workId);
+                            }
+                        } catch (e) {
+                            console.log("更新排行榜头像出错:", e);
+                        }
                     }
 
                     // 创建一个ListModel来存储用户数据
                     ListModel {
                         id: userButtonModel
+                    }
+                    
+                    // 刷新排行榜配置
+                    function refreshRankingImages() {
+                        console.log("刷新排行榜图像");
+                        
+                        // 修复路径格式的辅助函数
+                        function fixPath(path) {
+                            if (!path || path.toString().trim() === "") {
+                                return ""; // 返回空字符串而不是默认头像
+                            }
+                            
+                            var fixedPath = path.toString().trim();
+                            // 替换反斜杠为正斜杠
+                            fixedPath = fixedPath.replace(/\\/g, "/");
+                            
+                            // 确保有file:///前缀
+                            if (!fixedPath.startsWith("file:///")) {
+                                fixedPath = "file:///" + fixedPath;
+                            }
+                            
+                            console.log("原始路径:", path, "修正后:", fixedPath);
+                            return fixedPath;
+                        }
+                        
+                        // 首先将所有头像设置为空
+                        firstPlaceAvatar.source = "";
+                        secondPlaceAvatar.source = "";
+                        thirdPlaceAvatar.source = "";
+                        
+                        // 延迟一下再尝试加载真实头像
+                        Qt.callLater(function() {
+                            if (userButtonModel.count > 0) {
+                                var path1 = userButtonModel.get(0).avatarPath;
+                                if (path1 && path1 !== "") {
+                                    firstPlaceAvatar.source = fixPath(path1);
+                                }
+                            }
+                            
+                            if (userButtonModel.count > 1) {
+                                var path2 = userButtonModel.get(1).avatarPath;
+                                if (path2 && path2 !== "") {
+                                    secondPlaceAvatar.source = fixPath(path2);
+                                }
+                            }
+                            
+                            if (userButtonModel.count > 2) {
+                                var path3 = userButtonModel.get(2).avatarPath;
+                                if (path3 && path3 !== "") {
+                                    thirdPlaceAvatar.source = fixPath(path3);
+                                }
+                            }
+                        });
                     }
 
                     // 使用Repeater显示数据
@@ -1792,6 +2036,28 @@ Window {
                                 source: "qrc:/images/personal_button_bg.png"
                                 fillMode: Image.Stretch
                             }
+                            
+                            Item {
+                                // 奖牌图标容器
+                                visible: index < 3  // 只对前三名显示
+                                width: 30
+                                height: 30
+                                anchors.right: parent.right
+                                anchors.rightMargin: 10
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.verticalCenterOffset: -3
+                                
+                                Image {
+                                    anchors.fill: parent
+                                    source: {
+                                        if (index === 0) return "qrc:/images/goldMedal.png"
+                                        else if (index === 1) return "qrc:/images/silverMedal.png"
+                                        else return "qrc:/images/bronzeMedal.png"
+                                    }
+                                    fillMode: Image.PreserveAspectFit
+                                }
+                            }
+                            
                             contentItem: Text {
                                 text: model.name
                                 font.family: "阿里妈妈数黑体"

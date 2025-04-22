@@ -43,6 +43,9 @@ public:
     // 获取所有人脸数据
     Q_INVOKABLE QVariantList getAllFaceData();
 
+    // 获取所有人脸数据，按照通用设置中的首页排序设置进行排序
+    Q_INVOKABLE QVariantList getAllFaceDataSorted();
+
     // 根据工号查询人脸数据
     Q_INVOKABLE QVariantMap getFaceDataByWorkId(const QString &workId);
 
