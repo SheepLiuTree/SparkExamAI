@@ -378,6 +378,17 @@ Window {
                     }
                     onClicked: {
                         console.log("星火智能体 clicked")
+                        try {
+                            // 直接打开星火智能体页面，不需要人脸识别
+                            stackView.push("SparkAIAgentPage.qml")
+                        } catch (e) {
+                            // 显示错误信息
+                            console.error("打开星火智能体页面失败: " + e.message)
+                            // 显示提示对话框
+                            errorDialog.title = "功能不可用"
+                            errorDialog.text = "星火智能体需要QtWebEngine支持。请确保已安装Qt WebEngine模块。"
+                            errorDialog.open()
+                        }
                     }
                 }
             }
@@ -2977,4 +2988,83 @@ Window {
         }
     }
 
+    // 错误提示对话框
+    Dialog {
+        id: errorDialog
+        title: "错误"
+        modal: true
+        anchors.centerIn: parent
+        width: 400
+        height: 200
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        background: Rectangle {
+            color: "#44ffffff"
+            border.color: "#66ffffff"
+            border.width: 1
+            radius: 10
+        }
+        
+        header: Rectangle {
+            color: "#55000000"
+            height: 40
+            radius: 10
+            
+            Text {
+                text: errorDialog.title
+                color: "white"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 18
+                font.bold: true
+                anchors.centerIn: parent
+            }
+        }
+        
+        contentItem: Rectangle {
+            color: "transparent"
+            
+            Text {
+                id: errorMessageText
+                text: errorDialog.text
+                color: "white"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 16
+                wrapMode: Text.Wrap
+                anchors.fill: parent
+                anchors.margins: 10
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+        }
+        
+        footer: Rectangle {
+            color: "transparent"
+            height: 50
+            
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                width: 120
+                height: 40
+                
+                background: Rectangle {
+                    color: "#446688cc"
+                    radius: 5
+                }
+                
+                contentItem: Text {
+                    text: "确定"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 16
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                
+                onClicked: {
+                    errorDialog.close()
+                }
+            }
+        }
+    }
 }

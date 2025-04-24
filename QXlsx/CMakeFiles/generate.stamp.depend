@@ -1,0 +1,16 @@
+# CMake generation dependency list for this directory.
+C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5/Qt5Config.cmake
+C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5/Qt5ConfigVersion.cmake
+C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5/Qt5ModuleLocation.cmake
+C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Core/Qt5CoreConfig.cmake
+C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Core/Qt5CoreConfigVersion.cmake
+C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake
+C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Gui/Qt5GuiConfigVersion.cmake
+C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CPack.cmake
+C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CPackComponent.cmake
+C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/GNUInstallDirs.cmake
+C:/Qt/Tools/CMake_64/share/cmake-3.24/Templates/CPackConfig.cmake.in
+E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeLists.txt
+E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/cmake/modules/CPackConfig.cmake
+E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/cmake/modules/qxlsx-config-version.cmake.in
+E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/cmake/modules/qxlsx-config.cmake.in

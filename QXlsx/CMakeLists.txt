@@ -26,6 +26,11 @@ else()
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# MSVC编译器特定选项
+if(MSVC)
+    add_compile_options(/Zc:__cplusplus /utf-8)
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 if(NOT DEFINED QXLSX_PARENTPATH)

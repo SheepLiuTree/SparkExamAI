@@ -1,0 +1,580 @@
+{
+	"BUILD_DIR" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/QXlsx_autogen",
+	"CMAKE_BINARY_DIR" : "E:/SparkExamAI/SparkExamAI/SparkExamAI",
+	"CMAKE_CURRENT_BINARY_DIR" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx",
+	"CMAKE_CURRENT_SOURCE_DIR" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx",
+	"CMAKE_EXECUTABLE" : "C:/Qt/Tools/CMake_64/bin/cmake.exe",
+	"CMAKE_LIST_FILES" : 
+	[
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeLists.txt",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/GNUInstallDirs.cmake",
+		"C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5/Qt5Config.cmake",
+		"C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5/Qt5ModuleLocation.cmake",
+		"C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Core/Qt5CoreConfigVersion.cmake",
+		"C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Core/Qt5CoreConfig.cmake",
+		"C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Gui/Qt5GuiConfigVersion.cmake",
+		"C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake",
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/cmake/modules/qxlsx-config.cmake.in",
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/cmake/modules/qxlsx-config-version.cmake.in",
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/cmake/modules/CPackConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CPack.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CPackComponent.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Templates/CPackConfig.cmake.in",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Templates/CPackConfig.cmake.in"
+	],
+	"CMAKE_SOURCE_DIR" : "E:/SparkExamAI/SparkExamAI/SparkExamAI",
+	"DEP_FILE" : "",
+	"DEP_FILE_RULE_NAME" : "",
+	"HEADERS" : 
+	[
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxabstractooxmlfile.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxabstractooxmlfile.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxabstractooxmlfile_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxabstractooxmlfile_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxabstractsheet.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxabstractsheet.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxabstractsheet_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxabstractsheet_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxcell.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxcell.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxcell_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxcell_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxcellformula.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxcellformula.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxcellformula_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxcellformula_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxcelllocation.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxcelllocation.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxcellrange.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxcellrange.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxcellreference.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxcellreference.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxchart.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxchart.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxchart_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxchart_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxchartsheet.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxchartsheet.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxchartsheet_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxchartsheet_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxcolor_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxcolor_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxconditionalformatting.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxconditionalformatting.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxconditionalformatting_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxconditionalformatting_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxcontenttypes_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxcontenttypes_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxdatavalidation.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxdatavalidation.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxdatavalidation_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxdatavalidation_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxdatetype.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxdatetype.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxdocpropsapp_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxdocpropsapp_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxdocpropscore_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxdocpropscore_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxdocument.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxdocument.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxdocument_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxdocument_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxdrawing_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxdrawing_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxdrawinganchor_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxdrawinganchor_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxformat.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxformat.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxformat_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxformat_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxglobal.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxglobal.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxmediafile_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxmediafile_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxnumformatparser_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxnumformatparser_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxrelationships_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxrelationships_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxrichstring.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxrichstring.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxrichstring_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxrichstring_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxsharedstrings_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxsharedstrings_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxsimpleooxmlfile_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxsimpleooxmlfile_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxstyles_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxstyles_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxtheme_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxtheme_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxutility_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxutility_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxworkbook.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxworkbook.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxworkbook_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxworkbook_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxworksheet.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxworksheet.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxworksheet_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxworksheet_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxzipreader_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxzipreader_p.cpp",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header/xlsxzipwriter_p.h",
+			"MU",
+			"6OFTS6FJJP/moc_xlsxzipwriter_p.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/QXlsx_autogen/include",
+	"INCLUDE_DIR_Debug" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/QXlsx_autogen/include_Debug",
+	"INCLUDE_DIR_MinSizeRel" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/QXlsx_autogen/include_MinSizeRel",
+	"INCLUDE_DIR_RelWithDebInfo" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/QXlsx_autogen/include_RelWithDebInfo",
+	"INCLUDE_DIR_Release" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/QXlsx_autogen/include_Release",
+	"MOC_COMPILATION_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/QXlsx_autogen/mocs_compilation.cpp",
+	"MOC_COMPILATION_FILE_Debug" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/QXlsx_autogen/mocs_compilation_Debug.cpp",
+	"MOC_COMPILATION_FILE_MinSizeRel" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/QXlsx_autogen/mocs_compilation_MinSizeRel.cpp",
+	"MOC_COMPILATION_FILE_RelWithDebInfo" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/QXlsx_autogen/mocs_compilation_RelWithDebInfo.cpp",
+	"MOC_COMPILATION_FILE_Release" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/QXlsx_autogen/mocs_compilation_Release.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"QT_CORE_LIB",
+		"QT_DISABLE_DEPRECATED_BEFORE=0x060200",
+		"QT_GUI_LIB",
+		"QT_NO_CAST_FROM_ASCII",
+		"QT_NO_CAST_FROM_BYTEARRAY",
+		"QT_NO_CAST_TO_ASCII",
+		"QT_NO_DEBUG",
+		"QT_NO_KEYWORDS",
+		"QT_NO_SIGNALS_SLOTS_KEYWORDS",
+		"QT_NO_URL_CAST_FROM_STRING",
+		"QT_USE_FAST_OPERATOR_PLUS",
+		"QT_USE_QSTRINGBUILDER",
+		"UNICODE",
+		"WIN32",
+		"_UNICODE"
+	],
+	"MOC_DEFINITIONS_Debug" : 
+	[
+		"QT_CORE_LIB",
+		"QT_DISABLE_DEPRECATED_BEFORE=0x060200",
+		"QT_GUI_LIB",
+		"QT_NO_CAST_FROM_ASCII",
+		"QT_NO_CAST_FROM_BYTEARRAY",
+		"QT_NO_CAST_TO_ASCII",
+		"QT_NO_KEYWORDS",
+		"QT_NO_SIGNALS_SLOTS_KEYWORDS",
+		"QT_NO_URL_CAST_FROM_STRING",
+		"QT_USE_FAST_OPERATOR_PLUS",
+		"QT_USE_QSTRINGBUILDER",
+		"UNICODE",
+		"WIN32",
+		"_UNICODE"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx",
+		"C:/OpenCV4.5.2/include",
+		"C:/SeetaFace2/include",
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header",
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/header",
+		"C:/Qt/5.15.2/msvc2019_64/include",
+		"C:/Qt/5.15.2/msvc2019_64/include/QtCore",
+		"C:/Qt/5.15.2/msvc2019_64/mkspecs/win32-msvc",
+		"C:/Qt/5.15.2/msvc2019_64/include/QtGui/5.15.2",
+		"C:/Qt/5.15.2/msvc2019_64/include/QtGui/5.15.2/QtGui",
+		"C:/Qt/5.15.2/msvc2019_64/include/QtGui",
+		"C:/Qt/5.15.2/msvc2019_64/include/QtANGLE",
+		"C:/Qt/5.15.2/msvc2019_64/include/QtCore/5.15.2",
+		"C:/Qt/5.15.2/msvc2019_64/include/QtCore/5.15.2/QtCore"
+	],
+	"MOC_MACRO_NAMES" : [ "Q_OBJECT", "Q_GADGET", "Q_NAMESPACE", "Q_NAMESPACE_EXPORT" ],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : [],
+	"MOC_PREDEFS_FILE" : "",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : true,
+	"PARALLEL" : 4,
+	"PARSE_CACHE_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/ParseCache.txt",
+	"PARSE_CACHE_FILE_Debug" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/ParseCache_Debug.txt",
+	"PARSE_CACHE_FILE_MinSizeRel" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/ParseCache_MinSizeRel.txt",
+	"PARSE_CACHE_FILE_RelWithDebInfo" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/ParseCache_RelWithDebInfo.txt",
+	"PARSE_CACHE_FILE_Release" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/ParseCache_Release.txt",
+	"QT_MOC_EXECUTABLE" : "C:/Qt/5.15.2/msvc2019_64/bin/moc.exe",
+	"QT_UIC_EXECUTABLE" : "C:/Qt/5.15.2/msvc2019_64/bin/uic.exe",
+	"QT_VERSION_MAJOR" : 5,
+	"QT_VERSION_MINOR" : 15,
+	"SETTINGS_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/AutogenUsed.txt",
+	"SETTINGS_FILE_Debug" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/AutogenUsed_Debug.txt",
+	"SETTINGS_FILE_MinSizeRel" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/AutogenUsed_MinSizeRel.txt",
+	"SETTINGS_FILE_RelWithDebInfo" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/AutogenUsed_RelWithDebInfo.txt",
+	"SETTINGS_FILE_Release" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/AutogenUsed_Release.txt",
+	"SOURCES" : 
+	[
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxabstractooxmlfile.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxabstractsheet.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxcell.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxcellformula.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxcelllocation.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxcellrange.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxcellreference.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxchart.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxchartsheet.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxcolor.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxconditionalformatting.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxcontenttypes.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxdatavalidation.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxdatetype.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxdocpropsapp.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxdocpropscore.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxdocument.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxdrawing.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxdrawinganchor.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxformat.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxmediafile.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxnumformatparser.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxrelationships.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxrichstring.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxsharedstrings.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxsimpleooxmlfile.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxstyles.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxtheme.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxutility.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxworkbook.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxworksheet.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxzipreader.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/source/xlsxzipwriter.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"VERBOSITY" : 0
+}

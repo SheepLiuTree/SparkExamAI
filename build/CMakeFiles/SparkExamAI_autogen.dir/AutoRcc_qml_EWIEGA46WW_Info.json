@@ -9,6 +9,7 @@
 	[
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/FaceCollectionPage.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QuestionCollectionPage.qml",
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/SparkAIAgentPage.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/DailyCourseContent.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/QuestionEnginePage.qml",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/main.qml",
@@ -46,7 +47,7 @@
 	"OPTIONS" : [ "-name", "qml" ],
 	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
 	"OUTPUT_NAME" : "qrc_qml.cpp",
-	"RCC_EXECUTABLE" : "C:/Qt/5.15.2/mingw81_64/bin/rcc.exe",
+	"RCC_EXECUTABLE" : "C:/Qt/5.15.2/msvc2019_64/bin/rcc.exe",
 	"RCC_LIST_OPTIONS" : [ "--list" ],
 	"SETTINGS_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/SparkExamAI_autogen.dir/AutoRcc_qml_EWIEGA46WW_Used.txt",
 	"SOURCE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/qml.qrc",

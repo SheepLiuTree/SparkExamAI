@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\CMakeFiles\2b75a503ab18ed500c6da61ef3f65f06\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{9A4F95BB-CE84-316A-8913-C6AA116DC435}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

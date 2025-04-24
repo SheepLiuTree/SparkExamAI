@@ -1,0 +1,460 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{512E7035-259F-3FE0-9654-FE8899B4BC02}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.20348.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>QXlsx</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">QXlsx.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">QXlsxQt5</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">QXlsx.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">QXlsxQt5</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">QXlsx.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">QXlsxQt5</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">QXlsx.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">QXlsxQt5</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\include_Debug;C:\OpenCV4.5.2\include;C:\SeetaFace2\include;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\..\QXlsx\header;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Qt/5.15.2/msvc2019_64/include" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtCore" /external:I "C:/Qt/5.15.2/msvc2019_64/./mkspecs/win32-msvc" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtGui/5.15.2" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtGui/5.15.2/QtGui" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtGui" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtANGLE" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtCore/5.15.2" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtCore/5.15.2/QtCore" /Zc:__cplusplus /utf-8</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;QT_NO_KEYWORDS;QT_NO_CAST_TO_ASCII;QT_NO_CAST_FROM_ASCII;QT_NO_URL_CAST_FROM_STRING;QT_NO_CAST_FROM_BYTEARRAY;QT_USE_QSTRINGBUILDER;QT_NO_SIGNALS_SLOTS_KEYWORDS;QT_USE_FAST_OPERATOR_PLUS;QT_DISABLE_DEPRECATED_BEFORE=0x060200;UNICODE;_UNICODE;QT_CORE_LIB;QT_GUI_LIB;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;QT_NO_KEYWORDS;QT_NO_CAST_TO_ASCII;QT_NO_CAST_FROM_ASCII;QT_NO_URL_CAST_FROM_STRING;QT_NO_CAST_FROM_BYTEARRAY;QT_USE_QSTRINGBUILDER;QT_NO_SIGNALS_SLOTS_KEYWORDS;QT_USE_FAST_OPERATOR_PLUS;QT_DISABLE_DEPRECATED_BEFORE=0x060200;UNICODE;_UNICODE;QT_CORE_LIB;QT_GUI_LIB;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\include_Debug;C:\OpenCV4.5.2\include;C:\SeetaFace2\include;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\..\QXlsx\header;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header;C:\Qt\5.15.2\msvc2019_64\include;C:\Qt\5.15.2\msvc2019_64\include\QtCore;C:\Qt\5.15.2\msvc2019_64\.\mkspecs\win32-msvc;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtANGLE;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2\QtCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\include_Debug;C:\OpenCV4.5.2\include;C:\SeetaFace2\include;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\..\QXlsx\header;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header;C:\Qt\5.15.2\msvc2019_64\include;C:\Qt\5.15.2\msvc2019_64\include\QtCore;C:\Qt\5.15.2\msvc2019_64\.\mkspecs\win32-msvc;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtANGLE;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2\QtCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PreBuildEvent>
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message>Automatic MOC and UIC for target QXlsx</Message>
+      <Command>setlocal
+cd E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx
+if %errorlevel% neq 0 goto :cmEnd
+E:
+if %errorlevel% neq 0 goto :cmEnd
+C:\Qt\Tools\CMake_64\bin\cmake.exe -E cmake_autogen E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/AutogenInfo.json Debug
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PreBuildEvent>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\include_Release;C:\OpenCV4.5.2\include;C:\SeetaFace2\include;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\..\QXlsx\header;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Qt/5.15.2/msvc2019_64/include" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtCore" /external:I "C:/Qt/5.15.2/msvc2019_64/./mkspecs/win32-msvc" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtGui/5.15.2" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtGui/5.15.2/QtGui" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtGui" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtANGLE" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtCore/5.15.2" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtCore/5.15.2/QtCore" /Zc:__cplusplus /utf-8</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_NO_KEYWORDS;QT_NO_CAST_TO_ASCII;QT_NO_CAST_FROM_ASCII;QT_NO_URL_CAST_FROM_STRING;QT_NO_CAST_FROM_BYTEARRAY;QT_USE_QSTRINGBUILDER;QT_NO_SIGNALS_SLOTS_KEYWORDS;QT_USE_FAST_OPERATOR_PLUS;QT_DISABLE_DEPRECATED_BEFORE=0x060200;UNICODE;_UNICODE;QT_CORE_LIB;QT_NO_DEBUG;QT_GUI_LIB;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_NO_KEYWORDS;QT_NO_CAST_TO_ASCII;QT_NO_CAST_FROM_ASCII;QT_NO_URL_CAST_FROM_STRING;QT_NO_CAST_FROM_BYTEARRAY;QT_USE_QSTRINGBUILDER;QT_NO_SIGNALS_SLOTS_KEYWORDS;QT_USE_FAST_OPERATOR_PLUS;QT_DISABLE_DEPRECATED_BEFORE=0x060200;UNICODE;_UNICODE;QT_CORE_LIB;QT_NO_DEBUG;QT_GUI_LIB;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\include_Release;C:\OpenCV4.5.2\include;C:\SeetaFace2\include;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\..\QXlsx\header;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header;C:\Qt\5.15.2\msvc2019_64\include;C:\Qt\5.15.2\msvc2019_64\include\QtCore;C:\Qt\5.15.2\msvc2019_64\.\mkspecs\win32-msvc;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtANGLE;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2\QtCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\include_Release;C:\OpenCV4.5.2\include;C:\SeetaFace2\include;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\..\QXlsx\header;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header;C:\Qt\5.15.2\msvc2019_64\include;C:\Qt\5.15.2\msvc2019_64\include\QtCore;C:\Qt\5.15.2\msvc2019_64\.\mkspecs\win32-msvc;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtANGLE;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2\QtCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PreBuildEvent>
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message>Automatic MOC and UIC for target QXlsx</Message>
+      <Command>setlocal
+cd E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx
+if %errorlevel% neq 0 goto :cmEnd
+E:
+if %errorlevel% neq 0 goto :cmEnd
+C:\Qt\Tools\CMake_64\bin\cmake.exe -E cmake_autogen E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/AutogenInfo.json Release
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PreBuildEvent>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\include_MinSizeRel;C:\OpenCV4.5.2\include;C:\SeetaFace2\include;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\..\QXlsx\header;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Qt/5.15.2/msvc2019_64/include" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtCore" /external:I "C:/Qt/5.15.2/msvc2019_64/./mkspecs/win32-msvc" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtGui/5.15.2" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtGui/5.15.2/QtGui" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtGui" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtANGLE" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtCore/5.15.2" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtCore/5.15.2/QtCore" /Zc:__cplusplus /utf-8</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_NO_KEYWORDS;QT_NO_CAST_TO_ASCII;QT_NO_CAST_FROM_ASCII;QT_NO_URL_CAST_FROM_STRING;QT_NO_CAST_FROM_BYTEARRAY;QT_USE_QSTRINGBUILDER;QT_NO_SIGNALS_SLOTS_KEYWORDS;QT_USE_FAST_OPERATOR_PLUS;QT_DISABLE_DEPRECATED_BEFORE=0x060200;UNICODE;_UNICODE;QT_CORE_LIB;QT_NO_DEBUG;QT_GUI_LIB;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_NO_KEYWORDS;QT_NO_CAST_TO_ASCII;QT_NO_CAST_FROM_ASCII;QT_NO_URL_CAST_FROM_STRING;QT_NO_CAST_FROM_BYTEARRAY;QT_USE_QSTRINGBUILDER;QT_NO_SIGNALS_SLOTS_KEYWORDS;QT_USE_FAST_OPERATOR_PLUS;QT_DISABLE_DEPRECATED_BEFORE=0x060200;UNICODE;_UNICODE;QT_CORE_LIB;QT_NO_DEBUG;QT_GUI_LIB;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\include_MinSizeRel;C:\OpenCV4.5.2\include;C:\SeetaFace2\include;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\..\QXlsx\header;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header;C:\Qt\5.15.2\msvc2019_64\include;C:\Qt\5.15.2\msvc2019_64\include\QtCore;C:\Qt\5.15.2\msvc2019_64\.\mkspecs\win32-msvc;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtANGLE;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2\QtCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\include_MinSizeRel;C:\OpenCV4.5.2\include;C:\SeetaFace2\include;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\..\QXlsx\header;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header;C:\Qt\5.15.2\msvc2019_64\include;C:\Qt\5.15.2\msvc2019_64\include\QtCore;C:\Qt\5.15.2\msvc2019_64\.\mkspecs\win32-msvc;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtANGLE;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2\QtCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PreBuildEvent>
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message>Automatic MOC and UIC for target QXlsx</Message>
+      <Command>setlocal
+cd E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx
+if %errorlevel% neq 0 goto :cmEnd
+E:
+if %errorlevel% neq 0 goto :cmEnd
+C:\Qt\Tools\CMake_64\bin\cmake.exe -E cmake_autogen E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/AutogenInfo.json MinSizeRel
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PreBuildEvent>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\include_RelWithDebInfo;C:\OpenCV4.5.2\include;C:\SeetaFace2\include;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\..\QXlsx\header;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Qt/5.15.2/msvc2019_64/include" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtCore" /external:I "C:/Qt/5.15.2/msvc2019_64/./mkspecs/win32-msvc" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtGui/5.15.2" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtGui/5.15.2/QtGui" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtGui" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtANGLE" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtCore/5.15.2" /external:I "C:/Qt/5.15.2/msvc2019_64/include/QtCore/5.15.2/QtCore" /Zc:__cplusplus /utf-8</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_NO_KEYWORDS;QT_NO_CAST_TO_ASCII;QT_NO_CAST_FROM_ASCII;QT_NO_URL_CAST_FROM_STRING;QT_NO_CAST_FROM_BYTEARRAY;QT_USE_QSTRINGBUILDER;QT_NO_SIGNALS_SLOTS_KEYWORDS;QT_USE_FAST_OPERATOR_PLUS;QT_DISABLE_DEPRECATED_BEFORE=0x060200;UNICODE;_UNICODE;QT_CORE_LIB;QT_NO_DEBUG;QT_GUI_LIB;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_NO_KEYWORDS;QT_NO_CAST_TO_ASCII;QT_NO_CAST_FROM_ASCII;QT_NO_URL_CAST_FROM_STRING;QT_NO_CAST_FROM_BYTEARRAY;QT_USE_QSTRINGBUILDER;QT_NO_SIGNALS_SLOTS_KEYWORDS;QT_USE_FAST_OPERATOR_PLUS;QT_DISABLE_DEPRECATED_BEFORE=0x060200;UNICODE;_UNICODE;QT_CORE_LIB;QT_NO_DEBUG;QT_GUI_LIB;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\include_RelWithDebInfo;C:\OpenCV4.5.2\include;C:\SeetaFace2\include;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\..\QXlsx\header;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header;C:\Qt\5.15.2\msvc2019_64\include;C:\Qt\5.15.2\msvc2019_64\include\QtCore;C:\Qt\5.15.2\msvc2019_64\.\mkspecs\win32-msvc;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtANGLE;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2\QtCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\include_RelWithDebInfo;C:\OpenCV4.5.2\include;C:\SeetaFace2\include;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\..\QXlsx\header;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header;C:\Qt\5.15.2\msvc2019_64\include;C:\Qt\5.15.2\msvc2019_64\include\QtCore;C:\Qt\5.15.2\msvc2019_64\.\mkspecs\win32-msvc;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtGui\5.15.2\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtANGLE;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2;C:\Qt\5.15.2\msvc2019_64\include\QtCore\5.15.2\QtCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PreBuildEvent>
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message>Automatic MOC and UIC for target QXlsx</Message>
+      <Command>setlocal
+cd E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx
+if %errorlevel% neq 0 goto :cmEnd
+E:
+if %errorlevel% neq 0 goto :cmEnd
+C:\Qt\Tools\CMake_64\bin\cmake.exe -E cmake_autogen E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/QXlsx_autogen.dir/AutogenInfo.json RelWithDebInfo
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PreBuildEvent>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\Qt\Tools\CMake_64\bin\cmake.exe -SE:/SparkExamAI/SparkExamAI/SparkExamAI -BE:/SparkExamAI/SparkExamAI/SparkExamAI --check-stamp-file E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5Config.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5ModuleLocation.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Core\Qt5CoreConfig.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Core\Qt5CoreConfigVersion.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Gui\Qt5GuiConfig.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Gui\Qt5GuiConfigVersion.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\CPack.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\CPackComponent.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\GNUInstallDirs.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Templates\CPackConfig.cmake.in;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\cmake\modules\CPackConfig.cmake;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\cmake\modules\qxlsx-config-version.cmake.in;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\cmake\modules\qxlsx-config.cmake.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\Qt\Tools\CMake_64\bin\cmake.exe -SE:/SparkExamAI/SparkExamAI/SparkExamAI -BE:/SparkExamAI/SparkExamAI/SparkExamAI --check-stamp-file E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5Config.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5ModuleLocation.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Core\Qt5CoreConfig.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Core\Qt5CoreConfigVersion.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Gui\Qt5GuiConfig.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Gui\Qt5GuiConfigVersion.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\CPack.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\CPackComponent.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\GNUInstallDirs.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Templates\CPackConfig.cmake.in;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\cmake\modules\CPackConfig.cmake;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\cmake\modules\qxlsx-config-version.cmake.in;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\cmake\modules\qxlsx-config.cmake.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+C:\Qt\Tools\CMake_64\bin\cmake.exe -SE:/SparkExamAI/SparkExamAI/SparkExamAI -BE:/SparkExamAI/SparkExamAI/SparkExamAI --check-stamp-file E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5Config.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5ModuleLocation.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Core\Qt5CoreConfig.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Core\Qt5CoreConfigVersion.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Gui\Qt5GuiConfig.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Gui\Qt5GuiConfigVersion.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\CPack.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\CPackComponent.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\GNUInstallDirs.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Templates\CPackConfig.cmake.in;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\cmake\modules\CPackConfig.cmake;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\cmake\modules\qxlsx-config-version.cmake.in;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\cmake\modules\qxlsx-config.cmake.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+C:\Qt\Tools\CMake_64\bin\cmake.exe -SE:/SparkExamAI/SparkExamAI/SparkExamAI -BE:/SparkExamAI/SparkExamAI/SparkExamAI --check-stamp-file E:/SparkExamAI/SparkExamAI/SparkExamAI/QXlsx/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5Config.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5\Qt5ModuleLocation.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Core\Qt5CoreConfig.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Core\Qt5CoreConfigVersion.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Gui\Qt5GuiConfig.cmake;C:\Qt\5.15.2\msvc2019_64\lib\cmake\Qt5Gui\Qt5GuiConfigVersion.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\CPack.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\CPackComponent.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\GNUInstallDirs.cmake;C:\Qt\Tools\CMake_64\share\cmake-3.24\Templates\CPackConfig.cmake.in;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\cmake\modules\CPackConfig.cmake;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\cmake\modules\qxlsx-config-version.cmake.in;E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\cmake\modules\qxlsx-config.cmake.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\mocs_compilation_Debug.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcellrange.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcontenttypes.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdrawinganchor.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxrichstring.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxworkbook.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxabstractooxmlfile.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcellreference.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdatavalidation.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdrawing.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxsharedstrings.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxworksheet.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxabstractsheet.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxchart.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdatetype.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxformat.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxsimpleooxmlfile.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxzipreader.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcell.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxchartsheet.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdocpropsapp.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxmediafile.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxstyles.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxzipwriter.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcellformula.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcolor.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdocpropscore.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxnumformatparser.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxtheme.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcelllocation.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxconditionalformatting.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdocument.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxrelationships.cpp" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxutility.cpp" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxabstractooxmlfile_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxchartsheet_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdocpropsapp_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxformat_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxsharedstrings_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxworkbook_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxabstractsheet_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcolor_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdocpropscore_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxmediafile_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxsimpleooxmlfile_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxworksheet_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcellformula_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxconditionalformatting_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdocument_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxnumformatparser_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxstyles_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxzipreader_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcell_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcontenttypes_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdrawinganchor_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxrelationships_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxtheme_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxzipwriter_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxchart_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdatavalidation_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdrawing_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxrichstring_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxutility_p.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxabstractooxmlfile.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxabstractsheet.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcellformula.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcell.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcelllocation.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcellrange.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcellreference.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxchart.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxchartsheet.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxconditionalformatting.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdatavalidation.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdatetype.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdocument.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxformat.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxglobal.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxrichstring.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxworkbook.h" />
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxworksheet.h" />
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\mocs_compilation_Release.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\mocs_compilation_MinSizeRel.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\mocs_compilation_RelWithDebInfo.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\ZERO_CHECK.vcxproj">
+      <Project>{87DE8D01-2897-3DC6-A170-173E79F59D53}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,4 +1,5 @@
 #include "FaceRecognizer.h"
+#include <opencv2/imgproc.hpp>
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
@@ -117,13 +118,8 @@ bool FaceRecognizer::detectFace(const QString &imagePath)
             return false;
         }
         
-        // 转换为灰度图像
-        cv::Mat gray;
-        if (mat.channels() == 3) {
-            cv::cvtColor(mat, gray, cv::COLOR_BGR2RGB);
-        } else {
-            gray = mat.clone();
-        }
+        // 直接使用原始图像，不再调用cvtColor
+        cv::Mat gray = mat.clone();
         
         // 创建SeetaFace的图像对象
         seeta::ImageData imageData(gray.cols, gray.rows, gray.channels());
@@ -250,8 +246,15 @@ float FaceRecognizer::compareFaces(const QString &image1Path, const QString &ima
         float feature2[1024] = {0};
         
         // 提取人脸特征
-        m_faceRecognizer->Extract(imageData1, points1.data(), feature1);
-        m_faceRecognizer->Extract(imageData2, points2.data(), feature2);
+        #ifdef _WIN64
+        // 64位系统上，保持原样
+        m_faceRecognizer->Extract(imageData1, static_cast<const SeetaPointF*>(points1.data()), feature1);
+        m_faceRecognizer->Extract(imageData2, static_cast<const SeetaPointF*>(points2.data()), feature2);
+        #else
+        // 32位系统上，先使用static_cast确保指针类型转换安全
+        m_faceRecognizer->Extract(imageData1, reinterpret_cast<const SeetaPointF*>(points1.data()), feature1);
+        m_faceRecognizer->Extract(imageData2, reinterpret_cast<const SeetaPointF*>(points2.data()), feature2);
+        #endif
         
         // 计算相似度
         float similarity = m_faceRecognizer->CalculateSimilarity(feature1, feature2);
@@ -285,12 +288,12 @@ QImage FaceRecognizer::matToQImage(const cv::Mat &mat)
     
     // 8-bit, 3 channel
     if (mat.type() == CV_8UC3) {
-        QImage image(mat.data, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
+        QImage image(mat.data, mat.cols, mat.rows, static_cast<int>(mat.step), QImage::Format_RGB888);
         return image.rgbSwapped(); // Convert BGR to RGB
     }
     // 8-bit, 1 channel
     else if (mat.type() == CV_8UC1) {
-        QImage image(mat.data, mat.cols, mat.rows, mat.step, QImage::Format_Grayscale8);
+        QImage image(mat.data, mat.cols, mat.rows, static_cast<int>(mat.step), QImage::Format_Grayscale8);
         return image;
     }
     // Unsupported format
@@ -309,16 +312,36 @@ cv::Mat FaceRecognizer::qImageToMat(const QImage &image)
     
     switch (image.format()) {
     case QImage::Format_RGB888: {
-        cv::Mat mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
-        cv::cvtColor(mat, mat, cv::COLOR_RGB2BGR); // Convert RGB to BGR
-        return mat.clone();
+        // 创建一个BGR格式的Mat，然后手动复制和交换RGB通道
+        cv::Mat mat(image.height(), image.width(), CV_8UC3);
+        for (int y = 0; y < image.height(); y++) {
+            const uchar* scan = image.scanLine(y);
+            uchar* data = mat.ptr<uchar>(y);
+            for (int x = 0; x < image.width(); x++) {
+                // 手动交换RGB到BGR
+                data[x*3+0] = scan[x*3+2]; // B = R
+                data[x*3+1] = scan[x*3+1]; // G = G
+                data[x*3+2] = scan[x*3+0]; // R = B
+            }
+        }
+        return mat;
     }
     case QImage::Format_RGB32:
     case QImage::Format_ARGB32:
     case QImage::Format_ARGB32_Premultiplied: {
-        cv::Mat mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
-        cv::cvtColor(mat, mat, cv::COLOR_RGBA2BGR); // Convert RGBA to BGR
-        return mat.clone();
+        // 创建一个BGR格式的Mat，然后手动复制和交换RGBA通道
+        cv::Mat mat(image.height(), image.width(), CV_8UC3);
+        for (int y = 0; y < image.height(); y++) {
+            const QRgb* scan = reinterpret_cast<const QRgb*>(image.scanLine(y));
+            uchar* data = mat.ptr<uchar>(y);
+            for (int x = 0; x < image.width(); x++) {
+                // 手动获取RGBA值并存储为BGR
+                data[x*3+0] = qBlue(scan[x]);  // B
+                data[x*3+1] = qGreen(scan[x]); // G
+                data[x*3+2] = qRed(scan[x]);   // R
+            }
+        }
+        return mat;
     }
     case QImage::Format_Grayscale8: {
         cv::Mat mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
@@ -328,9 +351,19 @@ cv::Mat FaceRecognizer::qImageToMat(const QImage &image)
         // 其他格式转为RGB888后再处理
         qDebug() << "Converting QImage format" << image.format() << "to RGB888";
         QImage converted = image.convertToFormat(QImage::Format_RGB888);
-        cv::Mat mat(converted.height(), converted.width(), CV_8UC3, (void*)converted.constBits(), converted.bytesPerLine());
-        cv::cvtColor(mat, mat, cv::COLOR_RGB2BGR); // Convert RGB to BGR
-        return mat.clone();
+        // 重用上面的RGB888处理代码
+        cv::Mat mat(converted.height(), converted.width(), CV_8UC3);
+        for (int y = 0; y < converted.height(); y++) {
+            const uchar* scan = converted.scanLine(y);
+            uchar* data = mat.ptr<uchar>(y);
+            for (int x = 0; x < converted.width(); x++) {
+                // 手动交换RGB到BGR
+                data[x*3+0] = scan[x*3+2]; // B = R
+                data[x*3+1] = scan[x*3+1]; // G = G
+                data[x*3+2] = scan[x*3+0]; // R = B
+            }
+        }
+        return mat;
     }
 }
 

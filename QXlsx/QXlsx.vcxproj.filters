@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\mocs_compilation_Debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcellrange.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcontenttypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdrawinganchor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxrichstring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxworkbook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxabstractooxmlfile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcellreference.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdatavalidation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdrawing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxsharedstrings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxworksheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxabstractsheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxchart.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdatetype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxformat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxsimpleooxmlfile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxzipreader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxchartsheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdocpropsapp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxmediafile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxstyles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxzipwriter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcellformula.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcolor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdocpropscore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxnumformatparser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxtheme.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxcelllocation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxconditionalformatting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxdocument.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxrelationships.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\source\xlsxutility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\mocs_compilation_Release.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\mocs_compilation_MinSizeRel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\QXlsx_autogen\mocs_compilation_RelWithDebInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxabstractooxmlfile_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxchartsheet_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdocpropsapp_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxformat_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxsharedstrings_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxworkbook_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxabstractsheet_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcolor_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdocpropscore_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxmediafile_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxsimpleooxmlfile_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxworksheet_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcellformula_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxconditionalformatting_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdocument_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxnumformatparser_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxstyles_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxzipreader_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcell_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcontenttypes_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdrawinganchor_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxrelationships_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxtheme_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxzipwriter_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxchart_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdatavalidation_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdrawing_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxrichstring_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxutility_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxabstractooxmlfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxabstractsheet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcellformula.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcelllocation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcellrange.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxcellreference.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxchart.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxchartsheet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxconditionalformatting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdatavalidation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdatetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxdocument.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxformat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxglobal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxrichstring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxworkbook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\header\xlsxworksheet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\SparkExamAI\SparkExamAI\SparkExamAI\QXlsx\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{BF021F11-F672-3CC4-B80F-A2C7BF7AA0F8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{E0278D73-41FE-36AB-B76F-A8332D06720D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
