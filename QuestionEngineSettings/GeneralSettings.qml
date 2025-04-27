@@ -14,6 +14,7 @@ Rectangle {
     property string adminPassword: ""
     property bool showPassword: false
     property int homeSortOption: 1
+    property string aiAgentAddress: ""
     
     // 定义信号
     signal sortOptionUpdated()
@@ -71,6 +72,12 @@ Rectangle {
             sortOption1.checked = false;
             sortOption2.checked = true;
         }
+        
+        // 载入AI智能体地址设置
+        var savedAgentAddress = dbManager.getSetting("ai_agent_address", "https://www.coze.cn/store/agent/7485277516954271795?bot_id=true")
+        aiAgentAddress = savedAgentAddress
+        agentAddressField.text = savedAgentAddress
+        console.log("从数据库载入AI智能体地址: " + (savedAgentAddress ? savedAgentAddress : "未设置，使用默认值"))
     }
     
     ColumnLayout {
@@ -91,7 +98,7 @@ Rectangle {
                 
                 Rectangle {
                     Layout.fillWidth: true
-                    height: 320
+                    height: 380  // 增加高度以容纳新增的设置项
                     color: "#44ffffff"
                     radius: 10
                     
@@ -365,6 +372,50 @@ Rectangle {
                             }
                         }
                         
+                        // AI智能体地址设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "智能体地址:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                TextField {
+                                    id: agentAddressField
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    text: aiAgentAddress
+                                    placeholderText: "请输入AI智能体地址"
+                                    placeholderTextColor: "#cccccc"
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
+                                    
+                                    onTextChanged: {
+                                        aiAgentAddress = text
+                                    }
+                                }
+                            }
+                        }
+                        
                         // 保存按钮
                         Item {
                             Layout.fillWidth: true
@@ -456,6 +507,10 @@ Rectangle {
         console.log("首页排序设置已保存: " + (homeSortOption === 1 ? "本月个人能力排序(1)" : "本月刷题数排序(0)") + 
                    " (home_sort_option=" + homeSortOption.toString() + ")")
         
+        // 保存AI智能体地址
+        var agentAddressSuccess = dbManager.setSetting("ai_agent_address", agentAddressField.text)
+        console.log("AI智能体地址已保存: " + agentAddressField.text)
+        
         // 使用延迟调用确保数据库操作完成后再更新UI
         Qt.callLater(function() {
             // 再次从数据库读取设置确保保存成功
@@ -468,7 +523,7 @@ Rectangle {
         })
         
         // 显示结果消息
-        if (passwordSuccess && cameraSuccess && sortSuccess) {
+        if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess) {
             statusMessage = "所有设置已保存成功"
             isSuccess = true
         } else {
@@ -476,6 +531,7 @@ Rectangle {
             if (!passwordSuccess) failedSettings.push("密码");
             if (!cameraSuccess) failedSettings.push("摄像头");
             if (!sortSuccess) failedSettings.push("首页排序");
+            if (!agentAddressSuccess) failedSettings.push("智能体地址");
             
             statusMessage = "保存失败的设置: " + failedSettings.join(", ") + "，请重试"
             isSuccess = false

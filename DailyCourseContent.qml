@@ -94,42 +94,29 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter
             }
             onClicked: {
+                // 显示确认对话框
                 confirmDialog.dialogTitle = "返回确认"
                 confirmDialog.dialogMessage = "确定要返回上一页吗？\n当前进度将不会保存。"
                 confirmDialog.confirmAction = function() {
-                    // 如果有用户数据，更新练习数据
+                    // 如果当前有用户数据，尝试更新用户的练习数据
                     if (userData && userData.workId) {
-                        console.log("返回时准备更新用户数据，工号: " + userData.workId)
-                        
                         try {
-                            // 获取应用程序窗口并调用全局更新函数
-                            var rootWindow = Qt.application.activeWindow
-                            if (rootWindow && typeof rootWindow.updateUserData === "function") {
-                                var success = rootWindow.updateUserData(userData.workId)
-                                console.log("通过全局函数更新用户数据：" + (success ? "成功" : "失败"))
-                                
-                                // 同时更新首页排序
-                                if (typeof rootWindow.updateUserListSorting === "function") {
-                                    var sortUpdateSuccess = rootWindow.updateUserListSorting()
-                                    console.log("通过全局函数更新首页排序：" + (sortUpdateSuccess ? "成功" : "失败"))
-                                }
-                            } else {
-                                console.error("无法获取根窗口或更新函数不存在")
-                                
-                                // 备用方法：尝试手动查找组件
+                            // 尝试直接通过根对象调用全局函数
+                            var root = stackView.parent
+                            var updateSuccess = false
+                            
+                            if (root && typeof root.updateUserData === "function") {
+                                // 尝试使用全局函数
+                                updateSuccess = root.updateUserData(userData.workId)
+                                console.log("使用根对象全局函数更新用户数据: " + updateSuccess)
+                            }
+                            
+                            // 如果全局函数调用失败，尝试直接访问mainPage
+                            if (!updateSuccess) {
                                 var mainPageItem = findMainPage(stackView)
-                                
                                 if (mainPageItem) {
-                                    console.log("成功找到mainPage")
-                                    // 找到user_practice_data
-                                    var practiceDataItem = null
-                                    for (var i = 0; i < mainPageItem.children.length; i++) {
-                                        var child = mainPageItem.children[i]
-                                        if (child.objectName === "user_practice_data") {
-                                            practiceDataItem = child
-                                            break
-                                        }
-                                    }
+                                    console.log("找到mainPage，尝试直接访问user_practice_data")
+                                    var practiceDataItem = mainPageItem.user_practice_data
                                     
                                     if (practiceDataItem) {
                                         console.log("成功找到user_practice_data")
@@ -152,6 +139,18 @@ Rectangle {
                             }
                         } catch (e) {
                             console.error("更新用户数据时发生错误:", e)
+                        }
+                    }
+                    
+                    // 确保返回时显示中间列，隐藏个人数据页面
+                    var mainPage = stackView.get(0)
+                    if (mainPage) {
+                        console.log("确保返回时显示中间列，隐藏个人数据页面");
+                        if (mainPage.middle_column) {
+                            mainPage.middle_column.visible = true;
+                        }
+                        if (mainPage.user_practice_data) {
+                            mainPage.user_practice_data.visible = false;
                         }
                     }
                     

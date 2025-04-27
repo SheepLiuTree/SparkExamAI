@@ -484,7 +484,7 @@ Rectangle {
                 }
                 
                 Text {
-                    text: "表头格式要求:\n题干、答案、解析、选项A、选项B、选项C、选项D、选项E、选项F、选项G\n\n说明：\n1. 必填字段：题干、答案\n2. 选择题答案不要有字母外的其他字符\n3. 判断题的答案可以是：'正确', '错误', '对', '错', '√', '×', 'Y', 'N'"
+                    text: "表头格式要求:\n题干、答案、解析、选项A、选项B、选项C、选项D、选项E、选项F、选项G\n\n说明：\n1. 必填字段：题干、答案\n2. 答案不要有字母外的其他字符\n3. 判断题的答案为：\"A\",\"B\""
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 14
                     color: "#666666"
@@ -1139,6 +1139,20 @@ Rectangle {
                             verticalAlignment: Text.AlignVCenter
                         }
                         onClicked: {
+                            // 获取主页引用
+                            var mainPage = stackView.get(0)
+                            
+                            // 确保返回时显示中间列，隐藏个人数据页面
+                            if (mainPage) {
+                                console.log("确保返回时显示中间列，隐藏个人数据页面");
+                                if (mainPage.middle_column) {
+                                    mainPage.middle_column.visible = true;
+                                }
+                                if (mainPage.user_practice_data) {
+                                    mainPage.user_practice_data.visible = false;
+                                }
+                            }
+                            
                             // 返回到主界面
                             stackView.pop(null)
                             

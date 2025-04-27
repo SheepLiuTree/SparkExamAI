@@ -35,5 +35,6 @@
         <file>images/goldMedal.png</file>
         <file>images/silverMedal.png</file>
         <file>images/bronzeMedal.png</file>
+        <file>images/FaceTracking.png</file>
     </qresource>
 </RCC>

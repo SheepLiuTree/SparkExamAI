@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QDebug>
 #include <QApplication>
+#include <QUrl>
 
 FaceRecognizer::FaceRecognizer(QObject *parent) : QObject(parent),
     m_faceDetector(nullptr),
@@ -270,11 +271,39 @@ float FaceRecognizer::compareFaces(const QString &image1Path, const QString &ima
 
 QImage FaceRecognizer::loadImage(const QString &imagePath)
 {
-    QImage image(imagePath);
+    // 处理URL格式的路径（file:///开头）
+    QString filePath = imagePath;
+    if (filePath.startsWith("file:///")) {
+        QUrl url(filePath);
+        filePath = url.toLocalFile();
+        qDebug() << "转换URL路径到本地文件路径:" << imagePath << " -> " << filePath;
+    }
+    
+    // 检查文件是否存在
+    QFileInfo fileInfo(filePath);
+    if (!fileInfo.exists() || !fileInfo.isFile()) {
+        qDebug() << "文件不存在或不是文件:" << filePath;
+        qDebug() << "检查应用程序目录:" << QApplication::applicationDirPath();
+        
+        // 尝试作为相对路径处理
+        QString appDir = QApplication::applicationDirPath();
+        QString tryPath = filePath;
+        if (!tryPath.startsWith("/") && !tryPath.startsWith(appDir)) {
+            tryPath = appDir + "/" + tryPath;
+            qDebug() << "尝试作为相对路径处理:" << tryPath;
+            QFileInfo tryInfo(tryPath);
+            if (tryInfo.exists() && tryInfo.isFile()) {
+                filePath = tryPath;
+                qDebug() << "找到相对路径文件:" << filePath;
+            }
+        }
+    }
+    
+    QImage image(filePath);
     if (image.isNull()) {
-        qDebug() << "Failed to load image: " << imagePath;
+        qDebug() << "无法加载图像:" << filePath << "原始路径:" << imagePath;
     } else {
-        qDebug() << "Successfully loaded image:" << imagePath << "Size:" << image.size();
+        qDebug() << "成功加载图像:" << filePath << "尺寸:" << image.size();
     }
     return image;
 }

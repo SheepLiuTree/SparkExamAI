@@ -358,6 +358,17 @@ Rectangle {
                             mainPage.personal_page_column.loadUserListFromDatabase();
                         }
                         
+                        // 确保返回时显示中间列，隐藏个人数据页面
+                        if (mainPage) {
+                            console.log("确保返回时显示中间列，隐藏个人数据页面");
+                            if (mainPage.middle_column) {
+                                mainPage.middle_column.visible = true;
+                            }
+                            if (mainPage.user_practice_data) {
+                                mainPage.user_practice_data.visible = false;
+                            }
+                        }
+                        
                         // 返回到主界面
                         stackView.pop(null)
                         

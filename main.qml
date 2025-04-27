@@ -11,7 +11,7 @@ Window {
     // height: 1024
     visible: true
     visibility: Window.FullScreen
-    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
+    flags: Qt.Window | Qt.FramelessWindowHint
     title: qsTr("星火智能评测系统")
 
     // 提供一个全局函数用于更新用户数据
@@ -134,6 +134,19 @@ Window {
         anchors.bottomMargin: 10
         initialItem: mainPage
         clip: true
+
+        // 添加当前项改变的监听器
+        onCurrentItemChanged: {
+            // 检查是否返回到了主页（mainPage）
+            if (currentItem && currentItem === mainPage) {
+                console.log("已返回到首页，确保显示中间列")
+                // 显示中间列，隐藏个人练习数据
+                if (mainPage) {
+                    mainPage.middle_column.visible = true
+                    mainPage.user_practice_data.visible = false
+                }
+            }
+        }
     }
 
     // 主页面
@@ -145,6 +158,9 @@ Window {
         
         // 将个人主页用户列表列暴露为属性
         property alias personal_page_column: personal_page_column
+        // 将中间列和用户数据页面暴露为属性
+        property alias middle_column: middle_column
+        property alias user_practice_data: user_practice_data
 
         // Component initialization
         Component.onCompleted: {
@@ -1993,6 +2009,13 @@ Window {
                             }
                             
                             var fixedPath = path.toString().trim();
+                            
+                            // 该路径已经是QUrl格式，直接返回
+                            if (fixedPath.startsWith("file:///")) {
+                                console.log("路径已经是URL格式，不需要修正:", fixedPath);
+                                return fixedPath;
+                            }
+                            
                             // 替换反斜杠为正斜杠
                             fixedPath = fixedPath.replace(/\\/g, "/");
                             
@@ -2462,7 +2485,15 @@ Window {
                                 return Qt.rect(0, 0, width, height)
                             }
                             
-                            var srcRatio = sourceRect.width / sourceRect.height
+                            // 使用安全的方式获取源矩形宽高比
+                            // 如果sourceRect未定义，则使用备选方案
+                            var srcRatio
+                            if (typeof sourceRect !== 'undefined' && sourceRect) {
+                                srcRatio = sourceRect.width / sourceRect.height
+                            } else {
+                                // 使用摄像头分辨率作为备选
+                                srcRatio = camera.viewfinder.resolution.width / camera.viewfinder.resolution.height
+                            }
                             var destRatio = width / height
                             
                             var resultWidth, resultHeight, resultX, resultY
@@ -2503,18 +2534,18 @@ Window {
                     }
                     
                     // 人脸框辅助线 - 根据检测到的位置动态调整
-                    Rectangle {
+                    Image {
                         id: faceFrame
-                        color: "transparent"
-                        border.width: 2
-                        border.color: "red"
+                        source: "qrc:/images/FaceTracking.png"
                         visible: faceRecognitionPopup.isFaceDetected
                         
                         // 如果检测到人脸，使用检测到的位置和大小
-                        x: faceRecognitionPopup.detectedFaceRect.x
-                        y: faceRecognitionPopup.detectedFaceRect.y
-                        width: faceRecognitionPopup.detectedFaceRect.width
-                        height: faceRecognitionPopup.detectedFaceRect.height
+                        // 调整为正方形，保持中心点不变
+                        property real frameSize: Math.max(faceRecognitionPopup.detectedFaceRect.width, faceRecognitionPopup.detectedFaceRect.height)
+                        x: faceRecognitionPopup.detectedFaceRect.x + (faceRecognitionPopup.detectedFaceRect.width - frameSize) / 2
+                        y: faceRecognitionPopup.detectedFaceRect.y + (faceRecognitionPopup.detectedFaceRect.height - frameSize) / 2
+                        width: frameSize
+                        height: frameSize
                         
                         // 平滑过渡效果
                         Behavior on x { NumberAnimation { duration: 200 } }

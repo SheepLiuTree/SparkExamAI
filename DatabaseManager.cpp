@@ -10,6 +10,7 @@
 #include "FaceRecognizer.h"
 #include <QFile>
 #include <QVariantMap>
+#include <QUrl>
 
 // Forward declaration of helper functions
 QString getFieldValue(const QVariantMap &map, const QStringList &possibleKeys);
@@ -217,6 +218,29 @@ bool DatabaseManager::addFaceData(const QString &name, const QString &gender,
                                  const QString &avatarPath, bool isAdmin)
 {
     QSqlQuery query;
+    
+    // 将绝对路径转换为相对路径
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString relativeFaceImagePath = faceImagePath;
+    QString relativeAvatarPath = avatarPath;
+    
+    // 移除应用程序目录前缀，转换为相对路径
+    if (relativeFaceImagePath.startsWith(appDir)) {
+        relativeFaceImagePath = relativeFaceImagePath.mid(appDir.length());
+        // 确保路径以/开头
+        if (!relativeFaceImagePath.startsWith("/")) {
+            relativeFaceImagePath = "/" + relativeFaceImagePath;
+        }
+    }
+    
+    if (relativeAvatarPath.startsWith(appDir)) {
+        relativeAvatarPath = relativeAvatarPath.mid(appDir.length());
+        // 确保路径以/开头
+        if (!relativeAvatarPath.startsWith("/")) {
+            relativeAvatarPath = "/" + relativeAvatarPath;
+        }
+    }
+    
     query.prepare(
         "INSERT INTO users (name, gender, work_id, face_image_path, avatar_path, is_admin) "
         "VALUES (:name, :gender, :work_id, :face_image_path, :avatar_path, :is_admin)"
@@ -225,8 +249,8 @@ bool DatabaseManager::addFaceData(const QString &name, const QString &gender,
     query.bindValue(":name", name);
     query.bindValue(":gender", gender);
     query.bindValue(":work_id", workId);
-    query.bindValue(":face_image_path", faceImagePath);
-    query.bindValue(":avatar_path", avatarPath);
+    query.bindValue(":face_image_path", relativeFaceImagePath);
+    query.bindValue(":avatar_path", relativeAvatarPath);
     query.bindValue(":is_admin", isAdmin ? 1 : 0);
     
     if (!query.exec()) {
@@ -255,6 +279,7 @@ QVariantList DatabaseManager::getAllFaceData()
 {
     QVariantList result;
     QSqlQuery query("SELECT * FROM users ORDER BY name");
+    QString appDir = QCoreApplication::applicationDirPath();
     
     while (query.next()) {
         QVariantMap row;
@@ -262,8 +287,39 @@ QVariantList DatabaseManager::getAllFaceData()
         row["name"] = query.value("name").toString();
         row["gender"] = query.value("gender").toString();
         row["workId"] = query.value("work_id").toString();
-        row["faceImage"] = query.value("face_image_path").toString();
-        row["avatarPath"] = query.value("avatar_path").toString();
+        
+        // 获取图像路径
+        QString faceImagePath = query.value("face_image_path").toString();
+        QString avatarPath = query.value("avatar_path").toString();
+        
+        // 转换相对路径为绝对路径并进行URL编码
+        if (!faceImagePath.isEmpty() && !faceImagePath.startsWith("file:///")) {
+            if (faceImagePath.startsWith("/")) {
+                faceImagePath = appDir + faceImagePath;
+            } else {
+                faceImagePath = appDir + "/" + faceImagePath;
+            }
+            
+            // 将路径编码为URL格式以处理中文和特殊字符
+            QUrl fileUrl = QUrl::fromLocalFile(faceImagePath);
+            faceImagePath = fileUrl.toString();
+        }
+        
+        if (!avatarPath.isEmpty() && !avatarPath.startsWith("file:///")) {
+            if (avatarPath.startsWith("/")) {
+                avatarPath = appDir + avatarPath;
+            } else {
+                avatarPath = appDir + "/" + avatarPath;
+            }
+            
+            // 将路径编码为URL格式以处理中文和特殊字符
+            QUrl fileUrl = QUrl::fromLocalFile(avatarPath);
+            avatarPath = fileUrl.toString();
+        }
+        
+        row["faceImage"] = faceImagePath;
+        row["avatarPath"] = avatarPath;
+        
         row["isAdmin"] = query.value("is_admin").toBool();
         row["createdAt"] = query.value("created_at").toString();
         
@@ -276,6 +332,7 @@ QVariantList DatabaseManager::getAllFaceData()
 QVariantList DatabaseManager::getAllFaceDataSorted()
 {
     QVariantList result;
+    QString appDir = QCoreApplication::applicationDirPath();
     
     // 从设置中获取排序方式
     QString sortOption = getSetting("home_sort_option", "1");
@@ -299,8 +356,39 @@ QVariantList DatabaseManager::getAllFaceDataSorted()
         row["name"] = query.value("name").toString();
         row["gender"] = query.value("gender").toString();
         row["workId"] = query.value("work_id").toString();
-        row["faceImage"] = query.value("face_image_path").toString();
-        row["avatarPath"] = query.value("avatar_path").toString();
+        
+        // 获取图像路径
+        QString faceImagePath = query.value("face_image_path").toString();
+        QString avatarPath = query.value("avatar_path").toString();
+        
+        // 转换相对路径为绝对路径并进行URL编码
+        if (!faceImagePath.isEmpty() && !faceImagePath.startsWith("file:///")) {
+            if (faceImagePath.startsWith("/")) {
+                faceImagePath = appDir + faceImagePath;
+            } else {
+                faceImagePath = appDir + "/" + faceImagePath;
+            }
+            
+            // 将路径编码为URL格式以处理中文和特殊字符
+            QUrl fileUrl = QUrl::fromLocalFile(faceImagePath);
+            faceImagePath = fileUrl.toString();
+        }
+        
+        if (!avatarPath.isEmpty() && !avatarPath.startsWith("file:///")) {
+            if (avatarPath.startsWith("/")) {
+                avatarPath = appDir + avatarPath;
+            } else {
+                avatarPath = appDir + "/" + avatarPath;
+            }
+            
+            // 将路径编码为URL格式以处理中文和特殊字符
+            QUrl fileUrl = QUrl::fromLocalFile(avatarPath);
+            avatarPath = fileUrl.toString();
+        }
+        
+        row["faceImage"] = faceImagePath;
+        row["avatarPath"] = avatarPath;
+        
         row["isAdmin"] = query.value("is_admin").toBool();
         row["createdAt"] = query.value("created_at").toString();
         
@@ -407,8 +495,47 @@ QVariantMap DatabaseManager::getFaceDataByWorkId(const QString &workId)
         result["name"] = query.value("name").toString();
         result["gender"] = query.value("gender").toString();
         result["workId"] = query.value("work_id").toString();
-        result["faceImage"] = query.value("face_image_path").toString();
-        result["avatarPath"] = query.value("avatar_path").toString();
+        
+        // 获取图像路径
+        QString faceImagePath = query.value("face_image_path").toString();
+        QString avatarPath = query.value("avatar_path").toString();
+        
+        // 转换相对路径为绝对路径并进行URL编码
+        if (!faceImagePath.isEmpty() && !faceImagePath.startsWith("file:///")) {
+            // 添加应用程序目录前缀
+            QString appDir = QCoreApplication::applicationDirPath();
+            
+            if (faceImagePath.startsWith("/")) {
+                faceImagePath = appDir + faceImagePath;
+            } else {
+                faceImagePath = appDir + "/" + faceImagePath;
+            }
+            
+            // 将路径编码为URL格式以处理中文和特殊字符
+            QUrl fileUrl = QUrl::fromLocalFile(faceImagePath);
+            faceImagePath = fileUrl.toString();
+            qDebug() << "人脸图像路径转换为URL: " << faceImagePath;
+        }
+        
+        if (!avatarPath.isEmpty() && !avatarPath.startsWith("file:///")) {
+            // 添加应用程序目录前缀
+            QString appDir = QCoreApplication::applicationDirPath();
+            
+            if (avatarPath.startsWith("/")) {
+                avatarPath = appDir + avatarPath;
+            } else {
+                avatarPath = appDir + "/" + avatarPath;
+            }
+            
+            // 将路径编码为URL格式以处理中文和特殊字符
+            QUrl fileUrl = QUrl::fromLocalFile(avatarPath);
+            avatarPath = fileUrl.toString();
+            qDebug() << "头像路径转换为URL: " << avatarPath;
+        }
+        
+        result["faceImage"] = faceImagePath;
+        result["avatarPath"] = avatarPath;
+        
         result["isAdmin"] = query.value("is_admin").toBool();
         result["createdAt"] = query.value("created_at").toString();
     }
@@ -434,7 +561,7 @@ bool DatabaseManager::verifyFace(const QString &workId, const QString &faceImage
         "VALUES (:work_id, :access_result)"
     );
     
-    // 检查用户是否存在
+    // 检查用户是否存在，getFaceDataByWorkId已经处理了路径转换
     QVariantMap userData = getFaceDataByWorkId(workId);
     if (userData.isEmpty()) {
         qDebug() << "User with work ID" << workId << "not found in database";
@@ -448,6 +575,13 @@ bool DatabaseManager::verifyFace(const QString &workId, const QString &faceImage
     // 获取用户注册的人脸图像
     QString registeredFaceImage = userData["faceImage"].toString();
     qDebug() << "Registered face image path:" << registeredFaceImage;
+    
+    // 如果路径是URL格式，转换为本地路径
+    if (registeredFaceImage.startsWith("file:///")) {
+        QUrl url(registeredFaceImage);
+        registeredFaceImage = url.toLocalFile();
+        qDebug() << "转换URL为本地路径:" << registeredFaceImage;
+    }
     
     // 检查注册的人脸图像是否存在
     QFileInfo registeredImageFile(registeredFaceImage);
@@ -508,6 +642,29 @@ bool DatabaseManager::updateFaceData(const QString &workId, const QString &name,
                                     const QString &avatarPath, bool isAdmin)
 {
     QSqlQuery query;
+    
+    // 将绝对路径转换为相对路径
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString relativeFaceImagePath = faceImagePath;
+    QString relativeAvatarPath = avatarPath;
+    
+    // 移除应用程序目录前缀，转换为相对路径
+    if (relativeFaceImagePath.startsWith(appDir)) {
+        relativeFaceImagePath = relativeFaceImagePath.mid(appDir.length());
+        // 确保路径以/开头
+        if (!relativeFaceImagePath.startsWith("/")) {
+            relativeFaceImagePath = "/" + relativeFaceImagePath;
+        }
+    }
+    
+    if (relativeAvatarPath.startsWith(appDir)) {
+        relativeAvatarPath = relativeAvatarPath.mid(appDir.length());
+        // 确保路径以/开头
+        if (!relativeAvatarPath.startsWith("/")) {
+            relativeAvatarPath = "/" + relativeAvatarPath;
+        }
+    }
+    
     query.prepare(
         "UPDATE users SET "
         "name = :name, "
@@ -520,8 +677,8 @@ bool DatabaseManager::updateFaceData(const QString &workId, const QString &name,
     
     query.bindValue(":name", name);
     query.bindValue(":gender", gender);
-    query.bindValue(":face_image_path", faceImagePath);
-    query.bindValue(":avatar_path", avatarPath);
+    query.bindValue(":face_image_path", relativeFaceImagePath);
+    query.bindValue(":avatar_path", relativeAvatarPath);
     query.bindValue(":is_admin", isAdmin ? 1 : 0);
     query.bindValue(":work_id", workId);
     
@@ -653,6 +810,9 @@ void DatabaseManager::initDefaultSettings()
         // 首页排序设置 - 默认为"本月个人能力排序"(1)
         setSetting("home_sort_option", "1");
         
+        // AI智能体地址设置
+        setSetting("ai_agent_address", "https://www.coze.cn/store/agent/7485277516954271795?bot_id=true");
+        
         // 五芒图默认标题设置
         setSetting("pentagon_title_1", "基础认知");
         setSetting("pentagon_title_2", "原理理解");
@@ -775,7 +935,28 @@ QString DatabaseManager::getUserAvatarPath(const QString &workId)
     
     if (query.next()) {
         QString avatarPath = query.value(0).toString();
-        qDebug() << "成功获取用户头像路径: " << avatarPath;
+        qDebug() << "数据库中的头像路径: " << avatarPath;
+        
+        // 如果是相对路径，转换为绝对路径
+        if (!avatarPath.isEmpty() && !avatarPath.startsWith("file:///")) {
+            // 添加应用程序目录前缀
+            QString appDir = QCoreApplication::applicationDirPath();
+            
+            // 确保路径连接正确
+            if (avatarPath.startsWith("/")) {
+                avatarPath = appDir + avatarPath;
+            } else {
+                avatarPath = appDir + "/" + avatarPath;
+            }
+            
+            // 将路径编码为URL格式以处理中文和特殊字符
+            QUrl fileUrl = QUrl::fromLocalFile(avatarPath);
+            QString urlString = fileUrl.toString();
+            
+            qDebug() << "转换为URL路径: " << urlString;
+            return urlString;
+        }
+        
         return avatarPath;
     }
     

@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtMultimedia 5.15
 import QtQuick.Dialogs 1.3
+import QtGraphicalEffects 1.15
 
 Rectangle {
     color: "transparent" 
@@ -227,16 +228,25 @@ Rectangle {
         
         // 从数据库获取所有人脸数据
         var faceList = dbManager.getAllFaceData();
+        console.log("从数据库获取到 " + faceList.length + " 条人脸数据");
         
         // 将数据添加到模型中
         for (var i = 0; i < faceList.length; i++) {
             var face = faceList[i];
+            
+            // 处理头像和人脸图像路径
+            var processedFaceImage = face.faceImage;
+            var processedAvatarPath = face.avatarPath;
+            
+            console.log("原始人脸图像路径: " + processedFaceImage);
+            console.log("原始头像路径: " + processedAvatarPath);
+            
             faceCollectionModel.append({
                 "name": face.name,
                 "gender": face.gender,
                 "workId": face.workId,
-                "faceImage": face.faceImage,
-                "avatarPath": face.avatarPath,
+                "faceImage": processedFaceImage,
+                "avatarPath": processedAvatarPath,
                 "isAdmin": face.isAdmin
             });
         }
@@ -439,7 +449,7 @@ Rectangle {
                     Text {
                         id: guideText
                         anchors.centerIn: parent
-                        text: "请将脸部对准绿色框内"
+                        text: "请将脸部对准识别框内"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 15  // 增大字体
                         color: "white"
@@ -453,25 +463,15 @@ Rectangle {
                     anchors.fill: parent
                     visible: videoOutput.visible && !capturedImage.visible                
                     
-                    // 椭圆形引导框 - 旋转90度垂直放置
-                    Rectangle {
+                    // 椭圆形引导框 - 保持正方形尺寸
+                    Image {
                         id: clearArea
-                        color: "transparent"
-                        border.width: 2  // 增加边框宽度，提高清晰度
-                        border.color: "#4AFF4A"  // 更亮的绿色，提高对比度
+                        source: "qrc:/images/FaceTracking.png"
                         anchors.centerIn: parent
-                        // 交换宽高以旋转90度
-                        width: videoOutput.contentRect.height
-                        height: videoOutput.contentRect.width * 0.5
-                        radius: Math.min(width, height) / 2
-                        
-                        // 添加旋转变换
-                        transform: Rotation {
-                            id: clearAreaRotation
-                            angle: 90
-                            origin.x: clearArea.width / 2
-                            origin.y: clearArea.height / 2
-                        }
+                        // 设置为相同的宽高，确保是正方形
+                        property real size: Math.min(videoOutput.contentRect.width, videoOutput.contentRect.height)
+                        width: size
+                        height: size
                     }
                     
                     // 添加鼻子位置的十字标记 - 增加宽度提高可见性
@@ -1100,8 +1100,16 @@ Rectangle {
                                 anchors.centerIn: parent
                                 width: 40
                                 height: 40
-                                source: faceImage ? "file:///" + faceImage : ""
+                                source: faceImage ? processImagePath(faceImage) : ""
                                 fillMode: Image.PreserveAspectFit
+                                
+                                onStatusChanged: {
+                                    if (status === Image.Error) {
+                                        console.log("人脸图像加载失败: " + source)
+                                    } else if (status === Image.Ready) {
+                                        console.log("人脸图像加载成功: " + source)
+                                    }
+                                }
                             }
                         }
                         Rectangle {
@@ -1113,8 +1121,16 @@ Rectangle {
                                 anchors.centerIn: parent
                                 width: 40
                                 height: 40
-                                source: avatarPath ? "file:///" + avatarPath : ""
+                                source: avatarPath ? processImagePath(avatarPath) : ""
                                 fillMode: Image.PreserveAspectFit
+                                
+                                onStatusChanged: {
+                                    if (status === Image.Error) {
+                                        console.log("头像图像加载失败: " + source)
+                                    } else if (status === Image.Ready) {
+                                        console.log("头像图像加载成功: " + source)
+                                    }
+                                }
                             }
                         }
                     }
@@ -1518,6 +1534,21 @@ Rectangle {
                             if (messagePopup.visible) {
                                 messagePopup.close()
                             }
+                            
+                            // 获取主页引用
+                            var mainPage = stackView.get(0)
+                            
+                            // 确保返回时显示中间列，隐藏个人数据页面
+                            if (mainPage) {
+                                console.log("确保返回时显示中间列，隐藏个人数据页面");
+                                if (mainPage.middle_column) {
+                                    mainPage.middle_column.visible = true;
+                                }
+                                if (mainPage.user_practice_data) {
+                                    mainPage.user_practice_data.visible = false;
+                                }
+                            }
+                            
                             console.log("返回上一页面")
                             stackView.pop()
                             confirmDialog.close()
@@ -1593,5 +1624,31 @@ Rectangle {
         id: scaleTransform
         xScale: -1
         origin.x: 0
+    }
+
+    // 全局路径处理函数
+    function processImagePath(path) {
+        if (!path || path.toString().trim() === "") {
+            return ""; 
+        }
+        
+        var fixedPath = path.toString().trim();
+        console.log("处理图像路径: " + fixedPath);
+        
+        // 该路径已经是QUrl格式，直接返回
+        if (fixedPath.startsWith("file:///")) {
+            return fixedPath;
+        }
+        
+        // 替换反斜杠为正斜杠
+        fixedPath = fixedPath.replace(/\\/g, "/");
+        
+        // 确保有file:///前缀
+        if (!fixedPath.startsWith("file:///")) {
+            fixedPath = "file:///" + fixedPath;
+        }
+        
+        console.log("处理后的路径: " + fixedPath);
+        return fixedPath;
     }
 }
