@@ -26,8 +26,8 @@ The CXX compiler identification is MSVC, found in "E:/SparkExamAI/SparkExamAI/Sp
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/Qt/Tools/Ninja/ninja.exe cmTC_60c8a && [1/2] Building CXX object CMakeFiles\cmTC_60c8a.dir\CMakeCXXCompilerABI.cpp.obj
-[2/2] Linking CXX executable cmTC_60c8a.exe
+Run Build Command(s):C:/Qt/Tools/Ninja/ninja.exe cmTC_c2b20 && [1/2] Building CXX object CMakeFiles\cmTC_c2b20.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_c2b20.exe
 
 
 
