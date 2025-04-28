@@ -1,70 +1,83 @@
-# QXlsx
+# SparkExamAI
 
-> *Read this in other languages: [English](README.md), :kr: [Korean](README.ko.md), :ru: [Russian](README.RU.md)*
+SparkExamAI是一款基于人工智能的考试辅助系统，旨在帮助学生进行高效学习和考试准备。
 
-<p align="center"><img src="https://raw.githubusercontent.com/QtExcel/QXlsx/master/markdown.data/QXlsx-Desktop.png"></p>
+## 功能特点
 
-- QXlsx is excel file(`*.xlsx`) reader/writer library.
-  - Because QtXlsxWriter is no longer supported, I created a new project that is based on QtXlsx. (2017-)
-- Development language of QXlsx is C++. (with Qt)
-- You don't need to use static library or dynamic shared object using QXlsx.
-  - You can also use it as a static library.
+- 人脸识别登录系统
+- AI驱动的问题引擎
+- 专项训练模块
+- 问题练习与收藏
+- 每日课程内容推送
+- 智能学习助手
 
-## How to use
-- See [examples](Example.md)
-- See [wiki](https://github.com/QtExcel/QXlsx/wiki)
-- See [FAQ](https://github.com/QtExcel/QXlsx/wiki/FAQ)
+## 技术栈
 
-## How to set up (Installation)
+- C++/Qt框架
+- QML前端界面
+- 人脸识别技术
+- 数据库管理系统
 
-- See [how to setup QXlsx project (qmake)](HowToSetProject.md)	
-- See [how to setup QXlsx project (cmake)](HowToSetProject-cmake.md)	
+## 安装
 
-## Github Actions
+```bash
+# 克隆仓库
+git clone https://github.com/yourusername/SparkExamAI.git
 
-[![Android](https://github.com/QtExcel/QXlsx/actions/workflows/android.yml/badge.svg)](https://github.com/QtExcel/QXlsx/actions/workflows/android.yml) [![IOS](https://github.com/QtExcel/QXlsx/actions/workflows/ios.yml/badge.svg)](https://github.com/QtExcel/QXlsx/actions/workflows/ios.yml) [![MacOS](https://github.com/QtExcel/QXlsx/actions/workflows/macos.yml/badge.svg)](https://github.com/QtExcel/QXlsx/actions/workflows/macos.yml) [![Ubuntu](https://github.com/QtExcel/QXlsx/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/QtExcel/QXlsx/actions/workflows/ubuntu.yml) [![Windows](https://github.com/QtExcel/QXlsx/actions/workflows/windows.yml/badge.svg)](https://github.com/QtExcel/QXlsx/actions/workflows/windows.yml) [![CMake](https://github.com/QtExcel/QXlsx/actions/workflows/cmake.yml/badge.svg)](https://github.com/QtExcel/QXlsx/actions/workflows/cmake.yml) [![cmake-ubuntu](https://github.com/QtExcel/QXlsx/actions/workflows/cmake-ubuntu.yml/badge.svg)](https://github.com/QtExcel/QXlsx/actions/workflows/cmake-ubuntu.yml)
+# 进入项目目录
+cd SparkExamAI
 
-- See [tested environments](TestEnv.md) for more information.
+# 构建项目
+cmake .
+make
+```
 
-## Contributions
-- See [contributors](https://github.com/QtExcel/QXlsx/graphs/contributors).
+## 使用方法
 
-## License and links
-- QXlsx is under MIT license. [https://github.com/QtExcel/QXlsx](https://github.com/QtExcel/QXlsx)
-- Thank you for creating the following amazing projects. :+1:
-  - Qt is under LGPL v3 license or Commercial license. [https://www.qt.io/](https://www.qt.io/) 
-  - QtXlsxWriter is under MIT license. :+1: [https://github.com/dbzhang800/QtXlsxWriter](https://github.com/dbzhang800/QtXlsxWriter)
-  - Qt-Table-Printer is under BSD 3-Clause license. [https://github.com/T0ny0/Qt-Table-Printer](https://github.com/T0ny0/Qt-Table-Printer) 
-  - recurse is under MIT license. [https://github.com/pkoretic/recurse](https://github.com/pkoretic/recurse)
-  - libfort is under MIT license. [https://github.com/seleznevae/libfort](https://github.com/seleznevae/libfort)
-  - colorprintf is under MIT license. [https://github.com/VittGam/colorprintf](https://github.com/VittGam/colorprintf)
-  - HelloActions-Qt is under MIT license. [https://github.com/jaredtao/HelloActions-Qt](https://github.com/jaredtao/HelloActions-Qt)  
+运行编译后的可执行文件即可启动应用程序。
 
-## :email: Contact
-- Leave me a issue. [https://github.com/QtExcel/QXlsx/issues](https://github.com/QtExcel/QXlsx/issues)
-	- If you are interested in participating in the project, please contact us by issue.
-	- My native language is not English and my English is not fluent. Please, use EASY English. :-)
-- If you would like to translate README.md into your native language, please contact me.
-	- You can either raise an issue or use a pull request. (such as README.ko.md)
-	
-## Similar projects
+```bash
+./SparkExamAI
+```
 
-### :star: <b>Qxlnt</b> [https://github.com/QtExcel/Qxlnt](https://github.com/QtExcel/Qxlnt)
+## 项目结构
 
-<p align="center"><img src="https://github.com/QtExcel/Qxlnt/raw/master/markdown-data/Concept-QXlnt.jpg"></p>
+```
+SparkExamAI/
+├── build/                # 构建文件
+├── images/               # 图像资源
+├── model/                # 模型文件
+├── templates/            # 模板文件
+├── QXlsx/                # Excel操作库
+├── QuestionEngineSettings/ # 问题引擎设置
+├── DatabaseManager.cpp/h   # 数据库管理
+├── FaceRecognizer.cpp/h    # 人脸识别
+├── FileManager.cpp/h       # 文件管理
+├── main.cpp               # 主程序入口
+├── main.qml               # 主界面
+└── *.qml                  # 其他界面文件
+```
 
-- Qxlnt is a helper project that allows xlnt to be used in Qt.
-- xlnt is a excellent C++ library for using xlsx Excel files.
-- I was looking for a way to make it easy to use in Qt. Of course, cmake is compatible with Qt, but it is not convenient to use. So I created Qxlnt.
+## 贡献
 
-### :star: <b>Qlibxlsxwriter</b> [https://github.com/QtExcel/Qlibxlsxwriter](https://github.com/QtExcel/Qlibxlsxwriter)
+欢迎提交问题和贡献代码！以下是项目贡献情况：
 
-<p align="center"><img src="https://github.com/QtExcel/Qlibxlsxwriter/raw/master/markdown.data/logo.png"></p>
+[![贡献图](https://github.com/yourusername/SparkExamAI/graphs/contributors)](https://github.com/yourusername/SparkExamAI/graphs/contributors)
 
-- Qlibxlsxwriter is a helper project that allows libxlsxwriter to be used in Qt.
-- libxlsxwriter is a C library for creating Excel XLSX files.
+如需贡献代码：
 
-### :star: <b>QSimpleXlsxWriter</b> [https://github.com/QtExcel/QSimpleXlsxWriter](https://github.com/QtExcel/QSimpleXlsxWriter)
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建Pull Request
 
-- Use SimpleXlsxWriter in Qt.
-- SimpleXlsxWriter is C++ library for creating XLSX files for MS Excel 2007 and above.
+## 许可证
+
+本项目采用 MIT 许可证 - 详情请查看 [LICENSE](LICENSE) 文件
+
+## 联系方式
+
+项目维护者 - [your-email@example.com](mailto:your-email@example.com)
+
+项目链接: [https://github.com/yourusername/SparkExamAI](https://github.com/yourusername/SparkExamAI) 
