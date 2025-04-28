@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Rectangle {
+    id: thisPage
     color: "transparent"
     
     property var userData
@@ -62,15 +63,43 @@ Rectangle {
         for (var i = 0; i < banks.length; i++) {
             var bank = banks[i]
             var category = getBankCategory(bank.id)
+            
+            // 获取错题数量（如果用户已登录）
+            var wrongCount = 0
+            if (userData && userData.workId) {
+                var wrongQuestionIds = dbManager.getUserWrongQuestionIds(userData.workId, bank.id)
+                wrongCount = wrongQuestionIds.length
+            }
+            
             questionBankModel.append({
                 id: bank.id,
                 name: bank.name,
                 questionCount: bank.count,
+                wrongCount: wrongCount,
                 category: category
             })
         }
         
         console.log("加载题库完成，共", questionBankModel.count, "个题库")
+    }
+    
+    // 添加一个单独的计时器组件用于页面返回刷新
+    Timer {
+        id: refreshTimer
+        interval: 200
+        repeat: false
+        onTriggered: {
+            console.log("定时器触发，刷新题库列表")
+            loadQuestionBanks()
+        }
+    }
+    
+    // 当页面可见性变化时触发刷新
+    onVisibleChanged: {
+        if (visible) {
+            console.log("页面变为可见，刷新题库列表")
+            refreshTimer.start()
+        }
     }
     
     // 开始顺序刷题
@@ -112,6 +141,11 @@ Rectangle {
     }
     
     Component.onCompleted: {
+        loadQuestionBanks()
+    }
+    
+    // 当用户数据变化时，重新加载题库以更新错题数量
+    onUserDataChanged: {
         loadQuestionBanks()
     }
     
@@ -316,12 +350,23 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         
-                        Text {
-                            text: "题目数量: " + model.questionCount
-                            font.family: "阿里妈妈数黑体"
-                            font.pixelSize: 16
-                            color: "#cccccc"
+                        Row {
                             anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 10
+                            
+                            Text {
+                                text: "题目数量: " + model.questionCount
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 16
+                                color: "#cccccc"
+                            }
+                            
+                            Text {
+                                text: "错题数量: " + model.wrongCount
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 16
+                                color: "#FFB6C1"
+                            }
                         }
                         
                         Row {

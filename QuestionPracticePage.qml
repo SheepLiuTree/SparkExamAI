@@ -305,6 +305,44 @@ Rectangle {
         console.log("保存用户题库进度" + (success ? "成功" : "失败"))
     }
     
+    // 清空用户题库进度
+    function clearUserProgress() {
+        if (!userData || !userData.workId) {
+            console.log("无法清空进度：未登录用户")
+            return
+        }
+        
+        // 当前是错题模式不清空进度
+        if (wrongQuestionsMode) return
+        
+        var success = dbManager.deleteUserBankProgress(
+            userData.workId,
+            questionBankId
+        )
+        
+        if (success) {
+            // 重置内存中的数据
+            userAnswers = {}
+            currentQuestionIndex = 0
+            
+            // 隐藏答案分析面板
+            answerPanel.visible = false
+            
+            // 清空选项选择
+            clearSelections()
+            
+            // 清空填空题输入
+            fillAnswerInput.text = ""
+            
+            // 刷新UI
+            refresh()
+            
+            console.log("清空用户题库进度成功")
+        } else {
+            console.log("清空用户题库进度失败")
+        }
+    }
+    
     // 检查一个选项是否已选中
     function isOptionSelected(index) {
         return currentMultiSelections.indexOf(String.fromCharCode(65 + index)) !== -1;
@@ -884,6 +922,39 @@ Rectangle {
                     
                     // 返回上一页
                     stackView.pop()
+                }
+                confirmDialog.open()
+            }
+        }
+        
+        // 清空数据按钮，放在返回按钮右侧（只在非错题模式下显示）
+        Button {
+            id: clearDataButton
+            width: 150
+            height: 40
+            anchors.left: backButton.right
+            anchors.leftMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
+            visible: !wrongQuestionsMode // 只在顺序练习模式下显示
+            background: Image {
+                source: "qrc:/images/button_bg.png"
+                fillMode: Image.Stretch
+            }
+            contentItem: Text {
+                text: "清空答题数据"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 18
+                color: "white"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+            onClicked: {
+                // 显示确认对话框
+                confirmDialog.dialogTitle = "清空数据确认"
+                confirmDialog.dialogMessage = "确定要清空该题库的所有答题数据吗？\n注意：错题集不会被清空。"
+                confirmDialog.confirmAction = function() {
+                    // 清空用户题库进度
+                    clearUserProgress()
                 }
                 confirmDialog.open()
             }
