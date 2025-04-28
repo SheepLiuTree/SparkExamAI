@@ -1,8 +1,6 @@
 E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/EWIEGA46WW/moc_DatabaseManager.cpp: E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/QDateTime \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/QDebug \
-  C:/Qt/5.15.2/msvc2019_64/include/QtCore/QJsonDocument \
-  C:/Qt/5.15.2/msvc2019_64/include/QtCore/QJsonObject \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/QObject \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/QString \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/QVariant \
@@ -13,8 +11,6 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/EWIEGA46WW/moc_
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qbasicatomic.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qbytearray.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qbytearraylist.h \
-  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qcborcommon.h \
-  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qcborvalue.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qchar.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qcompilerdetection.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qconfig.h \
@@ -30,9 +26,6 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/EWIEGA46WW/moc_
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qhashfunctions.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qiodevice.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qiterator.h \
-  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qjsondocument.h \
-  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qjsonobject.h \
-  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qjsonvalue.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qlist.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qlocale.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qlogging.h \
@@ -49,7 +42,6 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/EWIEGA46WW/moc_
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qprocessordetection.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qrefcount.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qregexp.h \
-  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qregularexpression.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qscopedpointer.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qset.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qshareddata.h \
@@ -66,8 +58,6 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/EWIEGA46WW/moc_
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qtcore-config.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qtextstream.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qtypeinfo.h \
-  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qurl.h \
-  C:/Qt/5.15.2/msvc2019_64/include/QtCore/quuid.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qvariant.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qvarlengtharray.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qvector.h \

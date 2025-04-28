@@ -2,3 +2,4 @@ build/.ninja_log
 nul
 deploy/
 build/
+Release/

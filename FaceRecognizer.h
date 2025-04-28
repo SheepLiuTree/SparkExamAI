@@ -8,6 +8,7 @@
 #include <opencv2/opencv.hpp>
 #include <QVariantMap>
 #include <QTimer>
+#include <QDir>
 
 // SeetaFace2 include files
 #include <seeta/FaceDetector.h>
@@ -123,6 +124,12 @@ private:
     
     // 用于控制旋转的定时器
     QTimer *m_rotationTimer;
+    
+    // 递归搜索模型文件的辅助方法
+    QStringList findModelFiles(const QDir &dir);
+    
+    // 紧急初始化方法 - 使用硬编码路径
+    bool emergency_initialize();
 };
 
 #endif // FACERECOGNIZER_H 

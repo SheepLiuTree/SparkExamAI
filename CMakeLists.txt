@@ -151,6 +151,54 @@ if(WIN32)
       ${OPENCV_DLLS}
       $<TARGET_FILE_DIR:SparkExamAI>
   )
+  
+  # 确保模型文件夹存在并复制所有模型文件 - 使用多种方式以确保模型文件被正确复制
+  message(STATUS "==== 复制模型文件到目标目录 ====")
+  
+  # 检查源模型目录是否存在
+  if(EXISTS "${CMAKE_SOURCE_DIR}/model")
+    message(STATUS "源模型目录存在: ${CMAKE_SOURCE_DIR}/model")
+    
+    # 列出模型文件
+    file(GLOB MODEL_FILES "${CMAKE_SOURCE_DIR}/model/*.dat")
+    message(STATUS "模型文件列表: ${MODEL_FILES}")
+    
+    # 1. 复制到应用程序目录的model子目录
+    add_custom_command(TARGET SparkExamAI POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:SparkExamAI>/model
+      COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/model
+        $<TARGET_FILE_DIR:SparkExamAI>/model
+      COMMENT "复制模型文件到目标的model子目录"
+    )
+    
+    # 2. 也直接复制到应用程序目录（为保险起见）
+    add_custom_command(TARGET SparkExamAI POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${MODEL_FILES}
+        $<TARGET_FILE_DIR:SparkExamAI>
+      COMMENT "复制模型文件到目标根目录"
+    )
+    
+    # 记录日志
+    message(STATUS "模型文件源目录: ${CMAKE_SOURCE_DIR}/model")
+    message(STATUS "模型文件目标目录1: $<TARGET_FILE_DIR:SparkExamAI>/model")
+    message(STATUS "模型文件目标目录2: $<TARGET_FILE_DIR:SparkExamAI>")
+  else()
+    message(WARNING "源模型目录不存在: ${CMAKE_SOURCE_DIR}/model")
+  endif()
+  
+  # 添加安装指令，确保模型文件被正确安装
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/model/ 
+          DESTINATION bin/model
+          FILES_MATCHING PATTERN "*.dat")
+  
+  # 也直接复制到bin目录
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/model/ 
+          DESTINATION bin
+          FILES_MATCHING PATTERN "*.dat")
+          
+  message(STATUS "==== 模型文件复制设置完成 ====")
 endif()
 
 include(GNUInstallDirs)

@@ -98,13 +98,16 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/EWIEGA46WW/moc_
   C:/OpenCV4.5.2/include/opencv2/video/tracking.hpp \
   C:/OpenCV4.5.2/include/opencv2/videoio.hpp \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/QDebug \
+  C:/Qt/5.15.2/msvc2019_64/include/QtCore/QDir \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/QObject \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/QString \
+  C:/Qt/5.15.2/msvc2019_64/include/QtCore/QTimer \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/QVariantMap \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qalgorithms.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qarraydata.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qatomic.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qbasicatomic.h \
+  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qbasictimer.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qbytearray.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qbytearraylist.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qchar.h \
@@ -115,6 +118,10 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/EWIEGA46WW/moc_
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qcontiguouscache.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qdatastream.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qdebug.h \
+  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qdir.h \
+  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qfile.h \
+  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qfiledevice.h \
+  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qfileinfo.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qflags.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qglobal.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qglobalstatic.h \
@@ -158,6 +165,7 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/EWIEGA46WW/moc_
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qsystemdetection.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qtcore-config.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qtextstream.h \
+  C:/Qt/5.15.2/msvc2019_64/include/QtCore/qtimer.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qtypeinfo.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qvariant.h \
   C:/Qt/5.15.2/msvc2019_64/include/QtCore/qvarlengtharray.h \
