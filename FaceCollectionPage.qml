@@ -312,7 +312,7 @@ Rectangle {
 
     Popup {
         id: cameraPopup
-        width: 900
+        width: 1100
         height: 500
         anchors.centerIn: parent
         modal: true
@@ -367,7 +367,7 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 20
-                width: parent.width * 0.5 - 30
+                width: parent.width * 0.55 - 30
                 height: parent.height - 100
                 color: "black"
 
@@ -439,7 +439,7 @@ Rectangle {
                 // 顶部指导文字
                 Rectangle {
                     anchors.top: parent.top
-                    anchors.topMargin: 10
+                    anchors.topMargin: 5
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: guideText.width + 20
                     height: guideText.height + 10
@@ -500,7 +500,7 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.margins: 20
-                width: parent.width * 0.5 - 30
+                width: parent.width * 0.45 - 30
                 height: parent.height - 100
                 color: "#44ffffff"
                 radius: 10

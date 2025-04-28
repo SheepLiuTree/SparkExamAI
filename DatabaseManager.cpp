@@ -43,16 +43,69 @@ DatabaseManager::~DatabaseManager()
 bool DatabaseManager::initDatabase()
 {
     // 打开数据库连接
-    m_database = QSqlDatabase::addDatabase("QSQLITE");
+    if (QSqlDatabase::contains(QSqlDatabase::defaultConnection)) {
+        m_database = QSqlDatabase::database(QSqlDatabase::defaultConnection);
+    } else {
+        m_database = QSqlDatabase::addDatabase("QSQLITE");
+    }
+    
+    // 检查数据库目录是否存在
+    QFileInfo dbPathInfo(m_dbPath);
+    QDir dbDir = dbPathInfo.dir();
+    
+    // 详细记录数据库路径信息
+    qDebug() << "数据库文件路径: " << m_dbPath;
+    qDebug() << "数据库目录: " << dbDir.absolutePath();
+    qDebug() << "数据库目录存在: " << (dbDir.exists() ? "是" : "否");
+    
+    // 如果数据库目录不存在，尝试创建
+    if (!dbDir.exists()) {
+        qDebug() << "数据库目录不存在，尝试创建...";
+        if (!dbDir.mkpath(dbDir.absolutePath())) {
+            qDebug() << "创建数据库目录失败";
+            return false;
+        } else {
+            qDebug() << "成功创建数据库目录";
+        }
+    }
+    
+    // 检查目录权限
+    QFileInfo dirInfo(dbDir.absolutePath());
+    qDebug() << "数据库目录权限: " 
+             << (dirInfo.isReadable() ? "可读 " : "不可读 ")
+             << (dirInfo.isWritable() ? "可写 " : "不可写 ")
+             << (dirInfo.isExecutable() ? "可执行" : "不可执行");
+    
+    // 如果数据库文件已存在，检查其权限
+    if (dbPathInfo.exists()) {
+        qDebug() << "数据库文件已存在，大小: " << dbPathInfo.size() << " 字节";
+        qDebug() << "数据库文件权限: " 
+                << (dbPathInfo.isReadable() ? "可读 " : "不可读 ")
+                << (dbPathInfo.isWritable() ? "可写" : "不可写");
+    } else {
+        qDebug() << "数据库文件不存在，将在首次访问时创建";
+    }
+    
+    // 设置数据库文件路径
     m_database.setDatabaseName(m_dbPath);
     
     if (!m_database.open()) {
         qDebug() << "无法打开数据库:" << m_database.lastError().text();
+        
+        // 如果是因为目录不存在或权限问题，输出更多信息
+        QSqlError error = m_database.lastError();
+        qDebug() << "错误类型:" << error.type() << " 错误码:" << error.number();
+        qDebug() << "驱动错误:" << error.driverText();
+        qDebug() << "数据库错误:" << error.databaseText();
+        
         return false;
     }
     
+    qDebug() << "数据库连接成功打开";
+    
     // 创建表
     if (!createTables()) {
+        qDebug() << "创建数据库表失败";
         return false;
     }
     
@@ -65,6 +118,7 @@ bool DatabaseManager::initDatabase()
     // 初始化默认设置
     initDefaultSettings();
     
+    qDebug() << "数据库初始化完成";
     return true;
 }
 
@@ -199,9 +253,10 @@ bool DatabaseManager::createTables()
         "total_questions INTEGER NOT NULL, "
         "correct_count INTEGER NOT NULL, "
         "answer_data TEXT NOT NULL, "
+        "score_percentage REAL DEFAULT 0, "  // 添加score_percentage字段
         "question_bank_info TEXT, "
         "pentagon_type TEXT, "
-        "submission_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"  // 使用created_at而不是submission_time
         ")"
     );
 
@@ -1793,16 +1848,39 @@ bool DatabaseManager::saveUserAnswerRecord(const QString &workId,
         qDebug() << "数据库未打开，尝试重新打开";
         if (!m_database.open()) {
             qDebug() << "无法打开数据库:" << m_database.lastError().text();
-            return false;
+            qDebug() << "尝试重新初始化数据库...";
+            
+            // 检查数据库文件是否存在
+            QFileInfo dbFileInfo(m_dbPath);
+            if (dbFileInfo.exists()) {
+                qDebug() << "数据库文件存在，大小:" << dbFileInfo.size() << "字节";
+                qDebug() << "权限:" << (dbFileInfo.isReadable() ? "可读 " : "不可读 ") 
+                         << (dbFileInfo.isWritable() ? "可写" : "不可写");
+            } else {
+                qDebug() << "数据库文件不存在，可能需要创建";
+            }
+            
+            // 尝试重新初始化
+            if (!initDatabase()) {
+                qDebug() << "重新初始化数据库失败，无法保存答题记录";
+                return false;
+            }
         }
     }
     
+    // 在继续前确保表结构是最新的
+    updateDatabaseSchema();
+    
     QSqlQuery query(m_database);
-    query.prepare(
+    
+    // 准备SQL语句，使用参数化查询防止SQL注入
+    QString sqlStatement = 
         "INSERT INTO user_answer_records "
-        "(work_id, user_name, exam_type, total_questions, correct_count, answer_data, score_percentage, question_bank_info, pentagon_type) "
-        "VALUES (:work_id, :user_name, :exam_type, :total_questions, :correct_count, :answer_data, :score_percentage, :question_bank_info, :pentagon_type)"
-    );
+        "(work_id, user_name, exam_type, total_questions, correct_count, answer_data, score_percentage, question_bank_info, pentagon_type, created_at) "
+        "VALUES (:work_id, :user_name, :exam_type, :total_questions, :correct_count, :answer_data, :score_percentage, :question_bank_info, :pentagon_type, CURRENT_TIMESTAMP)";
+    
+    qDebug() << "执行SQL:" << sqlStatement;
+    query.prepare(sqlStatement);
     
     query.bindValue(":work_id", workId);
     query.bindValue(":user_name", userName);
@@ -1821,7 +1899,21 @@ bool DatabaseManager::saveUserAnswerRecord(const QString &workId,
     query.bindValue(":score_percentage", scorePercentage);
     
     if (!query.exec()) {
-        qDebug() << "保存用户答题记录失败:" << query.lastError().text();
+        QSqlError error = query.lastError();
+        qDebug() << "保存用户答题记录失败:" << error.text();
+        qDebug() << "错误类型:" << error.type() << " 错误码:" << error.number();
+        qDebug() << "驱动错误:" << error.driverText();
+        qDebug() << "数据库错误:" << error.databaseText();
+        
+        // 尝试检查表结构
+        QSqlQuery checkQuery(m_database);
+        if (checkQuery.exec("PRAGMA table_info(user_answer_records)")) {
+            qDebug() << "user_answer_records表结构:";
+            while (checkQuery.next()) {
+                qDebug() << "  " << checkQuery.value(1).toString() << " " << checkQuery.value(2).toString();
+            }
+        }
+        
         return false;
     }
     
@@ -2531,7 +2623,7 @@ bool DatabaseManager::updateDatabaseSchema()
     
     QSqlQuery query(m_database);
     
-    // 检查user_answer_records表中是否存在question_bank_info列
+    // 检查user_answer_records表中的列
     query.prepare("PRAGMA table_info(user_answer_records)");
     if (!query.exec()) {
         qDebug() << "检查表结构失败:" << query.lastError().text();
@@ -2540,6 +2632,9 @@ bool DatabaseManager::updateDatabaseSchema()
     
     bool hasQuestionBankInfo = false;
     bool hasPentagonType = false;
+    bool hasScorePercentage = false;
+    bool hasSubmissionTime = false;
+    bool hasCreatedAt = false;
     
     while (query.next()) {
         QString columnName = query.value(1).toString();
@@ -2547,6 +2642,12 @@ bool DatabaseManager::updateDatabaseSchema()
             hasQuestionBankInfo = true;
         } else if (columnName == "pentagon_type") {
             hasPentagonType = true;
+        } else if (columnName == "score_percentage") {
+            hasScorePercentage = true;
+        } else if (columnName == "submission_time") {
+            hasSubmissionTime = true;
+        } else if (columnName == "created_at") {
+            hasCreatedAt = true;
         }
     }
     
@@ -2564,7 +2665,40 @@ bool DatabaseManager::updateDatabaseSchema()
         qDebug() << "添加pentagon_type列到user_answer_records表";
         if (!query.exec("ALTER TABLE user_answer_records ADD COLUMN pentagon_type TEXT")) {
             qDebug() << "添加pentagon_type列失败:" << query.lastError().text();
-            return false;
+            // 继续执行，尝试添加下一列
+        }
+    }
+    
+    // 添加score_percentage列（如果不存在）
+    if (!hasScorePercentage) {
+        qDebug() << "添加score_percentage列到user_answer_records表";
+        if (!query.exec("ALTER TABLE user_answer_records ADD COLUMN score_percentage REAL DEFAULT 0")) {
+            qDebug() << "添加score_percentage列失败:" << query.lastError().text();
+            // 继续执行，尝试添加下一列
+        }
+    }
+    
+    // 处理字段名不一致的情况：submission_time 和 created_at
+    if (hasSubmissionTime && !hasCreatedAt) {
+        qDebug() << "添加created_at列到user_answer_records表并从submission_time复制数据";
+        
+        // 首先添加created_at列
+        if (!query.exec("ALTER TABLE user_answer_records ADD COLUMN created_at TIMESTAMP")) {
+            qDebug() << "添加created_at列失败:" << query.lastError().text();
+            // 继续执行
+        } else {
+            // 将submission_time的数据复制到created_at
+            if (!query.exec("UPDATE user_answer_records SET created_at = submission_time")) {
+                qDebug() << "从submission_time复制数据到created_at失败:" << query.lastError().text();
+                // 继续执行
+            }
+        }
+    } else if (!hasSubmissionTime && !hasCreatedAt) {
+        // 如果两个字段都不存在，添加created_at
+        qDebug() << "添加created_at列到user_answer_records表";
+        if (!query.exec("ALTER TABLE user_answer_records ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP")) {
+            qDebug() << "添加created_at列失败:" << query.lastError().text();
+            // 继续执行
         }
     }
     
