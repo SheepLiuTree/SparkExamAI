@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <opencv2/opencv.hpp>
 #include <QVariantMap>
+#include <QTimer>
 
 // SeetaFace2 include files
 #include <seeta/FaceDetector.h>
@@ -21,6 +22,7 @@
 class FaceRecognizer : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(float rotationAngle READ rotationAngle NOTIFY rotationAngleChanged)
 
 public:
     explicit FaceRecognizer(QObject *parent = nullptr);
@@ -78,6 +80,29 @@ public:
     // 用于人脸跟踪的方法，返回人脸位置信息
     Q_INVOKABLE QVariantMap detectFacePosition(const QString &imagePath);
 
+    // 获取当前旋转角度
+    float rotationAngle() const { return m_rotationAngle; }
+
+    /**
+     * @brief 开始人脸追踪框的逆时针旋转
+     * @param interval 旋转更新间隔 (毫秒)
+     * @param speed 旋转速度 (每次更新的角度增量)
+     */
+    Q_INVOKABLE void startRotation(int interval = 50, float speed = 2.0f);
+
+    /**
+     * @brief 停止人脸追踪框的旋转
+     */
+    Q_INVOKABLE void stopRotation();
+
+signals:
+    // 当旋转角度改变时发出信号
+    void rotationAngleChanged();
+
+private slots:
+    // 更新旋转角度
+    void updateRotation();
+
 private:
     // SeetaFace2 models
     seeta::FaceDetector *m_faceDetector;
@@ -89,6 +114,15 @@ private:
 
     // 模型路径
     QString m_modelPath;
+
+    // 旋转角度 (0-360度)
+    float m_rotationAngle;
+    
+    // 旋转速度 (每次更新的角度)
+    float m_rotationSpeed;
+    
+    // 用于控制旋转的定时器
+    QTimer *m_rotationTimer;
 };
 
 #endif // FACERECOGNIZER_H 

@@ -7,6 +7,8 @@
         <file>QuestionEnginePage.qml</file>
         <file>QuestionCollectionPage.qml</file>
         <file>SparkAIAgentPage.qml</file>
+        <file>SpecialTrainingPage.qml</file>
+        <file>QuestionPracticePage.qml</file>
         <file>QuestionEngineSettings/GeneralSettings.qml</file>
         <file>QuestionEngineSettings/StrategiesSettings.qml</file>
         <file>QuestionEngineSettings/KnowledgePointSettings.qml</file>

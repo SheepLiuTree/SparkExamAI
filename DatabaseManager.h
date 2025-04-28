@@ -198,6 +198,28 @@ public:
     // 获取用户的五芒图数据（当月、上月、上上月）
     Q_INVOKABLE QVariantMap getUserPentagonData(const QString &workId);
 
+    // 用户题库进度相关方法
+    
+    // 保存用户题库进度
+    Q_INVOKABLE bool saveUserBankProgress(const QString &workId, 
+                                         int bankId,
+                                         int currentQuestionIndex,
+                                         const QString &userAnswersJson);
+    
+    // 获取用户题库进度
+    Q_INVOKABLE QVariantMap getUserBankProgress(const QString &workId, int bankId);
+    
+    // 更新用户错题集
+    Q_INVOKABLE bool updateUserWrongQuestions(const QString &workId, 
+                                             int bankId,
+                                             const QVariantList &wrongQuestionIds);
+    
+    // 获取用户错题ID列表
+    Q_INVOKABLE QVariantList getUserWrongQuestionIds(const QString &workId, int bankId);
+    
+    // 删除用户题库进度
+    Q_INVOKABLE bool deleteUserBankProgress(const QString &workId, int bankId);
+
 private:
     QSqlDatabase m_database;
     QString m_dbPath;

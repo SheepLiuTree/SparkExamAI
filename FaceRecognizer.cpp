@@ -6,16 +6,24 @@
 #include <QDebug>
 #include <QApplication>
 #include <QUrl>
+#include <QTimer>
 
 FaceRecognizer::FaceRecognizer(QObject *parent) : QObject(parent),
     m_faceDetector(nullptr),
     m_faceLandmarker(nullptr),
     m_faceRecognizer(nullptr),
-    m_initialized(false)
+    m_initialized(false),
+    m_rotationAngle(0.0f),
+    m_rotationSpeed(2.0f),
+    m_rotationTimer(nullptr)
 {
     // 设置模型路径为当前应用程序目录下的model文件夹
     m_modelPath = QApplication::applicationDirPath() + "/model";
     qDebug() << "SeetaFace2 model path:" << m_modelPath;
+    
+    // 初始化旋转定时器
+    m_rotationTimer = new QTimer(this);
+    connect(m_rotationTimer, &QTimer::timeout, this, &FaceRecognizer::updateRotation);
 }
 
 FaceRecognizer::~FaceRecognizer()
@@ -34,6 +42,11 @@ FaceRecognizer::~FaceRecognizer()
     if (m_faceRecognizer) {
         delete m_faceRecognizer;
         m_faceRecognizer = nullptr;
+    }
+    
+    // 停止并清理定时器
+    if (m_rotationTimer) {
+        m_rotationTimer->stop();
     }
 }
 
@@ -461,9 +474,13 @@ QVariantMap FaceRecognizer::detectFacePosition(const QString &imagePath)
             result["height"] = face.pos.height;
             result["score"] = face.score;
             
+            // 添加旋转角度信息
+            result["rotationAngle"] = m_rotationAngle;
+            
             qDebug() << "人脸检测成功: 位置(" << face.pos.x << "," << face.pos.y 
                      << ") 尺寸(" << face.pos.width << "x" << face.pos.height
-                     << ") 置信度:" << face.score;
+                     << ") 置信度:" << face.score
+                     << " 旋转角度:" << m_rotationAngle;
             
             // 如果面部置信度太低，可能是误检，标记为未检测到
             if (face.score < 0.3) {
@@ -480,4 +497,45 @@ QVariantMap FaceRecognizer::detectFacePosition(const QString &imagePath)
         qDebug() << "人脸位置检测出错: " << e.what();
         return result;
     }
+}
+
+// 开始人脸追踪框的逆时针旋转
+void FaceRecognizer::startRotation(int interval, float speed)
+{
+    m_rotationSpeed = speed;
+    
+    // 如果定时器已经运行，先停止
+    if (m_rotationTimer->isActive()) {
+        m_rotationTimer->stop();
+    }
+    
+    // 设置新的定时器间隔并启动
+    m_rotationTimer->setInterval(interval);
+    m_rotationTimer->start();
+    
+    qDebug() << "开始人脸追踪框逆时针旋转, 间隔:" << interval << "毫秒, 速度:" << speed << "度/更新";
+}
+
+// 停止人脸追踪框的旋转
+void FaceRecognizer::stopRotation()
+{
+    if (m_rotationTimer->isActive()) {
+        m_rotationTimer->stop();
+        qDebug() << "停止人脸追踪框旋转";
+    }
+}
+
+// 更新旋转角度 (逆时针旋转)
+void FaceRecognizer::updateRotation()
+{
+    // 更新角度 (逆时针旋转，即角度增加)
+    m_rotationAngle += m_rotationSpeed;
+    
+    // 保持角度在0-360范围内
+    if (m_rotationAngle >= 360.0f) {
+        m_rotationAngle -= 360.0f;
+    }
+    
+    // 发出角度变化信号
+    emit rotationAngleChanged();
 } 

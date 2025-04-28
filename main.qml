@@ -949,7 +949,7 @@ Window {
                 
                 Text {
                     id: monthly_stats_title
-                    text: "本月星火日课刷题数："
+                    text: "本月刷题数："
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 20
                     color: "white"
@@ -2204,6 +2204,10 @@ Window {
                 console.log("启动人脸跟踪定时器")
                 faceTrackingTimer.start()
                 
+                // 启动人脸追踪框逆时针旋转
+                console.log("启动人脸追踪框逆时针旋转")
+                faceRecognizer.startRotation(50, 1.5) // 50毫秒更新一次，每次旋转1.5度
+                
                 // 延迟启动人脸识别
                 recognitionTimer.restart()
             })
@@ -2219,6 +2223,9 @@ Window {
             faceTrackingTimer.stop()
             recognitionTimer.stop()
             periodicRecognitionTimer.stop()
+            
+            // 停止人脸追踪框旋转
+            faceRecognizer.stopRotation()
             
             // 清理变量
             isRecognizing = false
@@ -2552,6 +2559,21 @@ Window {
                         Behavior on y { NumberAnimation { duration: 200 } }
                         Behavior on width { NumberAnimation { duration: 200 } }
                         Behavior on height { NumberAnimation { duration: 200 } }
+                        
+                        // 设置旋转属性和变换原点
+                        transformOrigin: Item.Center
+                        rotation: faceRecognitionPopup.isFaceDetected ? faceRecognizer.rotationAngle : 0
+                        
+                        // 平滑旋转动画
+                        Behavior on rotation { NumberAnimation { duration: 50 } }
+                        
+                        // 监听旋转角度变化
+                        Connections {
+                            target: faceRecognizer
+                            function onRotationAngleChanged() {
+                                // 角度已通过rotation属性自动绑定，不需要额外处理
+                            }
+                        }
                     }
                 }
                 

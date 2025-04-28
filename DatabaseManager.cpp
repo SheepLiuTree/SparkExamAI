@@ -199,14 +199,54 @@ bool DatabaseManager::createTables()
         "total_questions INTEGER NOT NULL, "
         "correct_count INTEGER NOT NULL, "
         "answer_data TEXT NOT NULL, "
-        "score_percentage REAL NOT NULL, "
-        "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-        "FOREIGN KEY (work_id) REFERENCES users(work_id)"
+        "question_bank_info TEXT, "
+        "pentagon_type TEXT, "
+        "submission_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
         ")"
     );
 
     if (!success) {
         qDebug() << "Failed to create user_answer_records table:" << query.lastError().text();
+        return false;
+    }
+    
+    // 创建用户题库进度表
+    success = query.exec(
+        "CREATE TABLE IF NOT EXISTS user_bank_progress ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "work_id TEXT NOT NULL, "
+        "bank_id INTEGER NOT NULL, "
+        "current_question_index INTEGER DEFAULT 0, "
+        "user_answers TEXT NOT NULL, "
+        "last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+        "UNIQUE(work_id, bank_id), "
+        "FOREIGN KEY (work_id) REFERENCES users(work_id), "
+        "FOREIGN KEY (bank_id) REFERENCES question_banks(id) ON DELETE CASCADE"
+        ")"
+    );
+
+    if (!success) {
+        qDebug() << "Failed to create user_bank_progress table:" << query.lastError().text();
+        return false;
+    }
+    
+    // 创建用户错题集表
+    success = query.exec(
+        "CREATE TABLE IF NOT EXISTS user_wrong_questions ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "work_id TEXT NOT NULL, "
+        "bank_id INTEGER NOT NULL, "
+        "question_id INTEGER NOT NULL, "
+        "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+        "UNIQUE(work_id, question_id), "
+        "FOREIGN KEY (work_id) REFERENCES users(work_id), "
+        "FOREIGN KEY (bank_id) REFERENCES question_banks(id) ON DELETE CASCADE, "
+        "FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE"
+        ")"
+    );
+
+    if (!success) {
+        qDebug() << "Failed to create user_wrong_questions table:" << query.lastError().text();
         return false;
     }
 
@@ -2157,11 +2197,10 @@ int DatabaseManager::getUserCurrentMonthQuestionCount(const QString &workId)
     
     QSqlQuery query(m_database);
     
-    // 查询当月完成的星火日课题目总数
+    // 查询当月完成的题目总数
     query.prepare("SELECT SUM(total_questions) "
                  "FROM user_answer_records "
                  "WHERE work_id = :workId "
-                 "AND exam_type = '星火日课' "  // 限定为星火日课
                  "AND date(created_at) >= date(:startDate) "
                  "AND date(created_at) <= date(:endDate)");
     query.bindValue(":workId", workId);
@@ -2207,12 +2246,11 @@ QVariantList DatabaseManager::getUserYearlyQuestionData(const QString &workId)
     
     QSqlQuery query(m_database);
     
-    // 查询本年度每月的星火日课题目总数
+    // 查询本年度每月的题目总数
     query.prepare("SELECT strftime('%m', created_at) as month, "
                  "SUM(total_questions) as questionCount "
                  "FROM user_answer_records "
                  "WHERE work_id = :workId "
-                 "AND exam_type = '星火日课' "  // 限定为星火日课
                  "AND strftime('%Y', created_at) = :year "
                  "GROUP BY strftime('%m', created_at) "
                  "ORDER BY month");
@@ -2287,12 +2325,11 @@ QVariantList DatabaseManager::getUserRollingYearQuestionData(const QString &work
     
     QSqlQuery query(m_database);
     
-    // 查询过去12个月的星火日课题目总数，使用精确的年月格式
+    // 查询过去12个月的题目总数，使用精确的年月格式
     query.prepare("SELECT strftime('%Y-%m', created_at) as yearMonth, "
                  "SUM(total_questions) as questionCount "
                  "FROM user_answer_records "
                  "WHERE work_id = :workId "
-                 "AND exam_type = '星火日课' "
                  "AND date(created_at) >= date(:startDate) "
                  "AND date(created_at) <= date(:endDate) "
                  "GROUP BY yearMonth "
@@ -2455,11 +2492,10 @@ int DatabaseManager::getMaxMonthlyQuestionCount()
     
     QSqlQuery query(m_database);
     
-    // 查询当月每个用户的星火日课题目总数，并获取最大值
+    // 查询当月每个用户的题目总数，并获取最大值
     query.prepare("SELECT work_id, SUM(total_questions) as total "
                  "FROM user_answer_records "
-                 "WHERE exam_type = '星火日课' "
-                 "AND date(created_at) >= date(:startDate) "
+                 "WHERE date(created_at) >= date(:startDate) "
                  "AND date(created_at) <= date(:endDate) "
                  "GROUP BY work_id "
                  "ORDER BY total DESC "
@@ -2725,4 +2761,225 @@ QVariantMap DatabaseManager::getUserPentagonData(const QString &workId)
     result["twoMonthsAgo"] = twoMonthsAgoData;
     
     return result;
-} 
+}
+
+// 保存用户题库进度
+bool DatabaseManager::saveUserBankProgress(const QString &workId, int bankId, 
+                                         int currentQuestionIndex, 
+                                         const QString &userAnswersJson)
+{
+    if (!m_database.isOpen()) {
+        qDebug() << "保存用户题库进度失败: 数据库未打开";
+        return false;
+    }
+    
+    if (workId.isEmpty()) {
+        qDebug() << "保存用户题库进度失败: 用户ID为空";
+        return false;
+    }
+    
+    QSqlQuery query(m_database);
+    
+    // 使用 INSERT OR REPLACE 语法进行 UPSERT 操作
+    query.prepare(
+        "INSERT OR REPLACE INTO user_bank_progress "
+        "(work_id, bank_id, current_question_index, user_answers, last_updated) "
+        "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)"
+    );
+    
+    query.bindValue(0, workId);
+    query.bindValue(1, bankId);
+    query.bindValue(2, currentQuestionIndex);
+    query.bindValue(3, userAnswersJson);
+    
+    bool success = query.exec();
+    
+    if (!success) {
+        qDebug() << "保存用户题库进度失败:" << query.lastError().text();
+    } else {
+        qDebug() << "成功保存用户" << workId << "题库" << bankId << "的进度";
+    }
+    
+    return success;
+}
+
+// 获取用户题库进度
+QVariantMap DatabaseManager::getUserBankProgress(const QString &workId, int bankId)
+{
+    QVariantMap result;
+    
+    if (!m_database.isOpen()) {
+        qDebug() << "获取用户题库进度失败: 数据库未打开";
+        return result;
+    }
+    
+    QSqlQuery query(m_database);
+    
+    query.prepare(
+        "SELECT current_question_index, user_answers "
+        "FROM user_bank_progress "
+        "WHERE work_id = ? AND bank_id = ?"
+    );
+    
+    query.bindValue(0, workId);
+    query.bindValue(1, bankId);
+    
+    bool success = query.exec();
+    
+    if (!success) {
+        qDebug() << "查询用户题库进度失败:" << query.lastError().text();
+        return result;
+    }
+    
+    if (query.next()) {
+        result["currentQuestionIndex"] = query.value(0).toInt();
+        result["userAnswers"] = query.value(1).toString();
+        result["hasProgress"] = true;
+    } else {
+        // 没有找到进度记录
+        result["hasProgress"] = false;
+    }
+    
+    return result;
+}
+
+// 更新用户错题集
+bool DatabaseManager::updateUserWrongQuestions(const QString &workId, int bankId, 
+                                             const QVariantList &wrongQuestionIds)
+{
+    if (!m_database.isOpen()) {
+        qDebug() << "更新用户错题集失败: 数据库未打开";
+        return false;
+    }
+    
+    if (workId.isEmpty()) {
+        qDebug() << "更新用户错题集失败: 用户ID为空";
+        return false;
+    }
+    
+    // 开始事务
+    m_database.transaction();
+    
+    QSqlQuery query(m_database);
+    
+    // 先删除该用户在该题库的所有错题记录
+    query.prepare(
+        "DELETE FROM user_wrong_questions "
+        "WHERE work_id = ? AND bank_id = ?"
+    );
+    
+    query.bindValue(0, workId);
+    query.bindValue(1, bankId);
+    
+    bool success = query.exec();
+    
+    if (!success) {
+        qDebug() << "删除旧错题记录失败:" << query.lastError().text();
+        m_database.rollback();
+        return false;
+    }
+    
+    // 如果有新的错题记录，则插入
+    if (!wrongQuestionIds.isEmpty()) {
+        // 插入新的错题记录
+        query.prepare(
+            "INSERT INTO user_wrong_questions "
+            "(work_id, bank_id, question_id) "
+            "VALUES (?, ?, ?)"
+        );
+        
+        for (const QVariant &questionIdVar : wrongQuestionIds) {
+            int questionId = questionIdVar.toInt();
+            
+            query.bindValue(0, workId);
+            query.bindValue(1, bankId);
+            query.bindValue(2, questionId);
+            
+            success = query.exec();
+            
+            if (!success) {
+                qDebug() << "插入错题记录失败:" << query.lastError().text();
+                m_database.rollback();
+                return false;
+            }
+        }
+        
+        qDebug() << "成功更新用户" << workId << "题库" << bankId << "的错题集，共" << wrongQuestionIds.size() << "道题";
+    } else {
+        // 如果没有错题记录，表示清空错题集
+        qDebug() << "成功清空用户" << workId << "题库" << bankId << "的错题集";
+    }
+    
+    // 提交事务
+    if (!m_database.commit()) {
+        qDebug() << "提交事务失败:" << m_database.lastError().text();
+        m_database.rollback();
+        return false;
+    }
+    
+    return true;
+}
+
+// 获取用户错题ID列表
+QVariantList DatabaseManager::getUserWrongQuestionIds(const QString &workId, int bankId)
+{
+    QVariantList result;
+    
+    if (!m_database.isOpen()) {
+        qDebug() << "获取用户错题集失败: 数据库未打开";
+        return result;
+    }
+    
+    QSqlQuery query(m_database);
+    
+    query.prepare(
+        "SELECT question_id "
+        "FROM user_wrong_questions "
+        "WHERE work_id = ? AND bank_id = ?"
+    );
+    
+    query.bindValue(0, workId);
+    query.bindValue(1, bankId);
+    
+    bool success = query.exec();
+    
+    if (!success) {
+        qDebug() << "查询用户错题集失败:" << query.lastError().text();
+        return result;
+    }
+    
+    while (query.next()) {
+        result.append(query.value(0).toInt());
+    }
+    
+    return result;
+}
+
+// 删除用户题库进度
+bool DatabaseManager::deleteUserBankProgress(const QString &workId, int bankId)
+{
+    if (!m_database.isOpen()) {
+        qDebug() << "删除用户题库进度失败: 数据库未打开";
+        return false;
+    }
+    
+    QSqlQuery query(m_database);
+    
+    query.prepare(
+        "DELETE FROM user_bank_progress "
+        "WHERE work_id = ? AND bank_id = ?"
+    );
+    
+    query.bindValue(0, workId);
+    query.bindValue(1, bankId);
+    
+    bool success = query.exec();
+    
+    if (!success) {
+        qDebug() << "删除用户题库进度失败:" << query.lastError().text();
+    } else {
+        qDebug() << "成功删除用户" << workId << "题库" << bankId << "的进度";
+    }
+    
+    return success;
+}

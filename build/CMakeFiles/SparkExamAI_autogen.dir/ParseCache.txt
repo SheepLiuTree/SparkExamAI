@@ -4,6 +4,8 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.h
  mdp:E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/QDateTime
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/QDebug
+ mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/QJsonDocument
+ mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/QJsonObject
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/QObject
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/QString
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/QVariant
@@ -14,6 +16,8 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qbasicatomic.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qbytearray.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qbytearraylist.h
+ mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qcborcommon.h
+ mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qcborvalue.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qchar.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qcompilerdetection.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qconfig.h
@@ -29,6 +33,9 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qhashfunctions.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qiodevice.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qiterator.h
+ mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qjsondocument.h
+ mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qjsonobject.h
+ mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qjsonvalue.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qlist.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qlocale.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qlogging.h
@@ -45,6 +52,7 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qprocessordetection.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qrefcount.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qregexp.h
+ mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qregularexpression.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qscopedpointer.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qset.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qshareddata.h
@@ -61,6 +69,8 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qtcore-config.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qtextstream.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qtypeinfo.h
+ mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qurl.h
+ mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/quuid.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qvariant.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qvarlengtharray.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qvector.h
@@ -316,6 +326,7 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/FileManager.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qvector.h
  mdp:C:/Qt/5.15.2/msvc2019_64/include/QtCore/qversiontagging.h
 E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.cpp
+E:/SparkExamAI/SparkExamAI/SparkExamAI/UserProgressAndWrongQuestions.cpp
 E:/SparkExamAI/SparkExamAI/SparkExamAI/FaceRecognizer.cpp
 E:/SparkExamAI/SparkExamAI/SparkExamAI/main.cpp
 E:/SparkExamAI/SparkExamAI/SparkExamAI/FileManager.cpp
