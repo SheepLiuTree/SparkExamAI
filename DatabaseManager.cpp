@@ -94,7 +94,7 @@ bool DatabaseManager::initDatabase()
         
         // 如果是因为目录不存在或权限问题，输出更多信息
         QSqlError error = m_database.lastError();
-        qDebug() << "错误类型:" << error.type() << " 错误码:" << error.number();
+        qDebug() << "错误类型:" << error.type() << " 错误码:" << error.nativeErrorCode();
         qDebug() << "驱动错误:" << error.driverText();
         qDebug() << "数据库错误:" << error.databaseText();
         
@@ -715,6 +715,150 @@ bool DatabaseManager::verifyFace(const QString &workId, const QString &faceImage
     logQuery.exec();
     
     qDebug() << "Face verification result:" << result << "Similarity:" << similarity << "Threshold:" << threshold;
+    
+    return result;
+}
+
+QVariantMap DatabaseManager::recognizeFace(const QString &faceImagePath)
+{
+    qDebug() << "Recognizing face using image:" << faceImagePath;
+    
+    QVariantMap result;
+    result["recognized"] = false;
+    
+    // 检查图像文件是否存在
+    QFileInfo imageFile(faceImagePath);
+    if (!imageFile.exists() || !imageFile.isFile()) {
+        qDebug() << "Face image file does not exist or is not a file:" << faceImagePath;
+        return result;
+    }
+    
+    // 创建人脸识别器
+    static FaceRecognizer faceRecognizer;
+    
+    // 初始化人脸识别器
+    if (!faceRecognizer.initialize()) {
+        qDebug() << "Failed to initialize face recognizer.";
+        return result;
+    }
+    
+    // 获取相似度阈值
+    float threshold = getSetting("face_recognition_threshold", "0.6").toFloat();
+    qDebug() << "Face recognition threshold:" << threshold;
+    
+    // 获取最近识别过的用户 - 优先比较这些用户
+    static QStringList recentUsers;
+    
+    // 最大比较用户数量，避免对所有用户进行比较
+    int maxUsersToCompare = 10;
+    
+    float highestSimilarity = 0.0f;
+    QVariantMap bestMatch;
+    
+    // 先检查人脸位置，确保有人脸再进行比对
+    QVariantMap facePosition = faceRecognizer.detectFacePosition(faceImagePath);
+    if (!facePosition["faceDetected"].toBool()) {
+        qDebug() << "No face detected in the recognition image";
+        return result;
+    }
+    
+    // 获取所有用户
+    QVariantList allUsers = getAllFaceData();
+    if (allUsers.isEmpty()) {
+        qDebug() << "No users found in database";
+        return result;
+    }
+    
+    // 重新排序用户列表，将最近识别过的用户放在前面
+    QVariantList sortedUsers;
+    
+    // 先添加最近识别过的用户
+    for (const QString &recentUserId : recentUsers) {
+        for (int i = 0; i < allUsers.size(); ++i) {
+            QVariantMap user = allUsers[i].toMap();
+            if (user["workId"].toString() == recentUserId) {
+                sortedUsers.append(user);
+                allUsers.removeAt(i);
+                break;
+            }
+        }
+    }
+    
+    // 然后添加其他用户
+    sortedUsers.append(allUsers);
+    
+    // 限制比较的用户数量
+    int usersToCompare = qMin(maxUsersToCompare, sortedUsers.size());
+    
+    // 遍历用户进行人脸比对
+    for (int i = 0; i < usersToCompare; ++i) {
+        QVariantMap user = sortedUsers[i].toMap();
+        
+        // 获取用户注册的人脸图像
+        QString registeredFaceImage = user["faceImage"].toString();
+        
+        // 如果路径是URL格式，转换为本地路径
+        if (registeredFaceImage.startsWith("file:///")) {
+            QUrl url(registeredFaceImage);
+            registeredFaceImage = url.toLocalFile();
+        }
+        
+        // 检查注册的人脸图像是否存在
+        QFileInfo registeredImageFile(registeredFaceImage);
+        if (!registeredImageFile.exists() || !registeredImageFile.isFile()) {
+            qDebug() << "Registered face image file does not exist or is not a file:" << registeredFaceImage;
+            continue;
+        }
+        
+        // 比较两张人脸图像
+        float similarity = faceRecognizer.compareFaces(registeredFaceImage, faceImagePath);
+        qDebug() << "User:" << user["name"].toString() << "Similarity:" << similarity;
+        
+        // 记录最高相似度的用户
+        if (similarity > highestSimilarity) {
+            highestSimilarity = similarity;
+            bestMatch = user;
+            
+            // 如果相似度已经很高，直接返回结果
+            if (similarity > 0.85) {
+                break;
+            }
+        }
+    }
+    
+    // 判断是否找到匹配的用户
+    if (highestSimilarity >= threshold && !bestMatch.isEmpty()) {
+        qDebug() << "Face recognized as user:" << bestMatch["name"].toString() 
+                 << "with similarity:" << highestSimilarity;
+        
+        // 更新最近识别的用户列表
+        QString recognizedUserId = bestMatch["workId"].toString();
+        recentUsers.removeAll(recognizedUserId);
+        recentUsers.prepend(recognizedUserId);
+        
+        // 最多保留5个最近用户
+        while (recentUsers.size() > 5) {
+            recentUsers.removeLast();
+        }
+        
+        // 记录访问日志
+        QSqlQuery logQuery;
+        logQuery.prepare(
+            "INSERT INTO access_logs (work_id, access_result) "
+            "VALUES (:work_id, :access_result)"
+        );
+        logQuery.bindValue(":work_id", bestMatch["workId"].toString());
+        logQuery.bindValue(":access_result", 1);
+        logQuery.exec();
+        
+        // 返回识别结果
+        result["recognized"] = true;
+        result["name"] = bestMatch["name"];
+        result["workId"] = bestMatch["workId"];
+        result["similarity"] = highestSimilarity;
+    } else {
+        qDebug() << "No matching face found. Highest similarity:" << highestSimilarity;
+    }
     
     return result;
 }
@@ -1901,7 +2045,7 @@ bool DatabaseManager::saveUserAnswerRecord(const QString &workId,
     if (!query.exec()) {
         QSqlError error = query.lastError();
         qDebug() << "保存用户答题记录失败:" << error.text();
-        qDebug() << "错误类型:" << error.type() << " 错误码:" << error.number();
+        qDebug() << "错误类型:" << error.type() << " 错误码:" << error.nativeErrorCode();
         qDebug() << "驱动错误:" << error.driverText();
         qDebug() << "数据库错误:" << error.databaseText();
         

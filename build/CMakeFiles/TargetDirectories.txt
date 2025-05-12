@@ -1,4 +1,5 @@
 E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/SparkExamAI.dir
+E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/SparkExamAI_qmlimportscan.dir
 E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/package.dir
 E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/package_source.dir
 E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/edit_cache.dir

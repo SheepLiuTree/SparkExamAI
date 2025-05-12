@@ -2,7 +2,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
-import QtQuick.Dialogs 1.3
+import QtQuick.Dialogs
+import QtCore
 
 Rectangle {
     id: knowledgePointSettingsPage
@@ -20,11 +21,11 @@ Rectangle {
     FileDialog {
         id: folderDialog
         title: "请选择保存模板的文件夹"
-        selectFolder: true
-        folder: shortcuts.home
+        fileMode: FileDialog.OpenDirectory
+        currentFolder: StandardPaths.standardLocations(StandardPaths.HomeLocation)[0]
         
         onAccepted: {
-            var folderPath = folderDialog.fileUrl.toString()
+            var folderPath = folderDialog.selectedFolder.toString()
             // 移除 file:/// 前缀
             folderPath = folderPath.replace(/^(file:\/{3})/,"")
             // 解码 URL 编码的路径
@@ -62,12 +63,12 @@ Rectangle {
     FileDialog {
         id: importDialog
         title: "请选择智点Excel文件"
-        selectFolder: false
-        folder: shortcuts.home
+        fileMode: FileDialog.OpenFile
+        currentFolder: StandardPaths.standardLocations(StandardPaths.HomeLocation)[0]
         nameFilters: ["Excel文件 (*.xlsx *.xls)"]
         
         onAccepted: {
-            var filePath = importDialog.fileUrl.toString()
+            var filePath = importDialog.selectedFile.toString()
             // 移除 file:/// 前缀
             filePath = filePath.replace(/^(file:\/{3})/,"")
             // 解码 URL 编码的路径

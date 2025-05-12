@@ -26,8 +26,85 @@ The CXX compiler identification is MSVC, found in "E:/SparkExamAI/SparkExamAI/Sp
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/Qt/Tools/Ninja/ninja.exe cmTC_6142f && [1/2] Building CXX object CMakeFiles\cmTC_6142f.dir\CMakeCXXCompilerABI.cpp.obj
-[2/2] Linking CXX executable cmTC_6142f.exe
+Run Build Command(s):C:/Tools/ninja/ninja.exe cmTC_9149e && [1/2] Building CXX object CMakeFiles\cmTC_9149e.dir\CMakeCXXCompilerABI.cpp.obj
+注意: 包含文件:  C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\CMakeCompilerABI.h
+[2/2] Linking CXX executable cmTC_9149e.exe
 
 
 
+Performing C++ SOURCE FILE Test HAVE_STDATOMIC succeeded with the following output:
+Change Dir: E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Tools/ninja/ninja.exe cmTC_78a29 && [1/2] Building CXX object CMakeFiles\cmTC_78a29.dir\src.cxx.obj
+注意: 包含文件:  C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\atomic
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\yvals.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\yvals_core.h
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vcruntime.h
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\sal.h
+注意: 包含文件:       C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\concurrencysal.h
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vadefs.h
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xkeycheck.h
+注意: 包含文件:    D:\Windows Kits\10\include\10.0.26100.0\ucrt\crtdbg.h
+注意: 包含文件:     D:\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vcruntime_new_debug.h
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vcruntime_new.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\crtdefs.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\use_ansi.h
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\cstddef
+注意: 包含文件:    D:\Windows Kits\10\include\10.0.26100.0\ucrt\stddef.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xtr1common
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\cstdint
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\stdint.h
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\cstring
+注意: 包含文件:    D:\Windows Kits\10\include\10.0.26100.0\ucrt\string.h
+注意: 包含文件:     D:\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_memory.h
+注意: 包含文件:      D:\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_memcpy_s.h
+注意: 包含文件:       D:\Windows Kits\10\include\10.0.26100.0\ucrt\errno.h
+注意: 包含文件:       C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vcruntime_string.h
+注意: 包含文件:     D:\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wstring.h
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xatomic.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\intrin0.h
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\intrin0.inl.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\type_traits
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xstddef
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\cstdlib
+注意: 包含文件:       D:\Windows Kits\10\include\10.0.26100.0\ucrt\math.h
+注意: 包含文件:        D:\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_math.h
+注意: 包含文件:       D:\Windows Kits\10\include\10.0.26100.0\ucrt\stdlib.h
+注意: 包含文件:        D:\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_malloc.h
+注意: 包含文件:        D:\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_search.h
+注意: 包含文件:        D:\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wstdlib.h
+注意: 包含文件:        C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\limits.h
+注意: 包含文件:      C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list
+注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xthreads.h
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\climits
+注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xtimec.h
+注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\ctime
+注意: 包含文件:      D:\Windows Kits\10\include\10.0.26100.0\ucrt\time.h
+注意: 包含文件:       D:\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wtime.h
+[2/2] Linking CXX executable cmTC_78a29.exe
+
+
+Source file was:
+#include <atomic>
+#include <cstdint>
+
+int main(int, char **)
+{
+    volatile std::atomic<char>    size_1;
+    volatile std::atomic<short>   size_2;
+    volatile std::atomic<int>     size_4;
+    volatile std::atomic<int64_t> size_8;
+
+    ++size_1;
+    ++size_2;
+    ++size_4;
+    ++size_8;
+
+    (void)size_1.load(std::memory_order_relaxed);
+    (void)size_2.load(std::memory_order_relaxed);
+    (void)size_4.load(std::memory_order_relaxed);
+    (void)size_8.load(std::memory_order_relaxed);
+
+    return 0;
+}

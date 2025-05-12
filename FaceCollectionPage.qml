@@ -1,9 +1,10 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
-import QtMultimedia 5.15
-import QtQuick.Dialogs 1.3
-import QtGraphicalEffects 1.15
+import QtMultimedia
+import QtQuick.Dialogs
+import Qt5Compat.GraphicalEffects
+import QtCore
 
 Rectangle {
     color: "transparent" 
@@ -17,37 +18,50 @@ Rectangle {
         id: faceCollectionModel
     }
 
+    // 添加MediaDevices对象用于访问摄像头列表
+    MediaDevices {
+        id: mediaDevices
+    }
+
     // 定义顶级摄像头组件
     Camera {
         id: camera
-        viewfinder.resolution: Qt.size(640, 360)
-        deviceId: ""  // 初始为空，在初始化函数中设置正确的值
+        active: false // 初始不激活，在初始化函数中设置
         
-        imageCapture {
-            onImageCaptured: {
-                console.log("Image captured with id: " + requestId)
-                capturedImage.source = preview
-            }
-            onImageSaved: {
-                console.log("Image saved as: " + path)
-                fileManager.moveFile(path, "faceimages/" + nameInput.text + ".jpg")
-            }
-        }
-        
-        onCameraStateChanged: {
-            console.log("摄像头状态变化:", cameraState)
-            if (cameraState === Camera.ActiveState) {
+        onActiveChanged: {
+            console.log("摄像头激活状态变化:", active)
+            if (active) {
                 cameraReady = true
-                console.log("摄像头已激活，使用的设备ID:", deviceId)
+                console.log("摄像头已激活，使用的设备:", cameraDevice ? cameraDevice.id : "未知")
             } else {
                 cameraReady = false
             }
         }
         
-        onErrorChanged: {
-            if (error !== Camera.NoError) {
-                console.log("摄像头错误:", error, errorString)
-            }
+        onErrorOccurred: function(error, errorString) {
+            console.log("摄像头错误:", error, errorString)
+        }
+    }
+    
+    // 添加CaptureSession组件用于连接摄像头和图像捕获
+    CaptureSession {
+        id: captureSession
+        camera: camera
+        videoOutput: videoOutput
+        imageCapture: imageCapture
+    }
+    
+    // 独立的图像捕获组件
+    ImageCapture {
+        id: imageCapture
+        
+        onImageCaptured: function(id, preview) {
+            console.log("Image captured with id: " + id)
+            capturedImage.source = preview
+        }
+        onImageSaved: function(id, path) {
+            console.log("Image saved as: " + path)
+            fileManager.moveFile(path, "faceimages/" + nameInput.text + ".jpg")
         }
     }
     
@@ -92,9 +106,9 @@ Rectangle {
         initAttempts++
         
         // 先释放已存在的资源
-        if (camera.cameraState === Camera.ActiveState) {
+        if (camera.active) {
             console.log("摄像头已在活动状态，先停止")
-            camera.stop()
+            camera.active = false
             // 短暂延迟后再重新启动
             Qt.callLater(function() {
                 startCamera()
@@ -111,18 +125,18 @@ Rectangle {
         console.log("获取摄像头设置:", savedCameraId)
         
         // 检查可用摄像头
-        var cameras = QtMultimedia.availableCameras
+        var cameras = mediaDevices.videoInputs
         console.log("可用摄像头数量:", cameras.length)
         for (var i = 0; i < cameras.length; i++) {
-            console.log("摄像头 #" + i + ": " + cameras[i].deviceId + " - " + cameras[i].displayName)
+            console.log("摄像头 #" + i + ": " + cameras[i].id + " - " + cameras[i].description)
         }
         
         // 设置摄像头ID
         if (savedCameraId === "auto") {
             // 自动模式，使用默认摄像头
             if (cameras.length > 0) {
-                camera.deviceId = QtMultimedia.defaultCamera.deviceId
-                console.log("使用默认摄像头:", camera.deviceId)
+                camera.cameraDevice = cameras[0]
+                console.log("使用默认摄像头:", camera.cameraDevice.id)
             } else {
                 console.log("没有可用摄像头!")
                 return
@@ -130,22 +144,24 @@ Rectangle {
         } else if (savedCameraId !== "") {
             // 使用指定的摄像头ID
             var foundDevice = false
+            var selectedCamera = null
             // 先检查指定的ID是否在可用列表中
             for (var i = 0; i < cameras.length; i++) {
-                if (cameras[i].deviceId === savedCameraId) {
+                if (cameras[i].id === savedCameraId) {
+                    selectedCamera = cameras[i]
                     foundDevice = true
                     break
                 }
             }
             
             if (foundDevice) {
-                camera.deviceId = savedCameraId
-                console.log("使用指定摄像头:", savedCameraId)
+                camera.cameraDevice = selectedCamera
+                console.log("使用指定摄像头:", selectedCamera.id)
             } else {
                 console.log("指定的摄像头不可用，使用默认摄像头")
                 if (cameras.length > 0) {
-                    camera.deviceId = QtMultimedia.defaultCamera.deviceId
-                    console.log("退回到默认摄像头:", camera.deviceId)
+                    camera.cameraDevice = cameras[0]
+                    console.log("退回到默认摄像头:", camera.cameraDevice.id)
                 } else {
                     console.log("没有可用摄像头!")
                     return
@@ -154,20 +170,43 @@ Rectangle {
         } else {
             // 空设置，使用默认摄像头
             if (cameras.length > 0) {
-                camera.deviceId = QtMultimedia.defaultCamera.deviceId
-                console.log("使用默认摄像头:", camera.deviceId)
+                camera.cameraDevice = cameras[0]
+                console.log("使用默认摄像头:", camera.cameraDevice.id)
             } else {
                 console.log("没有可用摄像头!")
                 return
             }
         }
         
+        // 设置合适的分辨率
+        if (camera.cameraDevice) {
+            var closestFormat = null
+            var targetRes = Qt.size(640, 360)
+            var minDiff = Number.MAX_VALUE
+            
+            for (var i = 0; i < camera.cameraDevice.videoFormats.length; i++) {
+                var format = camera.cameraDevice.videoFormats[i]
+                var res = format.resolution
+                var diff = Math.abs(res.width - targetRes.width) + Math.abs(res.height - targetRes.height)
+                
+                if (diff < minDiff) {
+                    minDiff = diff
+                    closestFormat = format
+                }
+            }
+            
+            if (closestFormat) {
+                camera.cameraFormat = closestFormat
+                console.log("设置摄像头分辨率:", camera.cameraFormat.resolution.width, "x", camera.cameraFormat.resolution.height)
+            }
+        }
+        
         // 记录当前使用的摄像头ID
-        console.log("最终设置的摄像头ID:", camera.deviceId)
+        console.log("最终设置的摄像头:", camera.cameraDevice ? camera.cameraDevice.id : "未设置")
         
         // 启动摄像头
         console.log("启动摄像头...")
-        camera.start()
+        camera.active = true
         
         // 确保VideoOutput变换设置正确
         Qt.callLater(function() {
@@ -201,7 +240,7 @@ Rectangle {
         
         onTriggered: {
             checkCount++
-            console.log("监视摄像头状态:", camera.cameraState, "就绪:", cameraReady, "次数:", checkCount)
+            console.log("监视摄像头状态:", camera.active, "就绪:", cameraReady, "次数:", checkCount)
             
             if (cameraReady) {
                 console.log("摄像头就绪，停止监视")
@@ -209,7 +248,7 @@ Rectangle {
                 checkCount = 0
             } else if (checkCount >= 5) {
                 console.log("摄像头未就绪，重试初始化")
-                camera.stop()
+                camera.active = false
                 cameraMonitorTimer.stop()
                 checkCount = 0
                 
@@ -330,14 +369,14 @@ Rectangle {
             avatarPathInput.text = ""
             avatarPathInput.filePath = ""
             
-            console.log("相机弹窗打开 - 摄像头状态:", camera.cameraState, "就绪:", cameraReady)
+            console.log("相机弹窗打开 - 摄像头状态:", camera.active, "就绪:", cameraReady)
             
             // 始终重新初始化摄像头，确保使用正确的设备
             console.log("重新初始化摄像头以确保使用正确的设备")
             
             // 如果摄像头在活动状态，先停止
-            if (camera.cameraState === Camera.ActiveState) {
-                camera.stop()
+            if (camera.active) {
+                camera.active = false
                 // 短暂延迟后重新初始化
                 Qt.callLater(function() {
                     initCamera()
@@ -373,12 +412,8 @@ Rectangle {
 
                 VideoOutput {
                     id: videoOutput
-                    source: camera
                     anchors.fill: parent
-                    fillMode: VideoOutput.PreserveAspectFit
-                    focus: visible
                     visible: true
-                    rotation: 0 // 显式设置为0度，防止旋转
                     
                     // 添加水平镜像变换
                     transform: [
@@ -391,32 +426,7 @@ Rectangle {
                     ]
                     
                     // 计算实际视频内容区域
-                    property rect contentRect: {
-                        if (sourceRect.width <= 0 || sourceRect.height <= 0) {
-                            return Qt.rect(0, 0, width, height)
-                        }
-                        
-                        var srcRatio = sourceRect.width / sourceRect.height
-                        var destRatio = width / height
-                        
-                        var resultWidth, resultHeight, resultX, resultY
-                        
-                        if (srcRatio > destRatio) {
-                            // 视频比例更宽，上下留黑边
-                            resultWidth = width
-                            resultHeight = width / srcRatio
-                            resultX = 0
-                            resultY = (height - resultHeight) / 2
-                        } else {
-                            // 视频比例更窄，左右留黑边
-                            resultHeight = height
-                            resultWidth = height * srcRatio
-                            resultX = (width - resultWidth) / 2
-                            resultY = 0
-                        }
-                        
-                        return Qt.rect(resultX, resultY, resultWidth, resultHeight)
-                    }
+                    property rect contentRect: Qt.rect(0, 0, width, height)
                 }
 
                 Image {
@@ -748,13 +758,13 @@ Rectangle {
             FileDialog {
                 id: fileDialog
                 title: "选择个人头像"
-                folder: shortcuts.pictures
+                currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
                 nameFilters: ["图片文件 (*.jpg *.jpeg *.png *.bmp)"]
-                selectMultiple: false
+                fileMode: FileDialog.OpenFile
 
                 onAccepted: {
-                    console.log("选择的文件: " + fileDialog.fileUrl)
-                    var filePath = fileDialog.fileUrl.toString().replace("file:///", "")
+                    console.log("选择的文件: " + selectedFile)
+                    var filePath = selectedFile.toString().replace("file:///", "")
                     avatarPathInput.text = filePath
                     avatarPathInput.filePath = filePath
                 }
@@ -1520,9 +1530,9 @@ Rectangle {
                             // 确保在返回前清理所有状态
                             if (camera) {
                                 console.log("关闭摄像头...")
-                                camera.stop()
-                                // 设置deviceId为空，彻底释放资源
-                                camera.deviceId = ""
+                                camera.active = false
+                                // 不再将null赋值给cameraDevice，避免Qt 6中的错误
+                                // camera.cameraDevice = null
                             }
                             
                             // 停止所有定时器
@@ -1573,10 +1583,10 @@ Rectangle {
         // 彻底停止摄像头
         if (camera) {
             console.log("正在停止摄像头...")
-            camera.stop()
+            camera.active = false
             
-            // 设置deviceId为空，彻底释放资源
-            camera.deviceId = ""
+            // 不再将null赋值给cameraDevice，避免Qt 6中的错误
+            // camera.cameraDevice = null
         }
         
         // 重置所有变换，确保不会影响其他页面

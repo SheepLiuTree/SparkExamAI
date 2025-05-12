@@ -1,105 +1,101 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FaceRecognizer.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
+** Created by: The Qt Meta Object Compiler version 68 (Qt 6.7.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include <memory>
 #include "../../../FaceRecognizer.h"
-#include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
+
+#include <QtCore/qtmochelpers.h>
+
+#include <memory>
+
+
+#include <QtCore/qxptype_traits.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'FaceRecognizer.h' doesn't include <QObject>."
-#elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.15.2. It"
+#elif Q_MOC_OUTPUT_REVISION != 68
+#error "This file was generated using the moc from 6.7.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
-QT_BEGIN_MOC_NAMESPACE
+#ifndef Q_CONSTINIT
+#define Q_CONSTINIT
+#endif
+
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
-struct qt_meta_stringdata_FaceRecognizer_t {
-    QByteArrayData data[23];
-    char stringdata0[261];
-};
-#define QT_MOC_LITERAL(idx, ofs, len) \
-    Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_FaceRecognizer_t, stringdata0) + ofs \
-        - idx * sizeof(QByteArrayData)) \
-    )
-static const qt_meta_stringdata_FaceRecognizer_t qt_meta_stringdata_FaceRecognizer = {
-    {
-QT_MOC_LITERAL(0, 0, 14), // "FaceRecognizer"
-QT_MOC_LITERAL(1, 15, 20), // "rotationAngleChanged"
-QT_MOC_LITERAL(2, 36, 0), // ""
-QT_MOC_LITERAL(3, 37, 14), // "updateRotation"
-QT_MOC_LITERAL(4, 52, 10), // "initialize"
-QT_MOC_LITERAL(5, 63, 10), // "detectFace"
-QT_MOC_LITERAL(6, 74, 9), // "imagePath"
-QT_MOC_LITERAL(7, 84, 14), // "extractFeature"
-QT_MOC_LITERAL(8, 99, 5), // "image"
-QT_MOC_LITERAL(9, 105, 12), // "compareFaces"
-QT_MOC_LITERAL(10, 118, 10), // "image1Path"
-QT_MOC_LITERAL(11, 129, 10), // "image2Path"
-QT_MOC_LITERAL(12, 140, 9), // "loadImage"
-QT_MOC_LITERAL(13, 150, 11), // "matToQImage"
-QT_MOC_LITERAL(14, 162, 7), // "cv::Mat"
-QT_MOC_LITERAL(15, 170, 3), // "mat"
-QT_MOC_LITERAL(16, 174, 11), // "qImageToMat"
-QT_MOC_LITERAL(17, 186, 18), // "detectFacePosition"
-QT_MOC_LITERAL(18, 205, 13), // "startRotation"
-QT_MOC_LITERAL(19, 219, 8), // "interval"
-QT_MOC_LITERAL(20, 228, 5), // "speed"
-QT_MOC_LITERAL(21, 234, 12), // "stopRotation"
-QT_MOC_LITERAL(22, 247, 13) // "rotationAngle"
+QT_WARNING_DISABLE_GCC("-Wuseless-cast")
+namespace {
 
-    },
-    "FaceRecognizer\0rotationAngleChanged\0"
-    "\0updateRotation\0initialize\0detectFace\0"
-    "imagePath\0extractFeature\0image\0"
-    "compareFaces\0image1Path\0image2Path\0"
-    "loadImage\0matToQImage\0cv::Mat\0mat\0"
-    "qImageToMat\0detectFacePosition\0"
-    "startRotation\0interval\0speed\0stopRotation\0"
+#ifdef QT_MOC_HAS_STRINGDATA
+struct qt_meta_stringdata_CLASSFaceRecognizerENDCLASS_t {};
+constexpr auto qt_meta_stringdata_CLASSFaceRecognizerENDCLASS = QtMocHelpers::stringData(
+    "FaceRecognizer",
+    "rotationAngleChanged",
+    "",
+    "updateRotation",
+    "initialize",
+    "detectFace",
+    "imagePath",
+    "extractFeature",
+    "image",
+    "compareFaces",
+    "image1Path",
+    "image2Path",
+    "loadImage",
+    "matToQImage",
+    "cv::Mat",
+    "mat",
+    "qImageToMat",
+    "detectFacePosition",
+    "startRotation",
+    "interval",
+    "speed",
+    "stopRotation",
     "rotationAngle"
-};
-#undef QT_MOC_LITERAL
+);
+#else  // !QT_MOC_HAS_STRINGDATA
+#error "qtmochelpers.h not found or too old."
+#endif // !QT_MOC_HAS_STRINGDATA
+} // unnamed namespace
 
-static const uint qt_meta_data_FaceRecognizer[] = {
+Q_CONSTINIT static const uint qt_meta_data_CLASSFaceRecognizerENDCLASS[] = {
 
  // content:
-       8,       // revision
+      12,       // revision
        0,       // classname
        0,    0, // classinfo
       14,   14, // methods
-       1,  120, // properties
+       1,  134, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        1,       // signalCount
 
- // signals: name, argc, parameters, tag, flags
-       1,    0,   84,    2, 0x06 /* Public */,
+ // signals: name, argc, parameters, tag, flags, initial metatype offsets
+       1,    0,   98,    2, 0x06,    2 /* Public */,
 
- // slots: name, argc, parameters, tag, flags
-       3,    0,   85,    2, 0x08 /* Private */,
+ // slots: name, argc, parameters, tag, flags, initial metatype offsets
+       3,    0,   99,    2, 0x08,    3 /* Private */,
 
- // methods: name, argc, parameters, tag, flags
-       4,    0,   86,    2, 0x02 /* Public */,
-       5,    1,   87,    2, 0x02 /* Public */,
-       7,    1,   90,    2, 0x02 /* Public */,
-       9,    2,   93,    2, 0x02 /* Public */,
-      12,    1,   98,    2, 0x02 /* Public */,
-      13,    1,  101,    2, 0x02 /* Public */,
-      16,    1,  104,    2, 0x02 /* Public */,
-      17,    1,  107,    2, 0x02 /* Public */,
-      18,    2,  110,    2, 0x02 /* Public */,
-      18,    1,  115,    2, 0x22 /* Public | MethodCloned */,
-      18,    0,  118,    2, 0x22 /* Public | MethodCloned */,
-      21,    0,  119,    2, 0x02 /* Public */,
+ // methods: name, argc, parameters, tag, flags, initial metatype offsets
+       4,    0,  100,    2, 0x02,    4 /* Public */,
+       5,    1,  101,    2, 0x02,    5 /* Public */,
+       7,    1,  104,    2, 0x02,    7 /* Public */,
+       9,    2,  107,    2, 0x02,    9 /* Public */,
+      12,    1,  112,    2, 0x02,   12 /* Public */,
+      13,    1,  115,    2, 0x02,   14 /* Public */,
+      16,    1,  118,    2, 0x02,   16 /* Public */,
+      17,    1,  121,    2, 0x02,   18 /* Public */,
+      18,    2,  124,    2, 0x02,   20 /* Public */,
+      18,    1,  129,    2, 0x22,   23 /* Public | MethodCloned */,
+      18,    0,  132,    2, 0x22,   25 /* Public | MethodCloned */,
+      21,    0,  133,    2, 0x02,   26 /* Public */,
 
  // signals: parameters
     QMetaType::Void,
@@ -122,40 +118,91 @@ static const uint qt_meta_data_FaceRecognizer[] = {
     QMetaType::Void,
 
  // properties: name, type, flags
-      22, QMetaType::Float, 0x00495001,
-
- // properties: notify_signal_id
-       0,
+      22, QMetaType::Float, 0x00015001, uint(0), 0,
 
        0        // eod
 };
+
+Q_CONSTINIT const QMetaObject FaceRecognizer::staticMetaObject = { {
+    QMetaObject::SuperData::link<QObject::staticMetaObject>(),
+    qt_meta_stringdata_CLASSFaceRecognizerENDCLASS.offsetsAndSizes,
+    qt_meta_data_CLASSFaceRecognizerENDCLASS,
+    qt_static_metacall,
+    nullptr,
+    qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSFaceRecognizerENDCLASS_t,
+        // property 'rotationAngle'
+        QtPrivate::TypeAndForceComplete<float, std::true_type>,
+        // Q_OBJECT / Q_GADGET
+        QtPrivate::TypeAndForceComplete<FaceRecognizer, std::true_type>,
+        // method 'rotationAngleChanged'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'updateRotation'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'initialize'
+        QtPrivate::TypeAndForceComplete<bool, std::false_type>,
+        // method 'detectFace'
+        QtPrivate::TypeAndForceComplete<bool, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        // method 'extractFeature'
+        QtPrivate::TypeAndForceComplete<bool, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QImage &, std::false_type>,
+        // method 'compareFaces'
+        QtPrivate::TypeAndForceComplete<float, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        // method 'loadImage'
+        QtPrivate::TypeAndForceComplete<QImage, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        // method 'matToQImage'
+        QtPrivate::TypeAndForceComplete<QImage, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const cv::Mat &, std::false_type>,
+        // method 'qImageToMat'
+        QtPrivate::TypeAndForceComplete<cv::Mat, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QImage &, std::false_type>,
+        // method 'detectFacePosition'
+        QtPrivate::TypeAndForceComplete<QVariantMap, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        // method 'startRotation'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        QtPrivate::TypeAndForceComplete<float, std::false_type>,
+        // method 'startRotation'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        // method 'startRotation'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'stopRotation'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>
+    >,
+    nullptr
+} };
 
 void FaceRecognizer::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         auto *_t = static_cast<FaceRecognizer *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         switch (_id) {
         case 0: _t->rotationAngleChanged(); break;
         case 1: _t->updateRotation(); break;
         case 2: { bool _r = _t->initialize();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 3: { bool _r = _t->detectFace((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 3: { bool _r = _t->detectFace((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 4: { bool _r = _t->extractFeature((*reinterpret_cast< const QImage(*)>(_a[1])));
+        case 4: { bool _r = _t->extractFeature((*reinterpret_cast< std::add_pointer_t<QImage>>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 5: { float _r = _t->compareFaces((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])));
+        case 5: { float _r = _t->compareFaces((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[2])));
             if (_a[0]) *reinterpret_cast< float*>(_a[0]) = std::move(_r); }  break;
-        case 6: { QImage _r = _t->loadImage((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 6: { QImage _r = _t->loadImage((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])));
             if (_a[0]) *reinterpret_cast< QImage*>(_a[0]) = std::move(_r); }  break;
-        case 7: { QImage _r = _t->matToQImage((*reinterpret_cast< const cv::Mat(*)>(_a[1])));
+        case 7: { QImage _r = _t->matToQImage((*reinterpret_cast< std::add_pointer_t<cv::Mat>>(_a[1])));
             if (_a[0]) *reinterpret_cast< QImage*>(_a[0]) = std::move(_r); }  break;
-        case 8: { cv::Mat _r = _t->qImageToMat((*reinterpret_cast< const QImage(*)>(_a[1])));
+        case 8: { cv::Mat _r = _t->qImageToMat((*reinterpret_cast< std::add_pointer_t<QImage>>(_a[1])));
             if (_a[0]) *reinterpret_cast< cv::Mat*>(_a[0]) = std::move(_r); }  break;
-        case 9: { QVariantMap _r = _t->detectFacePosition((*reinterpret_cast< const QString(*)>(_a[1])));
+        case 9: { QVariantMap _r = _t->detectFacePosition((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])));
             if (_a[0]) *reinterpret_cast< QVariantMap*>(_a[0]) = std::move(_r); }  break;
-        case 10: _t->startRotation((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< float(*)>(_a[2]))); break;
-        case 11: _t->startRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 10: _t->startRotation((*reinterpret_cast< std::add_pointer_t<int>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<float>>(_a[2]))); break;
+        case 11: _t->startRotation((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
         case 12: _t->startRotation(); break;
         case 13: _t->stopRotation(); break;
         default: ;
@@ -164,16 +211,14 @@ void FaceRecognizer::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         int *result = reinterpret_cast<int *>(_a[0]);
         {
             using _t = void (FaceRecognizer::*)();
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&FaceRecognizer::rotationAngleChanged)) {
+            if (_t _q_method = &FaceRecognizer::rotationAngleChanged; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
                 *result = 0;
                 return;
             }
         }
-    }
-#ifndef QT_NO_PROPERTIES
-    else if (_c == QMetaObject::ReadProperty) {
+    } else if (_c == QMetaObject::ReadProperty) {
         auto *_t = static_cast<FaceRecognizer *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         void *_v = _a[0];
         switch (_id) {
         case 0: *reinterpret_cast< float*>(_v) = _t->rotationAngle(); break;
@@ -181,19 +226,9 @@ void FaceRecognizer::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         }
     } else if (_c == QMetaObject::WriteProperty) {
     } else if (_c == QMetaObject::ResetProperty) {
+    } else if (_c == QMetaObject::BindableProperty) {
     }
-#endif // QT_NO_PROPERTIES
 }
-
-QT_INIT_METAOBJECT const QMetaObject FaceRecognizer::staticMetaObject = { {
-    QMetaObject::SuperData::link<QObject::staticMetaObject>(),
-    qt_meta_stringdata_FaceRecognizer.data,
-    qt_meta_data_FaceRecognizer,
-    qt_static_metacall,
-    nullptr,
-    nullptr
-} };
-
 
 const QMetaObject *FaceRecognizer::metaObject() const
 {
@@ -203,7 +238,7 @@ const QMetaObject *FaceRecognizer::metaObject() const
 void *FaceRecognizer::qt_metacast(const char *_clname)
 {
     if (!_clname) return nullptr;
-    if (!strcmp(_clname, qt_meta_stringdata_FaceRecognizer.stringdata0))
+    if (!strcmp(_clname, qt_meta_stringdata_CLASSFaceRecognizerENDCLASS.stringdata0))
         return static_cast<void*>(this);
     return QObject::qt_metacast(_clname);
 }
@@ -219,26 +254,14 @@ int FaceRecognizer::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         _id -= 14;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
         if (_id < 14)
-            *reinterpret_cast<int*>(_a[0]) = -1;
+            *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
         _id -= 14;
-    }
-#ifndef QT_NO_PROPERTIES
-    else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
-            || _c == QMetaObject::ResetProperty || _c == QMetaObject::RegisterPropertyMetaType) {
+    }else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
+            || _c == QMetaObject::ResetProperty || _c == QMetaObject::BindableProperty
+            || _c == QMetaObject::RegisterPropertyMetaType) {
         qt_static_metacall(this, _c, _id, _a);
         _id -= 1;
-    } else if (_c == QMetaObject::QueryPropertyDesignable) {
-        _id -= 1;
-    } else if (_c == QMetaObject::QueryPropertyScriptable) {
-        _id -= 1;
-    } else if (_c == QMetaObject::QueryPropertyStored) {
-        _id -= 1;
-    } else if (_c == QMetaObject::QueryPropertyEditable) {
-        _id -= 1;
-    } else if (_c == QMetaObject::QueryPropertyUser) {
-        _id -= 1;
     }
-#endif // QT_NO_PROPERTIES
     return _id;
 }
 
@@ -248,4 +271,3 @@ void FaceRecognizer::rotationAngleChanged()
     QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
 }
 QT_WARNING_POP
-QT_END_MOC_NAMESPACE

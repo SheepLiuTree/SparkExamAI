@@ -1,8 +1,10 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
-import QtMultimedia 5.15
-import QtGraphicalEffects 1.15
+import QtQuick.Controls.Material 2.15
+import QtMultimedia
+import Qt5Compat.GraphicalEffects
+import QtQuick.Dialogs
 
 Window {
     width: Screen.width
@@ -13,6 +15,10 @@ Window {
     visibility: Window.FullScreen
     flags: Qt.Window | Qt.FramelessWindowHint
     title: qsTr("星火智能评测系统")
+    
+    // 应用Material样式
+    Material.theme: Material.Dark
+    Material.accent: Material.Blue
 
     // 提供一个全局函数用于更新用户数据
     function updateUserData(workId) {
@@ -301,9 +307,9 @@ Window {
                         }
                         
                         // 确保释放任何可能在使用的摄像头资源
-                        if (camera && camera.cameraState === Camera.ActiveState) {
+                        if (camera && camera.active) {
                             console.log("面容采集前释放已使用的摄像头资源")
-                            camera.stop()
+                            camera.active = false
                         }
                         
                         // 短暂延迟后再打开页面，确保资源释放完成
@@ -2066,10 +2072,25 @@ Window {
                         Button {
                             width: 200
                             height: 60
+                            
+                            // 使用Qt 6兼容的样式定制方式
+
+                                
                             background: Image {
+                                    anchors.fill: parent
                                 source: "qrc:/images/personal_button_bg.png"
                                 fillMode: Image.Stretch
                             }
+                                
+                                contentItem: Text {
+                                    text: model.name
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 30
+                                    color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                    anchors.verticalCenterOffset: -6
+                                }
                             
                             Item {
                                 // 奖牌图标容器
@@ -2092,16 +2113,7 @@ Window {
                                 }
                             }
                             
-                            contentItem: Text {
-                                text: model.name
-                                font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 30
-                                color: "white"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.verticalCenterOffset: -6
-                            }
+                            
                             onClicked: {
                                 console.log(model.name + " clicked, workId: " + model.workId)
                                 // 设置当前选中的用户ID
@@ -2124,6 +2136,12 @@ Window {
         height: 600
         anchors.centerIn: parent
         modal: true
+        
+        // 去除模糊效果以提高性能
+        // Overlay.modal: Rectangle {
+        //     color: "#80000000"
+        // }
+        
         closePolicy: Popup.CloseOnEscape
         
         property string capturedImagePath: ""
@@ -2131,93 +2149,118 @@ Window {
         property int recognitionTimerId: 0
         property bool isFaceDetected: false
         property rect detectedFaceRect: Qt.rect(0, 0, 0, 0)
-        property int trackingUpdateInterval: 300 // 人脸跟踪更新间隔(毫秒)
+        property int trackingUpdateInterval: 200 // 人脸跟踪更新间隔(毫秒)，改为200ms提高响应速度
         property string targetPage: ""
         property string titleText: ""
         
-        onOpened: {
-            console.log("人脸识别弹窗已打开")
-            
-            // 先关闭之前可能在运行的摄像头
-            if (camera.cameraState === Camera.ActiveState) {
-                camera.stop()
-            }
-            
-            // 确保完全重新初始化摄像头
-            Qt.callLater(function() {
-                // 获取摄像头设置
-                var savedCameraId = dbManager.getSetting("camera_device", "auto")
-                console.log("人脸识别弹窗 - 重新设置摄像头，设置:", savedCameraId)
-                
-                if (savedCameraId === "auto") {
-                    // 自动模式，使用默认摄像头
-                    if (QtMultimedia.availableCameras.length > 0) {
-                        camera.deviceId = QtMultimedia.defaultCamera.deviceId
-                        console.log("人脸识别弹窗 - 使用默认摄像头:", camera.deviceId)
-                    }
-                } else if (savedCameraId !== "") {
-                    // 使用指定的摄像头ID
-                    var foundDevice = false
-                    // 先检查指定的ID是否在可用列表中
-                    for (var i = 0; i < QtMultimedia.availableCameras.length; i++) {
-                        if (QtMultimedia.availableCameras[i].deviceId === savedCameraId) {
-                            foundDevice = true
-                            break
-                        }
-                    }
-                    
-                    if (foundDevice) {
-                        camera.deviceId = savedCameraId
-                        console.log("人脸识别弹窗 - 使用指定摄像头:", camera.deviceId)
-                    } else if (QtMultimedia.availableCameras.length > 0) {
-                        camera.deviceId = QtMultimedia.defaultCamera.deviceId
-                        console.log("人脸识别弹窗 - 指定摄像头不可用，使用默认摄像头:", camera.deviceId)
-                    }
-                }
-                
-                // 确保VideoOutput的所有属性正确设置
-                if (videoOutput) {
-                    console.log("重置VideoOutput所有变换和属性")
-                    videoOutput.rotation = 0
-                    
-                    // 重新创建和设置变换
-                    var newTransform = []
-                    newTransform.push(Qt.createQmlObject(
-                        'import QtQuick 2.15; Scale { xScale: -1; yScale: 1; origin.x: videoOutput.width / 2 }',
-                        videoOutput, 
-                        "dynamicScaleTransform"
-                    ));
-                    videoOutput.transform = newTransform
-                }
-                
-                // 启动摄像头
-                console.log("人脸识别弹窗 - 启动摄像头")
-                camera.start()
-                
-                // 重置变量
-                isRecognizing = false
-                isFaceDetected = false
-                detectedFaceRect = Qt.rect(0, 0, 0, 0)
-                statusText.text = "请对准摄像头"
-                
-                // 启动人脸跟踪定时器
-                console.log("启动人脸跟踪定时器")
-                faceTrackingTimer.start()
-                
-                // 启动人脸追踪框逆时针旋转
-                console.log("启动人脸追踪框逆时针旋转")
-                faceRecognizer.startRotation(50, 1.5) // 50毫秒更新一次，每次旋转1.5度
-                
-                // 延迟启动人脸识别
-                recognitionTimer.restart()
-            })
+        // 添加MediaDevices对象用于访问摄像头列表
+        MediaDevices {
+            id: mediaDevices
         }
         
+        // 弹窗打开后立即检查摄像头并开始人脸跟踪
+        onOpened: {
+            console.log("人脸识别弹窗已打开，检查摄像头...")
+            
+            isRecognizing = false
+            isFaceDetected = false
+            
+            // 重置人脸矩形
+            detectedFaceRect = Qt.rect(0, 0, 0, 0)
+            
+            // 初始化摄像头
+            initCamera()
+            
+            // 激活摄像头
+            camera.active = true
+            
+            // 在成功打开摄像头后启动人脸跟踪
+            Qt.callLater(function() {
+                startFaceTracking()
+            })
+            
+            // 延迟2秒后开始识别
+            recognitionTimer.restart()
+        }
+        
+        // 初始化摄像头
+        function initCamera() {
+            // 先关闭之前可能在运行的摄像头
+            if (camera.active) {
+                camera.active = false
+            }
+            
+            // 获取摄像头设置
+            var savedCameraId = dbManager.getSetting("camera_device", "auto")
+            console.log("人脸识别弹窗 - 重新设置摄像头，设置:", savedCameraId)
+            
+            // 检查可用摄像头
+            var cameras = mediaDevices.videoInputs
+            console.log("可用摄像头数量:", cameras.length)
+            
+            if (cameras.length === 0) {
+                console.log("无法找到可用摄像头")
+                statusText.text = "未检测到摄像头设备"
+                return
+            }
+            
+            if (savedCameraId === "auto") {
+                // 自动模式，使用默认摄像头
+                if (cameras.length > 0) {
+                    camera.cameraDevice = cameras[0]
+                    console.log("人脸识别弹窗 - 使用默认摄像头:", camera.cameraDevice.id)
+                }
+            } else if (savedCameraId !== "") {
+                // 使用指定的摄像头ID
+                var foundDevice = false
+                var selectedCamera = null
+                // 先检查指定的ID是否在可用列表中
+                for (var i = 0; i < cameras.length; i++) {
+                    if (cameras[i].id === savedCameraId) {
+                        selectedCamera = cameras[i]
+                        foundDevice = true
+                        break
+                    }
+                }
+                
+                if (foundDevice) {
+                    camera.cameraDevice = selectedCamera
+                    console.log("人脸识别弹窗 - 使用指定摄像头:", camera.cameraDevice.id)
+                } else if (cameras.length > 0) {
+                    camera.cameraDevice = cameras[0]
+                    console.log("人脸识别弹窗 - 指定摄像头不可用，使用默认摄像头:", camera.cameraDevice.id)
+                }
+            }
+            
+            // 设置合适的分辨率
+            if (camera.cameraDevice) {
+                var closestFormat = null
+                var targetRes = Qt.size(640, 360)
+                var minDiff = Number.MAX_VALUE
+                
+                for (var i = 0; i < camera.cameraDevice.videoFormats.length; i++) {
+                    var format = camera.cameraDevice.videoFormats[i]
+                    var res = format.resolution
+                    var diff = Math.abs(res.width - targetRes.width) + Math.abs(res.height - targetRes.height)
+                    
+                    if (diff < minDiff) {
+                        minDiff = diff
+                        closestFormat = format
+                    }
+                }
+                
+                if (closestFormat) {
+                    camera.cameraFormat = closestFormat
+                    console.log("设置摄像头分辨率:", camera.cameraFormat.resolution.width, "x", camera.cameraFormat.resolution.height)
+                }
+            }
+        }
+
         onClosed: {
             console.log("人脸识别弹窗已关闭，停止摄像头")
             
             // 停止摄像头
-            camera.stop()
+            camera.active = false
             
             // 停止定时器
             faceTrackingTimer.stop()
@@ -2267,7 +2310,7 @@ Window {
         // 周期性人脸识别的定时器
         Timer {
             id: periodicRecognitionTimer
-            interval: 1500  // 每1.5秒尝试识别一次
+            interval: 1000  // 减少为1秒尝试识别一次
             repeat: true
             running: faceRecognitionPopup.isRecognizing
             onTriggered: {
@@ -2278,7 +2321,7 @@ Window {
         // 人脸跟踪定时器
         Timer {
             id: faceTrackingTimer
-            interval: faceRecognitionPopup.trackingUpdateInterval
+            interval: 200  // 减少为200毫秒，提高跟踪速度
             repeat: true
             running: false
             onTriggered: {
@@ -2298,7 +2341,7 @@ Window {
             if (!isRecognizing) return
             
             var tempPath = fileManager.getApplicationDir() + "/temp/face_recognition_temp.jpg"
-            camera.imageCapture.captureToLocation(tempPath)
+            imageCapture.captureToFile(tempPath)
             capturedImagePath = tempPath
             
             // 图片保存完成后由onImageSaved事件触发识别
@@ -2307,17 +2350,17 @@ Window {
         // 进行人脸跟踪
         function trackFace() {
             var tempPath = fileManager.getApplicationDir() + "/temp/face_tracking_temp.jpg"
-            camera.imageCapture.captureToLocation(tempPath)
+            imageCapture.captureToFile(tempPath)
             
             // 清理之前可能存在的所有连接
             try {
-                camera.imageCapture.imageSaved.disconnect(trackFaceImageSavedHandler)
+                imageCapture.imageSaved.disconnect(trackFaceImageSavedHandler)
             } catch (e) {
                 // 可能没有连接，忽略错误
             }
             
             // 在图片保存完成后检测人脸位置
-            camera.imageCapture.imageSaved.connect(trackFaceImageSavedHandler)
+            imageCapture.imageSaved.connect(trackFaceImageSavedHandler)
         }
         
         // 人脸跟踪图像保存后的处理函数
@@ -2366,7 +2409,8 @@ Window {
                 }
                 
                 // 更新人脸框颜色为绿色（成功检测到人脸）
-                faceFrame.border.color = "green"
+                // faceFrame.border.color = "green"  // Image没有border属性
+                faceFrame.opacity = 1.0  // 成功检测到人脸时使用完全不透明
             } else {
                 console.log("No face detected in tracking image")
                 isFaceDetected = false
@@ -2380,10 +2424,61 @@ Window {
                 }
                 
                 // 更新人脸框颜色为红色（未检测到人脸）
-                faceFrame.border.color = "red"
+                // faceFrame.border.color = "red"  // Image没有border属性
+                faceFrame.opacity = 0.5  // 未检测到人脸时使用半透明
+            }
+        }
+        
+        // 在所有用户中进行人脸识别的函数
+        function recognizeFaceInAllUsers(imagePath) {
+            console.log("开始人脸识别，图像路径: " + imagePath)
+            
+            // 停止定时器，避免重复识别
+            periodicRecognitionTimer.stop()
+            
+            // 首先检查是否检测到人脸
+            var faceInfo = faceRecognizer.detectFacePosition(imagePath)
+            if (!faceInfo.faceDetected) {
+                console.log("未检测到人脸，无法识别")
+                statusText.text = "未检测到人脸，请正对摄像头"
+                // 重新启动定时器继续识别
+                periodicRecognitionTimer.start()
+                return
             }
             
-            // 不需要断开连接，因为我们使用的是命名函数
+            // 显示正在识别状态
+            statusText.text = "正在识别人脸..."
+            
+            // 调用后端进行人脸识别
+            var result = dbManager.recognizeFace(imagePath)
+            console.log("人脸识别结果: " + JSON.stringify(result))
+            
+            if (result.recognized) {
+                // 识别成功
+                statusText.text = "欢迎你，" + result.name
+                
+                // 确保定时器已停止
+                periodicRecognitionTimer.stop()
+                faceTrackingTimer.stop()
+                
+                Qt.callLater(function() {
+                    // 关闭弹窗
+                    faceRecognitionPopup.close()
+                    
+                    // 判断目标页面并打开
+                    if (faceRecognitionPopup.targetPage !== "") {
+                        // 打开指定的页面
+                        console.log("打开目标页面：" + faceRecognitionPopup.targetPage)
+                        stackView.push(faceRecognitionPopup.targetPage)
+                    }
+                })
+            } else {
+                // 识别失败
+                statusText.text = "人脸识别失败，请再试一次"
+                console.log("人脸识别失败")
+                // 重新启动定时器继续识别
+                periodicRecognitionTimer.start()
+            }
         }
 
         Rectangle {
@@ -2419,11 +2514,25 @@ Window {
                     color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
                     
+                    // 使用常规Item包装摄像头模块
+                    Item {
+                        id: cameraItem
+                        anchors.fill: parent
+                        
+                        // 摄像头捕获会话
+                        CaptureSession {
+                            id: captureSession
+                            camera: camera
+                            imageCapture: imageCapture
+                            videoOutput: videoOutput
+                        }
+                                                        
+                        // 摄像头组件
                     Camera {
                         id: camera
+                            active: true
                         
-                        viewfinder.resolution: Qt.size(640, 360)
-                        // 在初始化时根据设置选择摄像头设备
+                            // 组件加载后设置合适的分辨率
                         Component.onCompleted: {
                             // 获取摄像头设置
                             var savedCameraId = dbManager.getSetting("camera_device", "auto")
@@ -2431,51 +2540,77 @@ Window {
                             
                             if (savedCameraId === "auto") {
                                 // 自动模式，使用默认摄像头
-                                if (QtMultimedia.availableCameras.length > 0) {
-                                    deviceId = QtMultimedia.defaultCamera.deviceId
-                                    console.log("人脸识别弹窗 - 使用默认摄像头:", deviceId)
+                                    var cameras = mediaDevices.videoInputs
+                                    if (cameras.length > 0) {
+                                        cameraDevice = cameras[0]
+                                        console.log("人脸识别弹窗 - 使用默认摄像头:", cameraDevice.id)
                                 }
                             } else if (savedCameraId !== "") {
                                 // 使用指定的摄像头ID
                                 var foundDevice = false
+                                    var cameras = mediaDevices.videoInputs
                                 // 先检查指定的ID是否在可用列表中
-                                for (var i = 0; i < QtMultimedia.availableCameras.length; i++) {
-                                    if (QtMultimedia.availableCameras[i].deviceId === savedCameraId) {
+                                    for (var i = 0; i < cameras.length; i++) {
+                                        if (cameras[i].id === savedCameraId) {
+                                            cameraDevice = cameras[i]
                                         foundDevice = true
                                         break
                                     }
                                 }
                                 
                                 if (foundDevice) {
-                                    deviceId = savedCameraId
-                                    console.log("人脸识别弹窗 - 使用指定摄像头:", deviceId)
-                                } else if (QtMultimedia.availableCameras.length > 0) {
-                                    deviceId = QtMultimedia.defaultCamera.deviceId
-                                    console.log("人脸识别弹窗 - 指定摄像头不可用，使用默认摄像头:", deviceId)
+                                        console.log("人脸识别弹窗 - 使用指定摄像头:", cameraDevice.id)
+                                    } else if (cameras.length > 0) {
+                                        cameraDevice = cameras[0]
+                                        console.log("人脸识别弹窗 - 指定摄像头不可用，使用默认摄像头:", cameraDevice.id)
+                                    }
+                                }
+                                
+                                // 设置合适的分辨率
+                                var closestFormat = null
+                                var targetRes = Qt.size(640, 360)
+                                var minDiff = Number.MAX_VALUE
+                                
+                                if (cameraDevice) {
+                                    for (var i = 0; i < cameraDevice.videoFormats.length; i++) {
+                                        var format = cameraDevice.videoFormats[i]
+                                        var res = format.resolution
+                                        var diff = Math.abs(res.width - targetRes.width) + Math.abs(res.height - targetRes.height)
+                                        
+                                        if (diff < minDiff) {
+                                            minDiff = diff
+                                            closestFormat = format
+                                        }
+                                    }
+                                    
+                                    if (closestFormat) {
+                                        cameraFormat = closestFormat
+                                        console.log("设置摄像头分辨率:", cameraFormat.resolution.width, "x", cameraFormat.resolution.height)
+                                    }
                                 }
                             }
                         }
                         
-                        imageCapture {
-                            onImageSaved: {
+                        // 图像捕获组件
+                        ImageCapture {
+                            id: imageCapture
+                            
+                            onImageSaved: function(id, path) {
                                 console.log("Image saved to: " + path)
                                 
                                 // 只有识别用的图片才触发人脸识别
                                 if (path === faceRecognitionPopup.capturedImagePath && faceRecognitionPopup.isRecognizing) {
                                     faceRecognitionPopup.recognizeFaceInAllUsers(path)
-                                }
                             }
                         }
                     }
                     
+                        // 视频输出
                     VideoOutput {
                         id: videoOutput
-                        source: camera
                         anchors.fill: parent
-                        fillMode: VideoOutput.PreserveAspectFit
-                        focus: visible
+                            //fillMode: VideoOutput.PreserveAspectFit
                         visible: true
-                        rotation: 0 // 显式设置为0度，防止旋转
                         
                         // 添加水平镜像变换
                         transform: [
@@ -2483,44 +2618,11 @@ Window {
                                 id: videoPopupTransform
                                 xScale: -1
                                 yScale: 1  // 明确设置yScale为1确保不会垂直翻转
-                                origin.x: videoOutput ? videoOutput.width / 2 : 0
-                            }
-                        ]
-                        
-                        property rect contentRect: {
-                            if (camera.viewfinder.resolution.width <= 0 || camera.viewfinder.resolution.height <= 0) {
-                                return Qt.rect(0, 0, width, height)
-                            }
+                                    origin.x: videoOutput.width / 2
+                                }
+                            ]
                             
-                            // 使用安全的方式获取源矩形宽高比
-                            // 如果sourceRect未定义，则使用备选方案
-                            var srcRatio
-                            if (typeof sourceRect !== 'undefined' && sourceRect) {
-                                srcRatio = sourceRect.width / sourceRect.height
-                            } else {
-                                // 使用摄像头分辨率作为备选
-                                srcRatio = camera.viewfinder.resolution.width / camera.viewfinder.resolution.height
-                            }
-                            var destRatio = width / height
-                            
-                            var resultWidth, resultHeight, resultX, resultY
-                            
-                            if (srcRatio > destRatio) {
-                                // 视频比例更宽，上下留黑边
-                                resultWidth = width
-                                resultHeight = width / srcRatio
-                                resultX = 0
-                                resultY = (height - resultHeight) / 2
-                            } else {
-                                // 视频比例更窄，左右留黑边
-                                resultHeight = height
-                                resultWidth = height * srcRatio
-                                resultX = (width - resultWidth) / 2
-                                resultY = 0
-                            }
-                            
-                            return Qt.rect(resultX, resultY, resultWidth, resultHeight)
-                        }
+                            property rect contentRect: Qt.rect(0, 0, width, height)
                     }
                     
                     Image {
@@ -2545,6 +2647,7 @@ Window {
                         id: faceFrame
                         source: "qrc:/images/FaceTracking.png"
                         visible: faceRecognitionPopup.isFaceDetected
+                            opacity: 0.5 // 默认半透明
                         
                         // 如果检测到人脸，使用检测到的位置和大小
                         // 调整为正方形，保持中心点不变
@@ -2576,466 +2679,33 @@ Window {
                         }
                     }
                 }
-                
-                ProgressBar {
-                    id: recognitionProgress
-                    width: 640
-                    height: 10
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    indeterminate: true
-                    visible: faceRecognitionPopup.isRecognizing
                 }
                 
+                // 取消按钮 - 移到摄像头预览区域下方
                 Button {
-                    width: 150
-                    height: 50
+                    id: cancelButton
+                    width: 120
+                    height: 40
                     anchors.horizontalCenter: parent.horizontalCenter
-                    background: Rectangle {
-                        color: "#F44336"
-                        radius: 5
-                    }
-                    contentItem: Text {
-                        text: "取消"
-                        font.pixelSize: 18
-                        color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                    onClicked: {
-                        faceRecognitionPopup.close()
-                    }
-                }
-            }
-        }
-        
-        // 自动识别所有用户中的人脸
-        function recognizeFaceInAllUsers(imagePath) {
-            // 获取所有用户数据
-            var allUsers = dbManager.getAllFaceData()
-            
-            if (allUsers.length === 0) {
-                statusText.text = "数据库中没有用户数据"
-                return
-            }
-            
-            // 先使用FaceRecognizer检测图像中是否有人脸
-            var faceDetected = faceRecognizer.detectFace(imagePath)
-            if (!faceDetected) {
-                statusText.text = "未检测到人脸，请正对摄像头"
-                return
-            }
-            
-            statusText.text = "正在比对人脸..."
-            
-            // 遍历所有用户，与当前拍摄的照片比对
-            var maxSimilarity = 0
-            var bestMatchUser = null
-            
-            for (var i = 0; i < allUsers.length; i++) {
-                var user = allUsers[i]
-                
-                // 跳过没有面部图像的用户
-                if (!user.faceImage || user.faceImage === "") continue
-                
-                // 比较人脸相似度
-                var similarity = faceRecognizer.compareFaces(user.faceImage, imagePath)
-                console.log("用户: " + user.name + ", 相似度: " + similarity)
-                
-                // 更新最佳匹配
-                if (similarity > maxSimilarity) {
-                    maxSimilarity = similarity
-                    bestMatchUser = user
-                }
-            }
-            
-            // 使用固定阈值0.65（65%）
-            var threshold = 0.65
-            
-            // 如果最佳匹配的相似度超过阈值，则识别成功
-            if (maxSimilarity >= threshold && bestMatchUser) {
-                // 设置用户信息对话框数据并显示
-                userInfoDialog.userData = bestMatchUser
-                userInfoDialog.similarityValue = Math.round(maxSimilarity * 100)
-                userInfoDialog.capturedImagePath = imagePath
-                userInfoDialog.useCapturedImageAsAvatar = true
-                userInfoDialog.targetPage = faceRecognitionPopup.targetPage
-                userInfoDialog.titleText = faceRecognitionPopup.titleText
-                isRecognizing = false
-                
-                // 获取用户头像路径
-                var userAvatarPath = dbManager.getUserAvatarPath(bestMatchUser.workId)
-                if (userAvatarPath && userAvatarPath !== "") {
-                    userInfoDialog.userData.avatarPath = userAvatarPath
-                    console.log("获取到用户头像路径:", userAvatarPath)
-                } else {
-                    // 如果没有头像，使用采集的面部图像作为头像
-                    userInfoDialog.userData.avatarPath = imagePath
-                    console.log("用户没有头像，使用采集的面部图像:", imagePath)
-                }
-                
-                statusText.text = "识别成功: " + bestMatchUser.name + " (相似度: " + Math.round(maxSimilarity * 100) + "%)"
-                console.log("Face recognition successful: " + bestMatchUser.name + " with similarity: " + maxSimilarity)
-                
-                // 关闭人脸识别对话框
-                faceRecognitionPopup.close()
-                
-                // 显示用户信息确认对话框
-                userInfoDialog.open()
-            } else {
-                // 如果找到了最佳匹配但相似度不够
-                if (bestMatchUser) {
-                    statusText.text = "人脸相似度不足: " + Math.round(maxSimilarity * 100) + "%, 需要65%以上"
-                    console.log("Face similarity too low: " + maxSimilarity + " (threshold: " + threshold + ")")
-                } else {
-                    statusText.text = "未找到匹配的人脸，请重试或先进行面容采集"
-                    console.log("No matching face found.")
-                }
-            }
-        }
-    }
-    
-    // 用户信息确认对话框
-    Dialog {
-        id: userInfoDialog
-        width: 400
-        height: 520
-        anchors.centerIn: parent
-        modal: true
-        title: "用户信息确认"
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        
-        property var userData: ({})
-        property int similarityValue: 0
-        property string capturedImagePath: ""
-        property bool useCapturedImageAsAvatar: false
-        property string targetPage: ""
-        property string titleText: ""
-        
-        // 添加打开事件，用于调试头像显示
-        onOpened: {
-            console.log("用户信息对话框已打开")
-            console.log("用户数据:", JSON.stringify(userData))
-            console.log("头像路径:", userData.avatarPath)
-            console.log("采集的图像路径:", capturedImagePath)
-            
-            var imageToShow = ""
-            
-            // 优先使用用户资料中的头像
-            if (userData.avatarPath && userData.avatarPath !== "") {
-                imageToShow = userData.avatarPath
-                console.log("使用用户头像:", imageToShow)
-            } 
-            // 如果允许且存在采集的图像，则使用采集的图像
-            else if (useCapturedImageAsAvatar && capturedImagePath && capturedImagePath !== "") {
-                imageToShow = capturedImagePath
-                console.log("使用采集的图像作为头像:", imageToShow)
-            }
-            
-            // 确保头像路径是完整的
-            if (imageToShow !== "") {
-                if (!imageToShow.startsWith("file:///")) {
-                    // 尝试修复头像路径
-                    var fixedPath = "file:///" + imageToShow.replace(/\\/g, "/")
-                    console.log("修正后的头像路径:", fixedPath)
-                    userAvatar.source = fixedPath
-                } else {
-                    userAvatar.source = imageToShow
-                }
-            } else {
-                console.log("无可用头像，显示默认头像")
-            }
-        }
-        
-        contentItem: Rectangle {
-            anchors.fill: parent
-            
-            Column {
-                anchors.fill: parent
-                anchors.margins: 20
-                spacing: 20
-                
-                Image {
-                    id: userAvatar
-                    width: 150
-                    height: 150
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    source: ""
-                    fillMode: Image.PreserveAspectFit
-                    cache: false
                     
-                    onStatusChanged: {
-                        if (status === Image.Ready) {
-                            console.log("头像加载成功:", source)
-                        } else if (status === Image.Error) {
-                            console.log("头像加载失败:", source)
-                        }
-                    }
-                    
-                    // 如果没有头像，显示默认图标
+                    // 使用Qt 6兼容的样式定制方式
                     Rectangle {
                         anchors.fill: parent
-                        color: "#DDDDDD"
-                        visible: userAvatar.status !== Image.Ready
-                        
-                        Text {
-                            anchors.centerIn: parent
-                            text: userInfoDialog.userData.name ? userInfoDialog.userData.name.charAt(0) : "?"
-                            font.pixelSize: 80
-                            font.family: "阿里妈妈数黑体"
-                            color: "#666666"
-                        }
-                    }
-                }
-                
-                // 显示头像路径（调试用）
-                Text {
-                    text: "头像路径: " + (userInfoDialog.userData.avatarPath || "无")
-                    font.pixelSize: 10
-                    color: "#999999"
-                    visible: false // 调试时设为true，发布时设为false
-                    width: parent.width
-                    wrapMode: Text.WrapAnywhere
-                    elide: Text.ElideMiddle
-                    maximumLineCount: 2
-                }
-                
-                Rectangle {
-                    width: parent.width
-                    height: 40
-                    color: "#E3F2FD"
+                        color: "#446688cc"
                     radius: 5
                     
                     Text {
                         anchors.centerIn: parent
-                        text: "人脸相似度: " + userInfoDialog.similarityValue + "%"
-                        font.pixelSize: 18
+                            text: "取消"
                         font.family: "阿里妈妈数黑体"
-                        color: userInfoDialog.similarityValue >= 90 ? "#4CAF50" : "#FF9800"
-                        font.bold: true
-                    }
-                }
-                
-                Text {
-                    text: "姓名: " + (userInfoDialog.userData.name || "")
-                    font.pixelSize: 18
-                    font.family: "阿里妈妈数黑体"
-                }
-                
-                Text {
-                    text: "性别: " + (userInfoDialog.userData.gender || "")
-                    font.pixelSize: 18
-                    font.family: "阿里妈妈数黑体"
-                }
-                
-                Text {
-                    text: "工号: " + (userInfoDialog.userData.workId || "")
-                    font.pixelSize: 18
-                    font.family: "阿里妈妈数黑体"
-                }
-                
-                Text {
-                    text: "是否管理员: " + (userInfoDialog.userData.isAdmin ? "是" : "否")
-                    font.pixelSize: 18
-                    font.family: "阿里妈妈数黑体"
-                }
-                
-                Text {
-                    text: "请确认以上信息是否正确"
                     font.pixelSize: 16
-                    font.family: "阿里妈妈数黑体"
-                    font.italic: true
-                    color: "#666666"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-                
-                Row {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 20
-                    
-                    Button {
-                        width: 120
-                        height: 40
-                        background: Rectangle {
-                            color: "#4CAF50"
-                            radius: 5
-                        }
-                        contentItem: Text {
-                            text: "确认并进入"
                             color: "white"
-                            font.pixelSize: 16
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        onClicked: {
-                            userInfoDialog.close()
-                            
-                            // 单独判断题策引擎，只有它需要管理员权限
-                            var needsAdmin = false;
-                            if (userInfoDialog.titleText === "题策引擎") {
-                                needsAdmin = true;
-                            }
-                            
-                            // 明确检查是否可以进入页面
-                            var canEnterPage = true;
-                            
-                            // 如果需要管理员权限但用户不是管理员则不能进入
-                            if (needsAdmin && !userInfoDialog.userData.isAdmin) {
-                                canEnterPage = false;
-                                console.log("非管理员用户尝试访问需要管理员权限的" + userInfoDialog.titleText);
-                                adminRequiredPopup.titleText = userInfoDialog.titleText;
-                                adminRequiredPopup.open();
-                            }
-                            
-                            // 如果可以进入页面，则创建并跳转
-                            if (canEnterPage) {
-                                console.log("用户已确认信息，正在跳转到" + userInfoDialog.titleText + "页面...");
-                                // 确认后跳转到对应页面，并传递用户数据
-                                var component = Qt.createComponent(userInfoDialog.targetPage);
-                                if (component.status === Component.Ready) {
-                                    var pageObject = component.createObject(stackView, {"userData": userInfoDialog.userData});
-                                    stackView.push(pageObject);
-                                } else {
-                                    console.error("组件加载失败:", component.errorString());
-                                    stackView.push(userInfoDialog.targetPage);
-                                }
-                            }
                         }
                     }
                     
-                    Button {
-                        width: 120
-                        height: 40
-                        background: Rectangle {
-                            color: "#F44336"
-                            radius: 5
-                        }
-                        contentItem: Text {
-                            text: "信息有误"
-                            color: "white"
-                            font.pixelSize: 16
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
                         onClicked: {
-                            userInfoDialog.close()
-                            // 返回人脸识别界面
-                            faceRecognitionPopup.open()
-                        }
+                        faceRecognitionPopup.close()
                     }
-                }
-            }
-        }
-    }
-
-    // 管理员权限提示弹窗
-    Popup {
-        id: adminRequiredPopup
-        width: 450
-        height: 300
-        anchors.centerIn: parent
-        modal: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        
-        property string titleText: "题策引擎" // 默认为题策引擎，可根据当前操作设置
-        
-        background: Rectangle {
-            color: "#FFFFFF"
-            radius: 10
-            border.color: "#E0E0E0"
-            border.width: 1
-        }
-        
-        contentItem: Item {
-            anchors.fill: parent
-            
-            // 顶部色带
-            Rectangle {
-                id: headerBand
-                width: parent.width
-                height: 8
-                color: "#F44336"
-                anchors.top: parent.top
-                radius: 10
-            }
-            
-            // 图标
-            Image {
-                id: lockIcon
-                source: "qrc:/images/face_icon.png"
-                width: 64
-                height: 64
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: 40
-                fillMode: Image.PreserveAspectFit
-            }
-            
-            // 红色锁图标
-            Text {
-                anchors.right: lockIcon.right
-                anchors.bottom: lockIcon.bottom
-                text: "🔒"
-                font.pixelSize: 24
-                color: "#F44336"
-            }
-            
-            // 标题
-            Text {
-                id: titleText
-                text: "需要管理员权限"
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: lockIcon.bottom
-                anchors.topMargin: 20
-                font.pixelSize: 24
-                font.family: "阿里妈妈数黑体"
-                font.bold: true
-                color: "#333333"
-            }
-            
-            // 说明文本
-            Text {
-                id: descriptionText
-                text: adminRequiredPopup.titleText + "仅对管理员开放，请联系系统管理员获取相应权限。"
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: titleText.bottom
-                anchors.topMargin: 15
-                width: parent.width - 60
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.WordWrap
-                font.pixelSize: 16
-                font.family: "阿里妈妈数黑体"
-                color: "#666666"
-                lineHeight: 1.3
-            }
-            
-            // 按钮
-            Button {
-                id: closeButton
-                text: "返回"
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 30
-                width: 180
-                height: 45
-                
-                background: Rectangle {
-                    color: closeButton.pressed ? "#E0E0E0" : "#F5F5F5"
-                    radius: 22.5
-                    border.color: "#DDDDDD"
-                    border.width: 1
-                }
-                
-                contentItem: Text {
-                    text: closeButton.text
-                    font.pixelSize: 16
-                    font.family: "阿里妈妈数黑体"
-                    color: "#333333"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                
-                onClicked: {
-                    adminRequiredPopup.close()
                 }
             }
         }
@@ -3119,5 +2789,21 @@ Window {
                 }
             }
         }
+    }
+
+    // 使用这个函数停止摄像头
+    function stopCamera() {
+        camera.active = false
+    }
+
+    // 开始人脸跟踪
+    function startFaceTracking() {
+        console.log("开始人脸跟踪...")
+        faceTrackingTimer.start()
+        statusText.text = "请将面部对准摄像头..."
+        
+        // 启动人脸追踪框逆时针旋转
+        console.log("启动人脸追踪框逆时针旋转")
+        faceRecognizer.startRotation(50, 1.5) // 50毫秒更新一次，每次旋转1.5度
     }
 }

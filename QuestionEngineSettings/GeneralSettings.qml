@@ -2,7 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
-import QtMultimedia 5.15
+import QtMultimedia
 
 Rectangle {
     id: generalSettingsPage
@@ -33,21 +33,20 @@ Rectangle {
     }
     
     Component.onCompleted: {
-        // 载入和应用已保存的设置
-        var savedPassword = dbManager.getSetting("admin_password", "123456")
-        adminPassword = savedPassword
-        passwordField.text = savedPassword
-        console.log("从数据库载入管理员密码: " + (savedPassword ? "已设置" : "未设置，使用默认值"))
-
-        // 载入已保存的摄像头设置
+        // 载入管理员密码设置
+        var savedPassword = dbManager.getSetting("admin_password", "")
+        adminPassword = savedPassword !== "" ? savedPassword : ""
+        passwordField.text = adminPassword
+        
+        // 载入摄像头设备设置
         var savedCameraId = dbManager.getSetting("camera_device", "auto")
         if (savedCameraId === "auto") {
             // 自动模式选择第一个特殊选项
             cameraComboBox.currentIndex = 0
         } else if (savedCameraId !== "") {
-            var cameras = QtMultimedia.availableCameras
+            var cameras = Qt.multimedia.videoInputs()
             for (var i = 0; i < cameras.length; i++) {
-                if (cameras[i].deviceId === savedCameraId) {
+                if (cameras[i].id === savedCameraId) {
                     cameraComboBox.currentIndex = i + 1  // +1是因为第一项是"自动"
                     break
                 }
@@ -227,8 +226,8 @@ Rectangle {
                                     }
                                     model: {
                                         var model = ["自动检测（推荐）"];
-                                        for (var i = 0; i < QtMultimedia.availableCameras.length; i++) {
-                                            model.push(QtMultimedia.availableCameras[i].displayName);
+                                        for (var i = 0; i < Qt.multimedia.videoInputs().length; i++) {
+                                            model.push(Qt.multimedia.videoInputs()[i].description);
                                         }
                                         return model;
                                     }
@@ -494,10 +493,10 @@ Rectangle {
             } else {
                 // 保存特定摄像头
                 var cameraIndex = cameraComboBox.currentIndex - 1; // 减1是因为第一项是"自动"
-                if (cameraIndex >= 0 && cameraIndex < QtMultimedia.availableCameras.length) {
-                    var selectedCamera = QtMultimedia.availableCameras[cameraIndex]
-                    cameraSuccess = dbManager.setSetting("camera_device", selectedCamera.deviceId)
-                    console.log("摄像头设置已更新: ID=" + selectedCamera.deviceId + ", 名称=" + selectedCamera.displayName)
+                if (cameraIndex >= 0 && cameraIndex < Qt.multimedia.videoInputs().length) {
+                    var selectedCamera = Qt.multimedia.videoInputs()[cameraIndex]
+                    cameraSuccess = dbManager.setSetting("camera_device", selectedCamera.id)
+                    console.log("摄像头设置已更新: ID=" + selectedCamera.id + ", 名称=" + selectedCamera.description)
                 }
             }
         }

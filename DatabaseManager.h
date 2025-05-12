@@ -51,6 +51,9 @@ public:
 
     // 验证人脸（根据工号和人脸图像路径）
     Q_INVOKABLE bool verifyFace(const QString &workId, const QString &faceImagePath);
+    
+    // 识别人脸，在所有用户中查找匹配的人脸
+    Q_INVOKABLE QVariantMap recognizeFace(const QString &faceImagePath);
 
     // 检查用户是否存在
     Q_INVOKABLE bool userExists(const QString &workId);

@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import QtQuick.Dialogs 1.3
+import QtQuick.Dialogs
 
 Rectangle {
     id: questionCollectionPage
@@ -995,16 +995,16 @@ Rectangle {
         }
     }
     
-    // FileDialog保持不变
+    // FileDialog使用Qt 6兼容写法
     FileDialog {
         id: folderDialog
         title: "选择保存文件夹"
-        folder: shortcuts.documents
-        selectFolder: true
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+        fileMode: FileDialog.OpenDirectory
         
         onAccepted: {
             // 将选择的URL转换为本地路径
-            var path = folderDialog.fileUrl.toString()
+            var path = folderDialog.selectedFolder.toString()
             // 去除file:/// 前缀
             path = path.replace(/^(file:\/{3})/, "")
             // 解码URL
@@ -1016,12 +1016,13 @@ Rectangle {
     FileDialog {
         id: fileDialog
         title: "选择Excel文件"
-        folder: shortcuts.documents
+        currentFolder: StandardPaths.standardLocations(StandardPaths.DocumentsLocation)[0]
+        fileMode: FileDialog.OpenFile
         nameFilters: [ "Excel files (*.xlsx *.xls)", "All files (*)" ]
         
         onAccepted: {
             // 将选择的URL转换为本地路径
-            var path = fileDialog.fileUrl.toString()
+            var path = fileDialog.selectedFile.toString()
             // 去除file:/// 前缀
             path = path.replace(/^(file:\/{3})/, "")
             // 解码URL
