@@ -8,7 +8,7 @@
 #include "FileManager.h"
 #include "DatabaseManager.h"
 #include "FaceRecognizer.h"
-
+#include <QtWebEngineQuick/QtWebEngineQuick>
 // 检查文件是否存在并输出信息的辅助函数
 void checkFileExists(const QString &filePath) {
     QFileInfo fileInfo(filePath);
@@ -46,6 +46,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     QGuiApplication app(argc, argv);
+
+    // 初始化 QtWebEngineQuick
+    QtWebEngineQuick::initialize();
     
     // 详细的启动日志
     qDebug() << "\n\n====================== 应用程序启动 ======================";
