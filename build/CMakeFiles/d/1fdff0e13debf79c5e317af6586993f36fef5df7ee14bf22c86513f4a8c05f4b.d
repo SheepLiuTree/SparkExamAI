@@ -1154,6 +1154,15 @@ SparkExamAI_autogen/timestamp: \
   C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6Sql/Qt6SqlTargets-relwithdebinfo.cmake \
   C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6Sql/Qt6SqlTargets.cmake \
   C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6Sql/Qt6SqlVersionlessTargets.cmake \
+  C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6VirtualKeyboard/Qt6VirtualKeyboardAdditionalTargetInfo.cmake \
+  C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6VirtualKeyboard/Qt6VirtualKeyboardConfig.cmake \
+  C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6VirtualKeyboard/Qt6VirtualKeyboardConfigVersion.cmake \
+  C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6VirtualKeyboard/Qt6VirtualKeyboardConfigVersionImpl.cmake \
+  C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6VirtualKeyboard/Qt6VirtualKeyboardDependencies.cmake \
+  C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6VirtualKeyboard/Qt6VirtualKeyboardTargets-debug.cmake \
+  C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6VirtualKeyboard/Qt6VirtualKeyboardTargets-relwithdebinfo.cmake \
+  C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6VirtualKeyboard/Qt6VirtualKeyboardTargets.cmake \
+  C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6VirtualKeyboard/Qt6VirtualKeyboardVersionlessTargets.cmake \
   C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6WebChannel/Qt6WebChannelAdditionalTargetInfo.cmake \
   C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6WebChannel/Qt6WebChannelConfig.cmake \
   C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6WebChannel/Qt6WebChannelConfigVersion.cmake \

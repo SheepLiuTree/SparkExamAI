@@ -5,6 +5,7 @@ import QtQuick.Controls.Material 2.15
 import QtMultimedia
 import Qt5Compat.GraphicalEffects
 import QtQuick.Dialogs
+import QtQuick.VirtualKeyboard 2.15
 
 Window {
     width: Screen.width
@@ -16,9 +17,18 @@ Window {
     flags: Qt.Window | Qt.FramelessWindowHint
     title: qsTr("星火智能评测系统")
     
-    // 应用Material样式
+    // 应用Material样式 - 确保全局应用
     Material.theme: Material.Dark
     Material.accent: Material.Blue
+    
+    // 虚拟键盘高度追踪
+    property int virtualKeyboardHeight: 0
+    
+    // 附加属性确保样式应用到所有控件
+    QtObject {
+        id: appStyle
+        property int style: QtQuick.Controls.ApplicationWindow.Material
+    }
 
     // 提供一个全局函数用于更新用户数据
     function updateUserData(workId) {
@@ -88,6 +98,15 @@ Window {
             font.family: "阿里妈妈数黑体"
             font.pixelSize: 48
             color: "white"
+            
+            // 添加鼠标事件区域，用于处理双击事件
+            MouseArea {
+                anchors.fill: parent
+                onDoubleClicked: {
+                    console.log("系统标题被双击，显示退出确认对话框")
+                    exitDialog.open()
+                }
+            }
         }
         Text {
             id: date_text
@@ -137,7 +156,7 @@ Window {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
+        anchors.bottomMargin: 10 + (virtualKeyboardHeight > 0 ? virtualKeyboardHeight : 0)
         initialItem: mainPage
         clip: true
 
@@ -334,29 +353,6 @@ Window {
                                 })
                             }
                         }
-                    }
-                }
-
-                Button {
-                    width: 200
-                    height: 70
-                    background: Image {
-                        source: "qrc:/images/button_bg.png"
-                        fillMode: Image.Stretch
-                    }
-                    contentItem: Text {
-                        text: "题集速录"
-                        font.family: "阿里妈妈数黑体"
-                        font.pixelSize: 24
-                        color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                    onClicked: {
-                        console.log("题集速录 clicked")
-                        faceRecognitionPopup.targetPage = "QuestionCollectionPage.qml"
-                        faceRecognitionPopup.titleText = "题集速录"
-                        faceRecognitionPopup.open()
                     }
                 }
 
@@ -2152,6 +2148,7 @@ Window {
         property int trackingUpdateInterval: 200 // 人脸跟踪更新间隔(毫秒)，改为200ms提高响应速度
         property string targetPage: ""
         property string titleText: ""
+        property var extraParams: ({}) // 添加额外参数属性，用于向目标页面传递参数
         
         // 添加MediaDevices对象用于访问摄像头列表
         MediaDevices {
@@ -2468,8 +2465,24 @@ Window {
                     // 判断目标页面并打开
                     if (faceRecognitionPopup.targetPage !== "") {
                         // 打开指定的页面
-                        console.log("打开目标页面：" + faceRecognitionPopup.targetPage)
-                        stackView.push(faceRecognitionPopup.targetPage)
+                        console.log("打开目标页面：" + faceRecognitionPopup.targetPage + 
+                                   (Object.keys(faceRecognitionPopup.extraParams).length > 0 ? 
+                                    "，附加参数：" + JSON.stringify(faceRecognitionPopup.extraParams) : ""))
+                        
+                        // 使用临时对象组合所有参数
+                        var pageParams = { 
+                            userData: { id: result.id, name: result.name, workId: result.workId }
+                        }
+                        
+                        // 合并extraParams中的参数
+                        if (Object.keys(faceRecognitionPopup.extraParams).length > 0) {
+                            for (var key in faceRecognitionPopup.extraParams) {
+                                pageParams[key] = faceRecognitionPopup.extraParams[key]
+                            }
+                        }
+                        
+                        // 打开页面并传递参数
+                        stackView.push(faceRecognitionPopup.targetPage, pageParams)
                     }
                 })
             } else {
@@ -2805,5 +2818,140 @@ Window {
         // 启动人脸追踪框逆时针旋转
         console.log("启动人脸追踪框逆时针旋转")
         faceRecognizer.startRotation(50, 1.5) // 50毫秒更新一次，每次旋转1.5度
+    }
+
+    // 退出确认对话框
+    Dialog {
+        id: exitDialog
+        anchors.centerIn: parent
+        width: 400
+        height: 200
+        modal: true
+        title: "退出确认"
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        // 设置对话框标题区域
+        header: Rectangle {
+            color: "#404040"
+            height: 40
+            radius: 5
+            
+            Text {
+                text: exitDialog.title
+                color: "white"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 18
+                font.bold: true
+                anchors.centerIn: parent
+            }
+        }
+        
+        // 设置对话框背景
+        background: Rectangle {
+            color: "#303030"
+            border.color: "#505050"
+            border.width: 1
+            radius: 5
+        }
+        
+        // 对话框内容
+        Column {
+            anchors.fill: parent
+            spacing: 20
+            anchors.margins: 20
+            
+            // 消息文本
+            Text {
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                text: "确定要退出星火智能评测系统吗？"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 20
+                color: "white"
+                wrapMode: Text.WordWrap
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+            
+            // 按钮行
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 30
+                
+                // 确认按钮
+                Button {
+                    width: 120
+                    height: 50
+                    background: Rectangle {
+                        color: "#0078d7"
+                        radius: 4
+                    }
+                    contentItem: Text {
+                        text: "确定"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 18
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("用户确认退出系统")
+                        Qt.quit()
+                    }
+                }
+                
+                // 取消按钮
+                Button {
+                    width: 120
+                    height: 50
+                    background: Rectangle {
+                        color: "#505050"
+                        radius: 4
+                    }
+                    contentItem: Text {
+                        text: "取消"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 18
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("用户取消退出系统")
+                        exitDialog.close()
+                    }
+                }
+            }
+        }
+    }
+    
+    // 全局虚拟键盘
+    InputPanel {
+        id: inputPanel
+        z: 99
+        width: parent.width
+        anchors.bottom: parent.bottom
+        visible: Qt.inputMethod.visible
+        
+        // 当输入面板高度变化时，调整页面布局
+        Component.onCompleted: {
+            console.log("虚拟键盘组件已加载")
+        }
+        
+        onVisibleChanged: {
+            if (visible) {
+                virtualKeyboardHeight = height
+                console.log("虚拟键盘显示，高度:", height)
+            } else {
+                virtualKeyboardHeight = 0
+                console.log("虚拟键盘隐藏")
+            }
+        }
+        
+        // 当键盘高度变化时更新属性
+        onHeightChanged: {
+            if (visible) {
+                virtualKeyboardHeight = height
+            }
+        }
     }
 }

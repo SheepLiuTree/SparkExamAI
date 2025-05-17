@@ -9,13 +9,46 @@ Rectangle {
     
     property var settingCategories: [
         { id: "general", name: "通用设置", icon: "qrc:/images/setting.png", component: "QuestionEngineSettings/GeneralSettings.qml" },
-        { id: "strategies", name: "出题策略", icon: "qrc:/images/strategy.png", component: "QuestionEngineSettings/StrategiesSettings.qml" },
+        { id: "collection", name: "题集速录", icon: "qrc:/images/collection.png", component: "QuestionCollectionPage.qml" },
         { id: "pentagon", name: "五芒图设置", icon: "qrc:/images/chart.png", component: "QuestionEngineSettings/PentagonalChartSettings.qml" },
+        { id: "strategies", name: "出题策略", icon: "qrc:/images/strategy.png", component: "QuestionEngineSettings/StrategiesSettings.qml" },
         { id: "knowledge", name: "智点速览", icon: "qrc:/images/list.png", component: "QuestionEngineSettings/KnowledgePointSettings.qml" }
     ]
     
     property int selectedCategoryIndex: 0
     property string userName: "管理员"
+    property var userData: ({})
+    property int initialTabIndex: -1
+    
+    // 处理initialTabIndex变化
+    onInitialTabIndexChanged: {
+        if (initialTabIndex >= 0 && initialTabIndex < settingCategories.length) {
+            console.log("题策引擎页面：切换到指定的初始选项卡索引 " + initialTabIndex)
+            selectedCategoryIndex = initialTabIndex
+            
+            // 确保列表视图也更新选中项
+            if (categoryListView) {
+                categoryListView.currentIndex = initialTabIndex
+            }
+            
+            // 只处理一次初始选项卡请求，处理后重置
+            initialTabIndex = -1
+        }
+    }
+    
+    // 检测userData变化
+    onUserDataChanged: {
+        if (userData && userData.name) {
+            userName = userData.name
+            console.log("题策引擎页面已接收用户数据: " + userName)
+            
+            // 如果当前显示的是题集速录页面，则立即传递数据
+            if (selectedCategoryIndex === 1 && settingsLoader.item) {
+                settingsLoader.item.userData = userData
+                console.log("已将用户数据传递到题集速录页面")
+            }
+        }
+    }
     
     // 当selectedCategoryIndex变化时，确保加载对应的组件
     onSelectedCategoryIndexChanged: {
@@ -220,6 +253,15 @@ Rectangle {
                     onStatusChanged: {
                         if (status == Loader.Ready) {
                             console.log("设置组件加载完成: " + source)
+                            
+                            // 判断是否是题集速录页面，如果是则设置嵌入模式
+                            if (settingCategories[selectedCategoryIndex].id === "collection" && item) {
+                                item.isEmbedded = true
+                                console.log("已将题集速录页面设置为嵌入模式")
+                                
+                                // 将用户数据传递给题集速录页面
+                                item.userData = userData
+                            }
                         }
                     }
                 }
@@ -246,6 +288,8 @@ Rectangle {
             return "📊"
         case "knowledge":
             return "📚"
+        case "collection":
+            return "📋"
         default:
             return ""
         }

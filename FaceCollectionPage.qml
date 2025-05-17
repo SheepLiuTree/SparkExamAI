@@ -349,15 +349,36 @@ Rectangle {
         visible: false
     }
 
-    Popup {
+    // 半透明遮罩层作为模态背景
+    Rectangle {
+        id: modalOverlay
+        anchors.fill: parent
+        color: "#80000000"  // 半透明黑色
+        visible: cameraPopup.visible
+        z: 99  // 确保在弹窗下面，但在其他元素上面
+        
+        // 点击遮罩层不关闭弹窗
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                // 不做任何操作
+            }
+        }
+    }
+
+    // 使用Rectangle实现弹窗效果，替代Popup组件
+    Rectangle {
         id: cameraPopup
         width: 1100
         height: 500
         anchors.centerIn: parent
-        modal: true
-        closePolicy: Popup.CloseOnEscape
+        visible: false  // 默认不可见
+        z: 100  // 确保显示在最上层
 
-        onOpened: {
+        // 定义打开和关闭函数
+        function open() {
+            visible = true
+            // 执行原Popup的onOpened逻辑
             capturedImage.visible = false
             videoOutput.visible = true
             capturedImage.source = ""
@@ -387,18 +408,24 @@ Rectangle {
             }
         }
         
-        onClosed: {
+        function close() {
+            visible = false
+            // 执行原Popup的onClosed逻辑
             console.log("相机弹窗关闭 - 不停止摄像头，保持运行状态")
         }
 
-        background: Rectangle {
-            color: "#333333"
-            border.color: "#666666"
-            border.width: 2
-            radius: 10
+        // 键盘处理，模拟Popup的CloseOnEscape功能
+        Keys.onEscapePressed: {
+            cameraPopup.close()
         }
 
-        contentItem: Item {
+        color: "#333333"
+        border.color: "#666666"
+        border.width: 2
+        radius: 10
+
+        // 内容部分
+        Item {
             anchors.fill: parent
 
             Rectangle {
@@ -1149,23 +1176,53 @@ Rectangle {
         }
     }
 
-    // 添加一个消息弹窗组件
-    Popup {
+    // 消息弹窗前的半透明遮罩层
+    Rectangle {
+        id: messageModalOverlay
+        anchors.fill: parent
+        color: "#80000000"  // 半透明黑色
+        visible: messagePopup.visible
+        z: 105  // 确保在弹窗下面，但在其他元素上面
+        
+        // 点击遮罩层不关闭弹窗
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                // 不做任何操作
+            }
+        }
+    }
+
+    // 消息弹窗组件，使用Rectangle实现替代Popup
+    Rectangle {
         id: messagePopup
         width: 400
         height: 200
         anchors.centerIn: parent
-        modal: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: false  // 默认不可见
+        z: 106  // 确保显示在最上层
 
-        background: Rectangle {
-            color: "#333333"
-            border.color: "#666666"
-            border.width: 2
-            radius: 10
+        // 定义打开和关闭函数
+        function open() {
+            visible = true
+        }
+        
+        function close() {
+            visible = false
         }
 
-        contentItem: Item {
+        // 键盘处理，模拟Popup的CloseOnEscape功能
+        Keys.onEscapePressed: {
+            messagePopup.close()
+        }
+
+        color: "#333333"
+        border.color: "#666666"
+        border.width: 2
+        radius: 10
+
+        // 内容部分
+        Item {
             anchors.fill: parent
 
             Text {
@@ -1204,25 +1261,58 @@ Rectangle {
         }
     }
 
-    // 添加管理员密码验证弹窗
-    Popup {
+    // 为管理员密码验证弹窗添加的半透明遮罩层
+    Rectangle {
+        id: adminModalOverlay
+        anchors.fill: parent
+        color: "#80000000"  // 半透明黑色
+        visible: adminPasswordPopup.visible
+        z: 101  // 确保在弹窗下面，但在其他元素上面
+        
+        // 点击遮罩层不关闭弹窗
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                // 不做任何操作
+            }
+        }
+    }
+
+    // 使用Rectangle实现管理员密码验证弹窗，替代Popup组件
+    Rectangle {
         id: adminPasswordPopup
         width: 400
         height: 250
         anchors.centerIn: parent
-        modal: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: false  // 默认不可见
+        z: 102  // 确保显示在最上层
         
         property var onPasswordVerified: null
 
-        background: Rectangle {
-            color: "#333333"
-            border.color: "#666666"
-            border.width: 2
-            radius: 10
+        // 定义打开和关闭函数
+        function open() {
+            visible = true
+            // 执行原Popup的onOpened逻辑
+            adminPasswordField.text = ""
+            passwordErrorText.visible = false
+        }
+        
+        function close() {
+            visible = false
         }
 
-        contentItem: Item {
+        // 键盘处理，模拟Popup的CloseOnEscape功能
+        Keys.onEscapePressed: {
+            adminPasswordPopup.close()
+        }
+
+        color: "#333333"
+        border.color: "#666666"
+        border.width: 2
+        radius: 10
+
+        // 内容部分
+        Item {
             anchors.fill: parent
 
             Text {
@@ -1349,11 +1439,6 @@ Rectangle {
                 passwordErrorText.visible = true
             }
         }
-        
-        onOpened: {
-            adminPasswordField.text = ""
-            passwordErrorText.visible = false
-        }
     }
 
     // 添加保存人脸数据的函数
@@ -1424,23 +1509,52 @@ Rectangle {
         userListUpdated();
     }
 
-    // 确认对话框
-    Popup {
+    // 确认对话框前的半透明遮罩层
+    Rectangle {
+        id: confirmModalOverlay
+        anchors.fill: parent
+        color: "#80000000"  // 半透明黑色
+        visible: confirmDialog.visible
+        z: 103  // 确保在弹窗下面，但在其他元素上面
+        
+        // 点击遮罩层不关闭弹窗
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                // 不做任何操作
+            }
+        }
+    }
+
+    // 确认对话框，使用Rectangle实现替代Popup
+    Rectangle {
         id: confirmDialog
         anchors.centerIn: parent
         width: 400
         height: 250
-        modal: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: false  // 默认不可见
+        z: 104  // 确保显示在最上层
         
-        background: Rectangle {
-            color: "#1e293b"
-            radius: 10
-            border.color: "#334155"
-            border.width: 2
+        // 定义打开和关闭函数
+        function open() {
+            visible = true
         }
         
-        contentItem: Item {
+        function close() {
+            visible = false
+        }
+
+        // 键盘处理，模拟Popup的CloseOnEscape功能
+        Keys.onEscapePressed: {
+            confirmDialog.close()
+        }
+        
+        color: "#1e293b"
+        radius: 10
+        border.color: "#334155"
+        border.width: 2
+        
+        Item {
             anchors.fill: parent
             
             Rectangle {

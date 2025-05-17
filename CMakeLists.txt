@@ -50,6 +50,8 @@ message(STATUS "SeetaNet: ${SEETA_NET}")
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick Sql Multimedia MultimediaWidgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Sql Multimedia MultimediaWidgets)
 find_package(Qt6 REQUIRED COMPONENTS WebEngineQuick)
+find_package(Qt6 REQUIRED COMPONENTS VirtualKeyboard)
+
 set(PROJECT_SOURCES
         main.cpp
         qml.qrc
@@ -87,6 +89,7 @@ target_link_libraries(SparkExamAI
   Qt${QT_VERSION_MAJOR}::Multimedia
   Qt${QT_VERSION_MAJOR}::MultimediaWidgets
   Qt${QT_VERSION_MAJOR}::WebEngineQuick
+  Qt${QT_VERSION_MAJOR}::VirtualKeyboard
   # 显式列出OpenCV库，先列出imgproc库
   C:/OpenCV4.5.2/x64/vc16/lib/opencv_imgproc452.lib
   C:/OpenCV4.5.2/x64/vc16/lib/opencv_core452.lib

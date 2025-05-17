@@ -10,6 +10,7 @@ Rectangle {
     property string userName: "管理员"
     property var questionBanks: []
     property var userData: ({})
+    property bool isEmbedded: false // 新增属性，标识是否嵌入在题策引擎中
     
     // 检测userData变化
     onUserDataChanged: {
@@ -35,68 +36,10 @@ Rectangle {
         questionBanks = dbManager.getAllQuestionBanks()
     }
     
-    // 返回按钮
-    Button {
-        id: backButton
-        anchors.top: parent.top
-        anchors.topMargin: 20
-        anchors.left: parent.left
-        anchors.leftMargin: 20
-        width: 100
-        height: 40
-        background: Image {
-            source: "qrc:/images/button_bg.png"
-            fillMode: Image.Stretch
-        }
-        contentItem: Text {
-            text: "返回"
-            font.family: "阿里妈妈数黑体"
-            font.pixelSize: 18
-            color: "white"
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
-        onClicked: {
-            // 显示确认对话框
-            confirmDialog.open()
-        }
-    }
+
     
-    // 页面标题
-    Text {
-        id: pageTitle
-        anchors.top: parent.top
-        anchors.topMargin: 30
-        anchors.horizontalCenter: parent.horizontalCenter
-        text: "题集速录"
-        font.family: "阿里妈妈数黑体"
-        font.pixelSize: 36
-        color: "white"
-        font.bold: true
-    }
-    
-    // 欢迎信息
-    Text {
-        id: welcomeText
-        anchors.top: pageTitle.bottom
-        anchors.topMargin: 10
-        anchors.horizontalCenter: parent.horizontalCenter
-        text: "欢迎, " + userName + "!"
-        font.family: "阿里妈妈数黑体"
-        font.pixelSize: 20
-        color: "white"
-    }
-    
-    // 主内容区域
-    Rectangle {
-        anchors.top: welcomeText.bottom
-        anchors.topMargin: 30
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 20
-        width: parent.width * 0.9
-        color: "#44ffffff"
-        radius: 10
+    // 主内容区域 - 根据模式调整位置
+   
         
         ColumnLayout {
             anchors.fill: parent
@@ -355,7 +298,7 @@ Rectangle {
                 }
             }
         }
-    }
+    
     
     // 批量导入对话框 - 使用Popup替代Dialog
     Popup {

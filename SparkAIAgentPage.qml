@@ -10,8 +10,8 @@ Rectangle {
     // 智能体地址属性
     property string aiAgentUrl: "https://www.coze.cn/store/agent/7485277516954271795?bot_id=true" // 默认值
     
-    // 返回按钮
-    Button {
+    // 返回按钮 - 使用纯基本组件而不依赖样式
+    Rectangle {
         id: backButton
         anchors.top: parent.top
         anchors.topMargin: 20
@@ -19,35 +19,44 @@ Rectangle {
         anchors.leftMargin: 20
         width: 100
         height: 40
-        background: Image {
+        color: backButtonMouse.pressed ? Qt.darker("#4f4f4f") : "#4f4f4f"
+        radius: 5
+        
+        Image {
+            id: buttonBg
+            anchors.fill: parent
             source: "qrc:/images/button_bg.png"
             fillMode: Image.Stretch
         }
-        contentItem: Text {
+        
+        Text {
+            anchors.centerIn: parent
             text: "返回"
             font.family: "阿里妈妈数黑体"
             font.pixelSize: 18
             color: "white"
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
         }
         
-        onClicked: {
-            // 获取主页引用
-            var mainPage = stackView.get(0)
-            
-            // 确保返回时显示中间列，隐藏个人数据页面
-            if (mainPage) {
-                console.log("确保返回时显示中间列，隐藏个人数据页面");
-                if (mainPage.middle_column) {
-                    mainPage.middle_column.visible = true;
+        MouseArea {
+            id: backButtonMouse
+            anchors.fill: parent
+            onClicked: {
+                // 获取主页引用
+                var mainPage = stackView.get(0)
+                
+                // 确保返回时显示中间列，隐藏个人数据页面
+                if (mainPage) {
+                    console.log("确保返回时显示中间列，隐藏个人数据页面");
+                    if (mainPage.middle_column) {
+                        mainPage.middle_column.visible = true;
+                    }
+                    if (mainPage.user_practice_data) {
+                        mainPage.user_practice_data.visible = false;
+                    }
                 }
-                if (mainPage.user_practice_data) {
-                    mainPage.user_practice_data.visible = false;
-                }
+                
+                stackView.pop()
             }
-            
-            stackView.pop()
         }
     }
     

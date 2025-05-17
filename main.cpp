@@ -45,6 +45,9 @@ int main(int argc, char *argv[])
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
+    // 设置Qt虚拟键盘为默认输入法
+    qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
+    
     QGuiApplication app(argc, argv);
 
     // 初始化 QtWebEngineQuick
