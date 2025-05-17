@@ -8,7 +8,11 @@
 #include "FileManager.h"
 #include "DatabaseManager.h"
 #include "FaceRecognizer.h"
+
+#ifdef HAS_WEBENGINE
 #include <QtWebEngineQuick/QtWebEngineQuick>
+#endif
+
 // 检查文件是否存在并输出信息的辅助函数
 void checkFileExists(const QString &filePath) {
     QFileInfo fileInfo(filePath);
@@ -45,13 +49,25 @@ int main(int argc, char *argv[])
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-    // 设置Qt虚拟键盘为默认输入法
+
+    // 设置虚拟键盘环境变量 - 在创建QGuiApplication之前设置
     qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
+    
+    // 启用虚拟键盘调试
+    qputenv("QT_VIRTUALKEYBOARD_DEBUG", QByteArray("1"));
+    
+    // 禁用预测功能，可能会影响键盘行为
+    qputenv("QT_VIRTUALKEYBOARD_DISABLE_PREDICTION", QByteArray("1"));
+    
+    // 禁用桌面模式，强制使用触摸模式
+    qputenv("QT_VIRTUALKEYBOARD_DESKTOP_DISABLE", QByteArray("0"));
     
     QGuiApplication app(argc, argv);
 
+#ifdef HAS_WEBENGINE
     // 初始化 QtWebEngineQuick
     QtWebEngineQuick::initialize();
+#endif
     
     // 详细的启动日志
     qDebug() << "\n\n====================== 应用程序启动 ======================";

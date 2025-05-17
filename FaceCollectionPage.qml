@@ -576,7 +576,7 @@ Rectangle {
                             color: "#22ffffff"
                             radius: 5
 
-                            TextInput {
+                            TextField {
                                 id: nameInput
                                 anchors.fill: parent
                                 anchors.margins: 5
@@ -584,6 +584,18 @@ Rectangle {
                                 font.pixelSize: 16
                                 color: "white"
                                 verticalAlignment: Text.AlignVCenter
+                                background: Rectangle {
+                                    color: "transparent"
+                                }
+                                inputMethodHints: Qt.ImhNone
+                                
+                                // 强制使用虚拟键盘
+                                onFocusChanged: {
+                                    if (focus) {
+                                        console.log("姓名输入框获得焦点")
+                                        forceActiveFocus()
+                                    }
+                                }
                             }
                         }
                     }
@@ -660,7 +672,7 @@ Rectangle {
                             color: "#22ffffff"
                             radius: 5
 
-                            TextInput {
+                            TextField {
                                 id: workIdInput
                                 anchors.fill: parent
                                 anchors.margins: 5
@@ -668,6 +680,18 @@ Rectangle {
                                 font.pixelSize: 16
                                 color: "white"
                                 verticalAlignment: Text.AlignVCenter
+                                background: Rectangle {
+                                    color: "transparent"
+                                }
+                                inputMethodHints: Qt.ImhDigitsOnly
+                                
+                                // 强制使用虚拟键盘
+                                onFocusChanged: {
+                                    if (focus) {
+                                        console.log("工号输入框获得焦点")
+                                        forceActiveFocus()
+                                    }
+                                }
                             }
                         }
                     }

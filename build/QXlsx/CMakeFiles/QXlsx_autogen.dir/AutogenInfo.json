@@ -339,6 +339,8 @@
 	"MOC_COMPILATION_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/build/QXlsx/QXlsx_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
+		"HAS_VIRTUALKEYBOARD",
+		"HAS_WEBENGINE",
 		"QT_CORE_LIB",
 		"QT_DISABLE_DEPRECATED_BEFORE=0x060200",
 		"QT_GUI_LIB",

@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(MSVC)
     add_compile_options(/Zc:__cplusplus)
     # 设置Qt MSVC版本的路径
-    set(CMAKE_PREFIX_PATH "C:/Qt/5.15.2/msvc2019_64")
+    set(CMAKE_PREFIX_PATH "C:/Qt/6.7.3/msvc2019_64")
     # 增加多字节字符集支持和UTF-8支持
     add_compile_options(/utf-8)
     # 添加QT多字节字符集支持定义
@@ -49,8 +49,19 @@ message(STATUS "SeetaNet: ${SEETA_NET}")
 # 查找Qt模块
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick Sql Multimedia MultimediaWidgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Sql Multimedia MultimediaWidgets)
-find_package(Qt6 REQUIRED COMPONENTS WebEngineQuick)
-find_package(Qt6 REQUIRED COMPONENTS VirtualKeyboard)
+
+# 可选的Qt模块
+find_package(Qt6 COMPONENTS WebEngineQuick)
+find_package(Qt6 COMPONENTS VirtualKeyboard)
+
+# 设置定义，以便在代码中检查模块是否可用
+if(Qt6WebEngineQuick_FOUND)
+    add_definitions(-DHAS_WEBENGINE)
+endif()
+
+if(Qt6VirtualKeyboard_FOUND)
+    add_definitions(-DHAS_VIRTUALKEYBOARD)
+endif()
 
 set(PROJECT_SOURCES
         main.cpp
@@ -88,8 +99,6 @@ target_link_libraries(SparkExamAI
   Qt${QT_VERSION_MAJOR}::Sql
   Qt${QT_VERSION_MAJOR}::Multimedia
   Qt${QT_VERSION_MAJOR}::MultimediaWidgets
-  Qt${QT_VERSION_MAJOR}::WebEngineQuick
-  Qt${QT_VERSION_MAJOR}::VirtualKeyboard
   # 显式列出OpenCV库，先列出imgproc库
   C:/OpenCV4.5.2/x64/vc16/lib/opencv_imgproc452.lib
   C:/OpenCV4.5.2/x64/vc16/lib/opencv_core452.lib
@@ -102,6 +111,15 @@ target_link_libraries(SparkExamAI
   C:/OpenCV4.5.2/x64/vc16/lib/opencv_dnn452.lib
   C:/OpenCV4.5.2/x64/vc16/lib/opencv_objdetect452.lib
 )
+
+# 可选的Qt模块链接
+if(Qt6WebEngineQuick_FOUND)
+  target_link_libraries(SparkExamAI PRIVATE Qt6::WebEngineQuick)
+endif()
+
+if(Qt6VirtualKeyboard_FOUND)
+  target_link_libraries(SparkExamAI PRIVATE Qt6::VirtualKeyboard)
+endif()
 
 # 添加QXlsx库
 add_subdirectory(QXlsx)  #添加

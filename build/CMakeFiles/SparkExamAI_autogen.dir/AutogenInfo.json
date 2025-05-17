@@ -1432,6 +1432,8 @@
 	"MOC_COMPILATION_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/build/SparkExamAI_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
+		"HAS_VIRTUALKEYBOARD",
+		"HAS_WEBENGINE",
 		"QT_CORE_LIB",
 		"QT_GUI_LIB",
 		"QT_MULTIMEDIAWIDGETS_LIB",

@@ -5,7 +5,6 @@ import QtQuick.Controls.Material 2.15
 import QtMultimedia
 import Qt5Compat.GraphicalEffects
 import QtQuick.Dialogs
-import QtQuick.VirtualKeyboard 2.15
 
 Window {
     width: Screen.width
@@ -20,9 +19,6 @@ Window {
     // 应用Material样式 - 确保全局应用
     Material.theme: Material.Dark
     Material.accent: Material.Blue
-    
-    // 虚拟键盘高度追踪
-    property int virtualKeyboardHeight: 0
     
     // 附加属性确保样式应用到所有控件
     QtObject {
@@ -62,6 +58,80 @@ Window {
             return true;
         }
         return false;
+    }
+
+    // 虚拟键盘组件
+    VirtualKeyboard {
+        id: virtualKeyboard
+        visible: false
+        
+        // 当键盘关闭时处理信号
+        onClosed: {
+            visible = false
+        }
+    }
+    
+    // 虚拟键盘控制按钮
+    Rectangle {
+        id: keyboardButton
+        width: 50
+        height: 50
+        radius: 25
+        color: "#404040"
+        opacity: 0.8
+        z: 1000
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: 20
+        
+        Text {
+            anchors.centerIn: parent
+            text: "⌨"
+            color: "white"
+            font.pixelSize: 24
+        }
+        
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                virtualKeyboard.visible = !virtualKeyboard.visible
+            }
+        }
+    }
+    
+    // 全局焦点变化监听器
+    Connections {
+        target: Window
+        function onActiveFocusItemChanged() {
+            checkFocusedItem()
+        }
+    }
+    
+    // 检查当前焦点项并显示键盘
+    function checkFocusedItem() {
+        var focusItem = Window.activeFocusItem
+        if (focusItem) {
+            console.log("焦点变化: " + focusItem)
+            
+            // 检查是否是输入控件
+            if (focusItem.hasOwnProperty("text") && 
+                (focusItem.hasOwnProperty("cursorPosition") || 
+                 focusItem.hasOwnProperty("inputMethodHints") || 
+                 focusItem.hasOwnProperty("echoMode"))) {
+                console.log("检测到输入控件获得焦点，显示虚拟键盘")
+                virtualKeyboard.visible = true
+            }
+        }
+    }
+    
+    // 应用程序激活状态监听
+    Connections {
+        target: Qt.application
+        function onActiveChanged() {
+            if (Qt.application.active) {
+                checkFocusedItem()
+            }
+        }
     }
 
     Image {
@@ -156,7 +226,7 @@ Window {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10 + (virtualKeyboardHeight > 0 ? virtualKeyboardHeight : 0)
+        anchors.bottomMargin: 10
         initialItem: mainPage
         clip: true
 
@@ -2920,37 +2990,6 @@ Window {
                         exitDialog.close()
                     }
                 }
-            }
-        }
-    }
-    
-    // 全局虚拟键盘
-    InputPanel {
-        id: inputPanel
-        z: 99
-        width: parent.width
-        anchors.bottom: parent.bottom
-        visible: Qt.inputMethod.visible
-        
-        // 当输入面板高度变化时，调整页面布局
-        Component.onCompleted: {
-            console.log("虚拟键盘组件已加载")
-        }
-        
-        onVisibleChanged: {
-            if (visible) {
-                virtualKeyboardHeight = height
-                console.log("虚拟键盘显示，高度:", height)
-            } else {
-                virtualKeyboardHeight = 0
-                console.log("虚拟键盘隐藏")
-            }
-        }
-        
-        // 当键盘高度变化时更新属性
-        onHeightChanged: {
-            if (visible) {
-                virtualKeyboardHeight = height
             }
         }
     }
