@@ -8,13 +8,13 @@ import QtQuick.Layouts 1.15
 Item {
     id: keyboardContainer
     width: 800
-    height: 300
+    height: inputPanel.height + 70
     z: 1000 // 确保在其他元素之上
     
     // 属性
     property bool keyboardVisible: visible
     property int minWidth: 500
-    property int minHeight: 200
+    property int minHeight: 20
     
     // 信号
     signal closed()
@@ -208,7 +208,7 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: controlBar.bottom
-            anchors.bottom: resizeHandle.top
+            //anchors.bottom: resizeHandle.top
             anchors.margins: 5
             active: true
             visible: keyboardContainer.visible
@@ -241,6 +241,7 @@ Item {
             width: 20
             height: 20
             color: "transparent"
+            anchors.top: inputPanel.bottom
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.margins: 5
@@ -303,11 +304,12 @@ Item {
                         var newHeight = keyboardContainer.height + deltaY
                         
                         if (newWidth >= keyboardContainer.minWidth) {
-                            keyboardContainer.width = newWidth
+                            keyboardContainer.width = newWidth                            
                         }
                         
                         if (newHeight >= keyboardContainer.minHeight) {
-                            keyboardContainer.height = newHeight
+                            //keyboardContainer.height = newHeight
+                            keyboardContainer.height = inputPanel.height + 70
                         }
                     }
                 }

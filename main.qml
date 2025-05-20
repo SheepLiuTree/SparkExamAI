@@ -163,6 +163,7 @@ Window {
         Text {
             id: headline_text
             anchors.top: parent.top
+            anchors.topMargin: 10
             anchors.horizontalCenter: parent.horizontalCenter
             text: "星火智能评测系统"
             font.family: "阿里妈妈数黑体"
