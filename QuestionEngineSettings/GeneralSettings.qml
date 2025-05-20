@@ -283,8 +283,6 @@ Rectangle {
                                         font.pixelSize: 16
                                         color: "white"
                                         text: adminPassword
-                                        placeholderText: "请输入管理员密码"
-                                        placeholderTextColor: "#cccccc"
                                         echoMode: showPassword ? TextInput.Normal : TextInput.Password
                                         
                                         background: Rectangle {
@@ -298,6 +296,7 @@ Rectangle {
                                     
                                     // 密码显示/隐藏按钮
                                     Button {
+                                        
                                         Layout.preferredWidth: 30
                                         Layout.fillHeight: true
                                         background: Rectangle {
@@ -312,6 +311,11 @@ Rectangle {
                                         }
                                         onClicked: {
                                             showPassword = !showPassword
+                                        }
+                                        // 占位符
+                                        Item {                                            
+                                            Layout.preferredWidth: 30
+                                            Layout.fillHeight: true                                            
                                         }
                                     }
                                 }
@@ -596,8 +600,6 @@ Rectangle {
                                     font.pixelSize: 16
                                     color: "white"
                                     text: aiAgentAddress
-                                    placeholderText: "请输入AI智能体地址"
-                                    placeholderTextColor: "#cccccc"
                                     
                                     background: Rectangle {
                                         color: "transparent"

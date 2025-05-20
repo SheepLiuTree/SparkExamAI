@@ -19,6 +19,8 @@ Window {
     // 应用Material样式 - 确保全局应用
     Material.theme: Material.Dark
     Material.accent: Material.Blue
+
+    
     
     // 附加属性确保样式应用到所有控件
     QtObject {

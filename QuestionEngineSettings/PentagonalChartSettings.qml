@@ -789,20 +789,18 @@ Rectangle {
                                     
                                     Rectangle {
                                         Layout.fillWidth: true
-                                        height: 38
+                                        height: 40
                                         color: "#22ffffff"
                                         radius: 5
                                         
                                         TextField {
                                             id: titleField1
                                             anchors.fill: parent
-                                            anchors.margins: 5
+                                            anchors.margins: 1
                                             text: pentagonTitles[0]
                                             color: "white"
                                             font.family: "阿里妈妈数黑体"
                                             font.pixelSize: 16
-                                            placeholderText: "请输入第一点标题"
-                                            placeholderTextColor: "#cccccc"
                                             background: Rectangle { color: "transparent" }
                                             onTextChanged: {
                                                 pentagonTitles[0] = text
@@ -827,7 +825,7 @@ Rectangle {
                                     // 第一点题库归类按钮
                                     Button {
                                         Layout.preferredWidth: 100
-                                        Layout.preferredHeight: 38
+                                        Layout.preferredHeight: 40
                                         background: Rectangle {
                                             color: "#33ffffff"
                                             radius: 4
@@ -869,20 +867,18 @@ Rectangle {
                                     
                                     Rectangle {
                                         Layout.fillWidth: true
-                                        height: 38
+                                        height: 40
                                         color: "#22ffffff"
                                         radius: 5
                                         
                                         TextField {
                                             id: titleField2
                                             anchors.fill: parent
-                                            anchors.margins: 5
+                                            anchors.margins: 1
                                             text: pentagonTitles[1]
                                             color: "white"
                                             font.family: "阿里妈妈数黑体"
-                                            font.pixelSize: 16
-                                            placeholderText: "请输入第二点标题"
-                                            placeholderTextColor: "#cccccc"
+                                            font.pixelSize: 16                            
                                             background: Rectangle { color: "transparent" }
                                             onTextChanged: {
                                                 pentagonTitles[1] = text
@@ -907,7 +903,7 @@ Rectangle {
                                     // 第二点题库归类按钮
                                     Button {
                                         Layout.preferredWidth: 100
-                                        Layout.preferredHeight: 38
+                                        Layout.preferredHeight: 40
                                         background: Rectangle {
                                             color: "#33ffffff"
                                             radius: 4
@@ -949,20 +945,18 @@ Rectangle {
                                     
                                     Rectangle {
                                         Layout.fillWidth: true
-                                        height: 38
+                                        height: 40
                                         color: "#22ffffff"
                                         radius: 5
                                         
                                         TextField {
                                             id: titleField3
                                             anchors.fill: parent
-                                            anchors.margins: 5
+                                            anchors.margins: 1
                                             text: pentagonTitles[2]
                                             color: "white"
                                             font.family: "阿里妈妈数黑体"
                                             font.pixelSize: 16
-                                            placeholderText: "请输入第三点标题"
-                                            placeholderTextColor: "#cccccc"
                                             background: Rectangle { color: "transparent" }
                                             onTextChanged: {
                                                 pentagonTitles[2] = text
@@ -987,7 +981,7 @@ Rectangle {
                                     // 第三点题库归类按钮
                                     Button {
                                         Layout.preferredWidth: 100
-                                        Layout.preferredHeight: 38
+                                        Layout.preferredHeight: 40
                                         background: Rectangle {
                                             color: "#33ffffff"
                                             radius: 4
@@ -1029,20 +1023,18 @@ Rectangle {
                                     
                                     Rectangle {
                                         Layout.fillWidth: true
-                                        height: 38
+                                        height: 40
                                         color: "#22ffffff"
                                         radius: 5
                                         
                                         TextField {
                                             id: titleField4
                                             anchors.fill: parent
-                                            anchors.margins: 5
+                                            anchors.margins: 1
                                             text: pentagonTitles[3]
                                             color: "white"
                                             font.family: "阿里妈妈数黑体"
                                             font.pixelSize: 16
-                                            placeholderText: "请输入第四点标题"
-                                            placeholderTextColor: "#cccccc"
                                             background: Rectangle { color: "transparent" }
                                             onTextChanged: {
                                                 pentagonTitles[3] = text
@@ -1067,7 +1059,7 @@ Rectangle {
                                     // 第四点题库归类按钮
                                     Button {
                                         Layout.preferredWidth: 100
-                                        Layout.preferredHeight: 38
+                                        Layout.preferredHeight: 40
                                         background: Rectangle {
                                             color: "#33ffffff"
                                             radius: 4
@@ -1109,20 +1101,18 @@ Rectangle {
                                     
                                     Rectangle {
                                         Layout.fillWidth: true
-                                        height: 38
+                                        height: 40
                                         color: "#22ffffff"
                                         radius: 5
                                         
                                         TextField {
                                             id: titleField5
                                             anchors.fill: parent
-                                            anchors.margins: 5
+                                            anchors.margins: 1
                                             text: pentagonTitles[4]
                                             color: "white"
                                             font.family: "阿里妈妈数黑体"
                                             font.pixelSize: 16
-                                            placeholderText: "请输入第五点标题"
-                                            placeholderTextColor: "#cccccc"
                                             background: Rectangle { color: "transparent" }
                                             onTextChanged: {
                                                 pentagonTitles[4] = text
@@ -1147,7 +1137,7 @@ Rectangle {
                                     // 第五点题库归类按钮
                                     Button {
                                         Layout.preferredWidth: 100
-                                        Layout.preferredHeight: 38
+                                        Layout.preferredHeight: 40
                                         background: Rectangle {
                                             color: "#33ffffff"
                                             radius: 4
@@ -1181,7 +1171,7 @@ Rectangle {
                             Button {
                                 anchors.right: parent.right
                                 width: 120
-                                height: 38
+                                height: 40
                                 background: Rectangle {
                                     color: "#2c70b7"
                                     radius: 4

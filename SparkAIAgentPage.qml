@@ -19,7 +19,7 @@ Rectangle {
         anchors.leftMargin: 20
         width: 100
         height: 40
-        color: backButtonMouse.pressed ? Qt.darker("#4f4f4f") : "#4f4f4f"
+        color: "transparent"
         radius: 5
         
         Image {

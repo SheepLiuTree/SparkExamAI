@@ -1370,12 +1370,10 @@ Rectangle {
                 TextField {
                     id: adminPasswordField
                     anchors.fill: parent
-                    anchors.margins: 5
+                    anchors.margins: 1
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 16
                     color: "white"
-                    placeholderText: "请输入管理员密码"
-                    placeholderTextColor: "#cccccc"
                     echoMode: TextInput.Password
                     
                     background: Rectangle {

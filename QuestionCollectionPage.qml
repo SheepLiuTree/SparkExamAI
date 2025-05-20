@@ -120,21 +120,6 @@ Rectangle {
                     Item {
                         Layout.fillWidth: true
                     }
-                    
-                    // 搜索框
-                    TextField {
-                        Layout.preferredWidth: 200
-                        placeholderText: "搜索题库..."
-                        font.family: "阿里妈妈数黑体"
-                        font.pixelSize: 14
-                        
-                        background: Rectangle {
-                            color: "#99ffffff"
-                            radius: 4
-                            border.color: "#cccccc"
-                            border.width: 1
-                        }
-                    }
                 }
             }
             
@@ -354,6 +339,7 @@ Rectangle {
                             Layout.fillWidth: true
                             readOnly: true
                             placeholderText: "请选择Excel文件"
+                            placeholderTextColor: "#cccccc"
                             font.family: "阿里妈妈数黑体"
                             font.pixelSize: 14
                             
@@ -406,7 +392,6 @@ Rectangle {
                 TextField {
                     id: questionBankName
                     Layout.fillWidth: true
-                    placeholderText: "请输入题库名称"
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 14
                     
@@ -633,6 +618,7 @@ Rectangle {
                             Layout.fillWidth: true
                             readOnly: true
                             placeholderText: "请选择保存文件夹"
+                            placeholderTextColor: "#cccccc"
                             font.family: "阿里妈妈数黑体"
                             font.pixelSize: 14
                             

@@ -1195,7 +1195,6 @@ Rectangle {
                                     font.family: "阿里妈妈数黑体"
                                     font.pixelSize: 16
                                     color: "white"
-                                    placeholderText: "在此输入答案..."
                                     background: Rectangle {
                                         color: "transparent"
                                     }
