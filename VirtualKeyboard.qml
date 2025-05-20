@@ -94,6 +94,10 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
+                        // 在关闭键盘前，确保输入法上下文被正确处理
+                        if (Qt.inputMethod) {
+                            Qt.inputMethod.hide()
+                        }
                         keyboardContainer.visible = false
                         keyboardContainer.closed()
                     }

@@ -68,6 +68,10 @@ Window {
         // 当键盘关闭时处理信号
         onClosed: {
             visible = false
+            // 确保输入法上下文被正确处理
+            if (Qt.inputMethod) {
+                Qt.inputMethod.hide()
+            }
         }
     }
     
