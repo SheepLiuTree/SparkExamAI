@@ -17,6 +17,8 @@ Rectangle {
     property int homeSortOption: 1
     property string aiAgentAddress: ""
     property bool enableVirtualKeyboard: true
+    property bool virtualKeyboardChanged: false
+    property bool previousVirtualKeyboardState: true // 保存之前的虚拟键盘状态
     
     // 定义信号
     signal sortOptionUpdated()
@@ -43,6 +45,7 @@ Rectangle {
         // 载入虚拟键盘设置
         var savedVirtualKeyboard = dbManager.getSetting("enable_virtual_keyboard", "true")
         enableVirtualKeyboard = savedVirtualKeyboard.toLowerCase() === "true"
+        previousVirtualKeyboardState = enableVirtualKeyboard
         
         // 载入摄像头设备设置
         var savedCameraId = dbManager.getSetting("camera_device", "auto")
@@ -83,6 +86,131 @@ Rectangle {
         aiAgentAddress = savedAgentAddress
         agentAddressField.text = savedAgentAddress
         console.log("从数据库载入AI智能体地址: " + (savedAgentAddress ? savedAgentAddress : "未设置，使用默认值"))
+    }
+    
+    // 虚拟键盘重启对话框
+    Dialog {
+        id: restartDialog
+        title: "重启提示"
+        modal: true
+        closePolicy: Popup.CloseOnEscape
+        anchors.centerIn: parent
+        width: 400
+        height: 200
+        
+        background: Rectangle {
+            color: "#333333"
+            border.color: "#666666"
+            border.width: 1
+            radius: 5
+        }
+        
+        header: Rectangle {
+            color: "#2c70b7"
+            height: 40
+            width: parent.width
+            radius: 5
+            
+            Text {
+                text: restartDialog.title
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 18
+                font.bold: true
+                color: "white"
+                anchors.centerIn: parent
+            }
+        }
+        
+        contentItem: Rectangle {
+            color: "transparent"
+            
+            Text {
+                anchors.centerIn: parent
+                text: "更改虚拟键盘设置后需重启软件生效"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 16
+                color: "white"
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WordWrap
+                width: parent.width - 40
+            }
+        }
+        
+        footer: Rectangle {
+            color: "transparent"
+            height: 60
+            width: parent.width
+            
+            RowLayout {
+                anchors.centerIn: parent
+                spacing: 20
+                
+                Button {
+                    text: "确定"
+                    Layout.preferredWidth: 120
+                    Layout.preferredHeight: 40
+                    
+                    background: Rectangle {
+                        color: "#2c70b7"
+                        radius: 4
+                    }
+                    
+                    contentItem: Text {
+                        text: "确定重启"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    onClicked: {
+                        // 保存虚拟键盘设置到数据库
+                        var virtualKeyboardSuccess = dbManager.setSetting("enable_virtual_keyboard", enableVirtualKeyboard.toString())
+                        console.log("保存虚拟键盘设置: " + enableVirtualKeyboard)
+                        
+                        if (virtualKeyboardSuccess) {
+                            // 更新先前状态
+                            previousVirtualKeyboardState = enableVirtualKeyboard
+                        }
+                        
+                        restartDialog.close()
+                        // 退出应用程序以便重启
+                        Qt.quit()
+                    }
+                }
+                
+                Button {
+                    text: "取消"
+                    Layout.preferredWidth: 120
+                    Layout.preferredHeight: 40
+                    
+                    background: Rectangle {
+                        color: "#666666"
+                        radius: 4
+                    }
+                    
+                    contentItem: Text {
+                        text: "取消"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    onClicked: {
+                        console.log("取消虚拟键盘设置更改，恢复为: " + previousVirtualKeyboardState)
+                        // 恢复为先前状态
+                        enableVirtualKeyboard = previousVirtualKeyboardState
+                        // 更新开关状态，注意这不会触发onCheckedChanged
+                        virtualKeyboardSwitch.checked = previousVirtualKeyboardState
+                        virtualKeyboardChanged = false
+                        restartDialog.close()
+                    }
+                }
+            }
+        }
     }
     
     ColumnLayout {
@@ -272,7 +400,10 @@ Rectangle {
                                     checked: enableVirtualKeyboard
                                     
                                     onCheckedChanged: {
-                                        enableVirtualKeyboard = checked
+                                        if (enableVirtualKeyboard !== checked) {
+                                            enableVirtualKeyboard = checked
+                                            virtualKeyboardChanged = true
+                                        }
                                     }
                                     
                                     indicator: Rectangle {
@@ -547,9 +678,6 @@ Rectangle {
         // 保存管理员密码
         var passwordSuccess = dbManager.setSetting("admin_password", passwordField.text)
         
-        // 保存虚拟键盘设置
-        var virtualKeyboardSuccess = dbManager.setSetting("enable_virtual_keyboard", enableVirtualKeyboard.toString())
-        
         // 保存摄像头设置
         var cameraSuccess = false
         if (cameraComboBox.currentIndex >= 0) {
@@ -568,7 +696,7 @@ Rectangle {
             }
         }
         
-        // 保存首页排序设置 - 再次确保设置正确保存
+        // 保存首页排序设置
         var sortSuccess = dbManager.setSetting("home_sort_option", homeSortOption.toString())
         console.log("首页排序设置已保存: " + (homeSortOption === 1 ? "本月个人能力排序(1)" : "本月刷题数排序(0)") + 
                    " (home_sort_option=" + homeSortOption.toString() + ")")
@@ -588,9 +716,31 @@ Rectangle {
             sortOptionUpdated()
         })
         
-        // 显示结果消息
-        if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess && virtualKeyboardSuccess) {
-            statusMessage = "所有设置已保存成功"
+        // 默认考虑虚拟键盘设置是成功的
+        var virtualKeyboardSuccess = true
+        
+        // 判断是否虚拟键盘设置发生了变化
+        if (virtualKeyboardChanged) {
+            console.log("检测到虚拟键盘设置变更，弹出确认对话框")
+            // 显示重启确认对话框，不立即保存设置
+            restartDialog.open()
+            // 保持virtualKeyboardChanged为true，以便在确认后使用
+        } else {
+            // 如果没有变化，直接保存虚拟键盘设置
+            virtualKeyboardSuccess = dbManager.setSetting("enable_virtual_keyboard", enableVirtualKeyboard.toString())
+            console.log("虚拟键盘设置没有变化，直接保存: " + enableVirtualKeyboard)
+        }
+        
+        // 显示结果消息，但不包括虚拟键盘设置（如果它已更改）
+        if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess && 
+            (virtualKeyboardSuccess || virtualKeyboardChanged)) {
+            
+            // 如果虚拟键盘设置已更改，则只显示其他设置已保存
+            if (virtualKeyboardChanged) {
+                statusMessage = "其他设置已保存成功，等待确认虚拟键盘设置变更"
+            } else {
+                statusMessage = "所有设置已保存成功"
+            }
             isSuccess = true
         } else {
             let failedSettings = [];
@@ -598,7 +748,7 @@ Rectangle {
             if (!cameraSuccess) failedSettings.push("摄像头");
             if (!sortSuccess) failedSettings.push("首页排序");
             if (!agentAddressSuccess) failedSettings.push("智能体地址");
-            if (!virtualKeyboardSuccess) failedSettings.push("虚拟键盘");
+            if (!virtualKeyboardSuccess && !virtualKeyboardChanged) failedSettings.push("虚拟键盘");
             
             statusMessage = "保存失败的设置: " + failedSettings.join(", ") + "，请重试"
             isSuccess = false
