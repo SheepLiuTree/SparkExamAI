@@ -511,5 +511,5 @@ E:/SparkExamAI/SparkExamAI/SparkExamAI/FileManager.h
  mdp:C:/Qt/6.7.3/msvc2019_64/include/QtCore/qyieldcpu.h
 E:/SparkExamAI/SparkExamAI/SparkExamAI/DatabaseManager.cpp
 E:/SparkExamAI/SparkExamAI/SparkExamAI/FaceRecognizer.cpp
-E:/SparkExamAI/SparkExamAI/SparkExamAI/main.cpp
 E:/SparkExamAI/SparkExamAI/SparkExamAI/FileManager.cpp
+E:/SparkExamAI/SparkExamAI/SparkExamAI/main.cpp

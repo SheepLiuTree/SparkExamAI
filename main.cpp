@@ -50,20 +50,51 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
-    // 设置虚拟键盘环境变量 - 在创建QGuiApplication之前设置
-    qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
-    
-    // 启用虚拟键盘调试
-    qputenv("QT_VIRTUALKEYBOARD_DEBUG", QByteArray("1"));
-    
-    // 禁用预测功能，可能会影响键盘行为
-    qputenv("QT_VIRTUALKEYBOARD_DISABLE_PREDICTION", QByteArray("1"));
-    
-    // 禁用桌面模式，强制使用触摸模式
-    qputenv("QT_VIRTUALKEYBOARD_DESKTOP_DISABLE", QByteArray("0"));
-    
-    QGuiApplication app(argc, argv);
+    // 创建临时QCoreApplication用于读取数据库设置
+    {
+        QCoreApplication tempApp(argc, argv);
+        
+        // 创建临时数据库管理器实例来读取设置
+        DatabaseManager tempDbManager;
+        if (!tempDbManager.initDatabase()) {
+            qDebug() << "数据库初始化失败，将使用默认设置";
+        }
+        
+        // 从数据库读取虚拟键盘设置
+        QString enableVirtualKeyboard = tempDbManager.getSetting("enable_virtual_keyboard", "true");
+        qDebug() << "从数据库读取的虚拟键盘设置:" << enableVirtualKeyboard;
+        
+        // 根据设置决定是否启用虚拟键盘
+        if (enableVirtualKeyboard.toLower() == "true") {
+            // 设置虚拟键盘环境变量
+            qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
+            
+            // 启用虚拟键盘调试
+            qputenv("QT_VIRTUALKEYBOARD_DEBUG", QByteArray("1"));
+            
+            // 禁用预测功能，可能会影响键盘行为
+            qputenv("QT_VIRTUALKEYBOARD_DISABLE_PREDICTION", QByteArray("1"));
+            
+            // 禁用桌面模式，强制使用触摸模式
+            qputenv("QT_VIRTUALKEYBOARD_DESKTOP_DISABLE", QByteArray("0"));
+            
+            qDebug() << "虚拟键盘已启用";
+            qDebug() << "环境变量设置:";
+            qDebug() << "QT_IM_MODULE:" << qgetenv("QT_IM_MODULE");
+            qDebug() << "QT_VIRTUALKEYBOARD_DEBUG:" << qgetenv("QT_VIRTUALKEYBOARD_DEBUG");
+            qDebug() << "QT_VIRTUALKEYBOARD_DISABLE_PREDICTION:" << qgetenv("QT_VIRTUALKEYBOARD_DISABLE_PREDICTION");
+            qDebug() << "QT_VIRTUALKEYBOARD_DESKTOP_DISABLE:" << qgetenv("QT_VIRTUALKEYBOARD_DESKTOP_DISABLE");
+        } else {
+            qDebug() << "虚拟键盘已禁用";
+        }
+    } // 临时QCoreApplication在这里被销毁
 
+    // 创建真正的应用程序实例
+    QGuiApplication app(argc, argv);
+    
+    // 检查输入法模块
+    qDebug() << "当前输入法模块:" << QGuiApplication::inputMethod()->objectName();
+    
 #ifdef HAS_WEBENGINE
     // 初始化 QtWebEngineQuick
     QtWebEngineQuick::initialize();

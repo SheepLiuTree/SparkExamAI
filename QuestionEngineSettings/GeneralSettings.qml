@@ -2,7 +2,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
-import QtMultimedia
+import QtMultimedia 5.15
+import QtMultimedia 5.15 as QtMultimedia
 
 Rectangle {
     id: generalSettingsPage
@@ -15,6 +16,7 @@ Rectangle {
     property bool showPassword: false
     property int homeSortOption: 1
     property string aiAgentAddress: ""
+    property bool enableVirtualKeyboard: true
     
     // 定义信号
     signal sortOptionUpdated()
@@ -38,13 +40,17 @@ Rectangle {
         adminPassword = savedPassword !== "" ? savedPassword : ""
         passwordField.text = adminPassword
         
+        // 载入虚拟键盘设置
+        var savedVirtualKeyboard = dbManager.getSetting("enable_virtual_keyboard", "true")
+        enableVirtualKeyboard = savedVirtualKeyboard.toLowerCase() === "true"
+        
         // 载入摄像头设备设置
         var savedCameraId = dbManager.getSetting("camera_device", "auto")
         if (savedCameraId === "auto") {
             // 自动模式选择第一个特殊选项
             cameraComboBox.currentIndex = 0
         } else if (savedCameraId !== "") {
-            var cameras = Qt.multimedia.videoInputs()
+            var cameras = QtMultimedia.videoInputs();
             for (var i = 0; i < cameras.length; i++) {
                 if (cameras[i].id === savedCameraId) {
                     cameraComboBox.currentIndex = i + 1  // +1是因为第一项是"自动"
@@ -226,10 +232,68 @@ Rectangle {
                                     }
                                     model: {
                                         var model = ["自动检测（推荐）"];
-                                        for (var i = 0; i < Qt.multimedia.videoInputs().length; i++) {
-                                            model.push(Qt.multimedia.videoInputs()[i].description);
+                                        var cameras = QtMultimedia.videoInputs();
+                                        for (var i = 0; i < cameras.length; i++) {
+                                            model.push(cameras[i].description);
                                         }
                                         return model;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // 虚拟键盘设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "启用虚拟键盘:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                Switch {
+                                    id: virtualKeyboardSwitch
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: 10
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    checked: enableVirtualKeyboard
+                                    
+                                    onCheckedChanged: {
+                                        enableVirtualKeyboard = checked
+                                    }
+                                    
+                                    indicator: Rectangle {
+                                        implicitWidth: 48
+                                        implicitHeight: 24
+                                        x: virtualKeyboardSwitch.leftPadding
+                                        y: parent.height / 2 - height / 2
+                                        radius: 12
+                                        color: virtualKeyboardSwitch.checked ? "#2c70b7" : "#666666"
+                                        border.color: virtualKeyboardSwitch.checked ? "#2c70b7" : "#999999"
+                                        
+                                        Rectangle {
+                                            x: virtualKeyboardSwitch.checked ? parent.width - width : 0
+                                            width: 20
+                                            height: 20
+                                            radius: 10
+                                            color: "white"
+                                            border.color: "#999999"
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.margins: 2
+                                        }
                                     }
                                 }
                             }
@@ -483,6 +547,9 @@ Rectangle {
         // 保存管理员密码
         var passwordSuccess = dbManager.setSetting("admin_password", passwordField.text)
         
+        // 保存虚拟键盘设置
+        var virtualKeyboardSuccess = dbManager.setSetting("enable_virtual_keyboard", enableVirtualKeyboard.toString())
+        
         // 保存摄像头设置
         var cameraSuccess = false
         if (cameraComboBox.currentIndex >= 0) {
@@ -493,8 +560,8 @@ Rectangle {
             } else {
                 // 保存特定摄像头
                 var cameraIndex = cameraComboBox.currentIndex - 1; // 减1是因为第一项是"自动"
-                if (cameraIndex >= 0 && cameraIndex < Qt.multimedia.videoInputs().length) {
-                    var selectedCamera = Qt.multimedia.videoInputs()[cameraIndex]
+                if (cameraIndex >= 0 && cameraIndex < QtMultimedia.videoInputs().length) {
+                    var selectedCamera = QtMultimedia.videoInputs()[cameraIndex]
                     cameraSuccess = dbManager.setSetting("camera_device", selectedCamera.id)
                     console.log("摄像头设置已更新: ID=" + selectedCamera.id + ", 名称=" + selectedCamera.description)
                 }
@@ -522,7 +589,7 @@ Rectangle {
         })
         
         // 显示结果消息
-        if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess) {
+        if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess && virtualKeyboardSuccess) {
             statusMessage = "所有设置已保存成功"
             isSuccess = true
         } else {
@@ -531,6 +598,7 @@ Rectangle {
             if (!cameraSuccess) failedSettings.push("摄像头");
             if (!sortSuccess) failedSettings.push("首页排序");
             if (!agentAddressSuccess) failedSettings.push("智能体地址");
+            if (!virtualKeyboardSuccess) failedSettings.push("虚拟键盘");
             
             statusMessage = "保存失败的设置: " + failedSettings.join(", ") + "，请重试"
             isSuccess = false

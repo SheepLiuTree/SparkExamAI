@@ -1059,6 +1059,9 @@ void DatabaseManager::initDefaultSettings()
         setSetting("pentagon_title_4", "诊断分析");
         setSetting("pentagon_title_5", "安全规范");
         
+        // 虚拟键盘设置 - 默认启用
+        setSetting("enable_virtual_keyboard", "true");
+        
         qDebug() << "初始化默认设置完成";
     }
 }
