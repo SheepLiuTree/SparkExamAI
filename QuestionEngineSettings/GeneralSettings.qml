@@ -20,6 +20,11 @@ Rectangle {
     property bool virtualKeyboardChanged: false
     property bool previousVirtualKeyboardState: true // 保存之前的虚拟键盘状态
     
+    // 新增：智能体用户名和密码设置
+    property string aiAgentUsername: ""
+    property string aiAgentPassword: ""
+    property bool showAgentPassword: false
+    
     // 定义信号
     signal sortOptionUpdated()
     
@@ -86,6 +91,17 @@ Rectangle {
         aiAgentAddress = savedAgentAddress
         agentAddressField.text = savedAgentAddress
         console.log("从数据库载入AI智能体地址: " + (savedAgentAddress ? savedAgentAddress : "未设置，使用默认值"))
+        
+        // 载入AI智能体用户名和密码设置
+        var savedAgentUsername = dbManager.getSetting("ai_agent_username", "")
+        aiAgentUsername = savedAgentUsername
+        agentUsernameField.text = savedAgentUsername
+        console.log("从数据库载入AI智能体用户名: " + (savedAgentUsername ? "已设置" : "未设置"))
+        
+        var savedAgentPassword = dbManager.getSetting("ai_agent_password", "")
+        aiAgentPassword = savedAgentPassword
+        agentPasswordField.text = savedAgentPassword
+        console.log("从数据库载入AI智能体密码: " + (savedAgentPassword ? "已设置" : "未设置"))
     }
     
     // 虚拟键盘重启对话框
@@ -231,7 +247,7 @@ Rectangle {
                 
                 Rectangle {
                     Layout.fillWidth: true
-                    height: 380  // 增加高度以容纳新增的设置项
+                    height: 560  // 增加高度以容纳新增的智能体用户名和密码设置项
                     color: "#44ffffff"
                     radius: 10
                     
@@ -612,6 +628,116 @@ Rectangle {
                             }
                         }
                         
+                        // AI智能体用户名设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "智能体用户名:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                TextField {
+                                    id: agentUsernameField
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    text: aiAgentUsername
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
+                                    
+                                    onTextChanged: {
+                                        aiAgentUsername = text
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // AI智能体密码设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "智能体密码:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    spacing: 5
+                                    
+                                    TextField {
+                                        id: agentPasswordField
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 16
+                                        color: "white"
+                                        text: aiAgentPassword
+                                        echoMode: showAgentPassword ? TextInput.Normal : TextInput.Password
+                                        
+                                        background: Rectangle {
+                                            color: "transparent"
+                                        }
+                                        
+                                        onTextChanged: {
+                                            aiAgentPassword = text
+                                        }
+                                    }
+                                    
+                                    // 密码显示/隐藏按钮
+                                    Button {
+                                        Layout.preferredWidth: 30
+                                        Layout.fillHeight: true
+                                        background: Rectangle {
+                                            color: "transparent"
+                                        }
+                                        contentItem: Text {
+                                            text: showAgentPassword ? "👁️" : "👁️‍🗨️"
+                                            font.pixelSize: 16
+                                            color: "white"
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        onClicked: {
+                                            showAgentPassword = !showAgentPassword
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
                         // 保存按钮
                         Item {
                             Layout.fillWidth: true
@@ -707,6 +833,14 @@ Rectangle {
         var agentAddressSuccess = dbManager.setSetting("ai_agent_address", agentAddressField.text)
         console.log("AI智能体地址已保存: " + agentAddressField.text)
         
+        // 保存AI智能体用户名
+        var agentUsernameSuccess = dbManager.setSetting("ai_agent_username", agentUsernameField.text)
+        console.log("AI智能体用户名已保存: " + (agentUsernameField.text ? "已设置" : "未设置"))
+        
+        // 保存AI智能体密码
+        var agentPasswordSuccess = dbManager.setSetting("ai_agent_password", agentPasswordField.text)
+        console.log("AI智能体密码已保存: " + (agentPasswordField.text ? "已设置" : "未设置"))
+        
         // 使用延迟调用确保数据库操作完成后再更新UI
         Qt.callLater(function() {
             // 再次从数据库读取设置确保保存成功
@@ -734,7 +868,7 @@ Rectangle {
         }
         
         // 显示结果消息，但不包括虚拟键盘设置（如果它已更改）
-        if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess && 
+        if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess && agentUsernameSuccess && agentPasswordSuccess && 
             (virtualKeyboardSuccess || virtualKeyboardChanged)) {
             
             // 如果虚拟键盘设置已更改，则只显示其他设置已保存
@@ -750,6 +884,8 @@ Rectangle {
             if (!cameraSuccess) failedSettings.push("摄像头");
             if (!sortSuccess) failedSettings.push("首页排序");
             if (!agentAddressSuccess) failedSettings.push("智能体地址");
+            if (!agentUsernameSuccess) failedSettings.push("智能体用户名");
+            if (!agentPasswordSuccess) failedSettings.push("智能体密码");
             if (!virtualKeyboardSuccess && !virtualKeyboardChanged) failedSettings.push("虚拟键盘");
             
             statusMessage = "保存失败的设置: " + failedSettings.join(", ") + "，请重试"
