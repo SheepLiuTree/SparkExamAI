@@ -19,6 +19,9 @@ Window {
     // 应用Material样式 - 确保全局应用
     Material.theme: Material.Dark
     Material.accent: Material.Blue
+    
+    // 虚拟键盘设置属性
+    property bool enableVirtualKeyboard: true
 
     
     
@@ -89,6 +92,7 @@ Window {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: 20
+        visible: enableVirtualKeyboard  // 根据虚拟键盘设置控制显示
         
         Text {
             anchors.centerIn: parent
@@ -449,9 +453,9 @@ Window {
                         verticalAlignment: Text.AlignVCenter
                     }
                     onClicked: {
-                        console.log("题策引擎 clicked")
+                        console.log("策略引擎 clicked")
                         faceRecognitionPopup.targetPage = "QuestionEnginePage.qml"
-                        faceRecognitionPopup.titleText = "题策引擎"
+                        faceRecognitionPopup.titleText = "策略引擎"
                         faceRecognitionPopup.open()
                     }
                 }
@@ -824,7 +828,7 @@ Window {
                         knowledge_point_timer.start()
                     } else {
                         knowledge_point_title.text = "暂无智点"
-                        knowledge_point_content.text = "请先在题策引擎中添加智点"
+                        knowledge_point_content.text = "请先在策略引擎中添加智点"
                     }
                 }
 
@@ -2999,5 +3003,13 @@ Window {
                 }
             }
         }
+    }
+    
+    // 初始化组件时读取虚拟键盘设置
+    Component.onCompleted: {
+        // 从数据库读取虚拟键盘设置
+        var savedVirtualKeyboard = dbManager.getSetting("enable_virtual_keyboard", "true")
+        enableVirtualKeyboard = savedVirtualKeyboard.toLowerCase() === "true"
+        console.log("从数据库读取虚拟键盘设置: " + savedVirtualKeyboard + " -> " + enableVirtualKeyboard)
     }
 }

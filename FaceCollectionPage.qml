@@ -506,7 +506,7 @@ Rectangle {
                         source: "qrc:/images/FaceTracking.png"
                         anchors.centerIn: parent
                         // 设置为相同的宽高，确保是正方形
-                        property real size: Math.min(videoOutput.contentRect.width, videoOutput.contentRect.height)
+                        property real size: Math.min(videoOutput.contentRect.width * 0.8, videoOutput.contentRect.height * 0.8)
                         width: size
                         height: size
                     }

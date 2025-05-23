@@ -2,8 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.15
-import QtMultimedia 5.15
-import QtMultimedia 5.15 as QtMultimedia
+import QtMultimedia 6.0
 
 Rectangle {
     id: generalSettingsPage
@@ -25,23 +24,32 @@ Rectangle {
     property string aiAgentPassword: ""
     property bool showAgentPassword: false
     
+    // 摄像头相关属性
+    property var availableCameras: []
+    property bool camerasLoaded: false
+    property int cameraRetryCount: 0
+    property int maxCameraRetries: 5
+    
     // 定义信号
     signal sortOptionUpdated()
     
+    // 添加MediaDevices对象用于访问摄像头列表
+    MediaDevices {
+        id: mediaDevices
+    }
+    
     // 连接到信号以更新首页用户列表
     onSortOptionUpdated: {
-        // 调用主窗口提供的全局函数更新用户列表排序
-        var success = Qt.callLater(function() {
-            if (typeof window.updateUserListSorting === "function") {
-                window.updateUserListSorting()
-                console.log("已通知主窗口更新用户列表排序")
-            } else {
-                console.log("未找到主窗口更新用户列表排序的函数")
-            }
-        })
+        // 发送排序选项变更信号，不依赖window对象
+        console.log("已发送首页排序设置变更信号")
     }
     
     Component.onCompleted: {
+        // 首先验证数据库中的摄像头设置
+        console.log("=== 页面加载时验证数据库设置 ===")
+        var initialCameraSetting = dbManager.getSetting("camera_device", "auto")
+        console.log("数据库中当前摄像头设置: [" + initialCameraSetting + "], 类型: " + typeof initialCameraSetting)
+        
         // 载入管理员密码设置
         var savedPassword = dbManager.getSetting("admin_password", "")
         adminPassword = savedPassword !== "" ? savedPassword : ""
@@ -51,21 +59,6 @@ Rectangle {
         var savedVirtualKeyboard = dbManager.getSetting("enable_virtual_keyboard", "true")
         enableVirtualKeyboard = savedVirtualKeyboard.toLowerCase() === "true"
         previousVirtualKeyboardState = enableVirtualKeyboard
-        
-        // 载入摄像头设备设置
-        var savedCameraId = dbManager.getSetting("camera_device", "auto")
-        if (savedCameraId === "auto") {
-            // 自动模式选择第一个特殊选项
-            cameraComboBox.currentIndex = 0
-        } else if (savedCameraId !== "") {
-            var cameras = QtMultimedia.videoInputs();
-            for (var i = 0; i < cameras.length; i++) {
-                if (cameras[i].id === savedCameraId) {
-                    cameraComboBox.currentIndex = i + 1  // +1是因为第一项是"自动"
-                    break
-                }
-            }
-        }
         
         // 载入首页排序设置
         var savedSortOption = dbManager.getSetting("home_sort_option", "1").toString().trim()
@@ -102,6 +95,9 @@ Rectangle {
         aiAgentPassword = savedAgentPassword
         agentPasswordField.text = savedAgentPassword
         console.log("从数据库载入AI智能体密码: " + (savedAgentPassword ? "已设置" : "未设置"))
+        
+        // 初始化摄像头
+        initializeCameras()
     }
     
     // 虚拟键盘重启对话框
@@ -378,14 +374,10 @@ Rectangle {
                                         horizontalAlignment: Text.AlignLeft
                                         elide: Text.ElideRight
                                     }
-                                    model: {
-                                        var model = ["自动检测（推荐）"];
-                                        var cameras = QtMultimedia.videoInputs();
-                                        for (var i = 0; i < cameras.length; i++) {
-                                            model.push(cameras[i].description);
-                                        }
-                                        return model;
-                                    }
+                                    
+                                    // 初始模型
+                                    model: ["自动检测（推荐）", "正在加载..."]
+                                    currentIndex: 0
                                 }
                             }
                         }
@@ -808,21 +800,37 @@ Rectangle {
         
         // 保存摄像头设置
         var cameraSuccess = false
-        if (cameraComboBox.currentIndex >= 0) {
-            if (cameraComboBox.currentIndex === 0) {
-                // 保存自动模式
-                cameraSuccess = dbManager.setSetting("camera_device", "auto")
-                console.log("摄像头设置已更新为自动模式")
-            } else {
-                // 保存特定摄像头
-                var cameraIndex = cameraComboBox.currentIndex - 1; // 减1是因为第一项是"自动"
-                if (cameraIndex >= 0 && cameraIndex < QtMultimedia.videoInputs().length) {
-                    var selectedCamera = QtMultimedia.videoInputs()[cameraIndex]
-                    cameraSuccess = dbManager.setSetting("camera_device", selectedCamera.id)
-                    console.log("摄像头设置已更新: ID=" + selectedCamera.id + ", 名称=" + selectedCamera.description)
+        console.log("=== 开始保存摄像头设置 ===")
+        console.log("当前ComboBox索引: " + cameraComboBox.currentIndex)
+        console.log("当前显示文本: " + cameraComboBox.currentText)
+        
+        try {
+            var cameraId = getCurrentCameraId()
+            console.log("要保存的摄像头ID: " + cameraId)
+            
+            cameraSuccess = dbManager.setSetting("camera_device", cameraId)
+            console.log("摄像头设置保存结果: " + cameraSuccess)
+            
+            if (cameraSuccess) {
+                if (cameraId === "auto") {
+                    console.log("已保存自动检测模式")
+                } else {
+                    // 查找设备名称用于日志
+                    var deviceName = "未知设备"
+                    var deviceIndex = cameraComboBox.currentIndex - 1
+                    if (deviceIndex >= 0 && deviceIndex < availableCameras.length) {
+                        deviceName = availableCameras[deviceIndex].description
+                    }
+                    console.log("已保存特定摄像头: ID=" + cameraId + ", 名称=" + deviceName)
                 }
             }
+        } catch (e) {
+            console.log("保存摄像头设置时出错: " + e.toString() + "，使用自动模式")
+            cameraSuccess = dbManager.setSetting("camera_device", "auto")
+            console.log("错误处理后保存结果: " + cameraSuccess)
         }
+        
+        console.log("=== 摄像头设置保存完成 ===")
         
         // 保存首页排序设置
         var sortSuccess = dbManager.setSetting("home_sort_option", homeSortOption.toString())
@@ -890,6 +898,223 @@ Rectangle {
             
             statusMessage = "保存失败的设置: " + failedSettings.join(", ") + "，请重试"
             isSuccess = false
+        }
+    }
+    
+    // 摄像头重试定时器
+    Timer {
+        id: cameraRetryTimer
+        interval: 1000
+        repeat: false
+        onTriggered: {
+            console.log("重试定时器触发，第 " + (cameraRetryCount + 1) + " 次尝试")
+            tryLoadCameras()
+        }
+    }
+    
+    // 页面级别的摄像头初始化
+    function initializeCameras() {
+        console.log("=== 页面级别初始化摄像头 ===")
+        cameraRetryCount = 0
+        camerasLoaded = false
+        tryLoadCameras()
+    }
+    
+    // 尝试加载摄像头
+    function tryLoadCameras() {
+        cameraRetryCount++
+        console.log("尝试加载摄像头列表，第 " + cameraRetryCount + " 次")
+        
+        try {
+            // 检查MediaDevices是否存在
+            if (typeof mediaDevices === 'undefined' || !mediaDevices) {
+                console.log("MediaDevices对象不存在或未定义")
+                handleCameraLoadFailure()
+                return
+            }
+            
+            // 尝试获取摄像头列表
+            var cameras
+            try {
+                cameras = mediaDevices.videoInputs
+            } catch (e) {
+                console.log("获取videoInputs时出错: " + e.toString())
+                handleCameraLoadFailure()
+                return
+            }
+            
+            if (!cameras) {
+                console.log("摄像头列表为null")
+                handleCameraLoadFailure()
+                return
+            }
+            
+            if (cameras.length === undefined) {
+                console.log("摄像头列表长度未定义")
+                handleCameraLoadFailure()
+                return
+            }
+            
+            console.log("成功获取摄像头列表，共 " + cameras.length + " 个设备")
+            
+            // 构建摄像头数组
+            availableCameras = []
+            for (var i = 0; i < cameras.length; i++) {
+                var camera = cameras[i]
+                if (camera && camera.id && camera.description) {
+                    // 确保ID和描述都是字符串
+                    var cameraId = String(camera.id)
+                    var cameraDesc = String(camera.description)
+                    
+                    availableCameras.push({
+                        id: cameraId,
+                        description: cameraDesc
+                    })
+                    console.log("摄像头 " + i + ": ID=[" + cameraId + "], 名称=[" + cameraDesc + "]")
+                } else {
+                    console.log("摄像头 " + i + " 数据不完整，跳过")
+                }
+            }
+            
+            camerasLoaded = true
+            console.log("摄像头数据加载完成，有效摄像头: " + availableCameras.length + " 个")
+            setupCameraComboBox()
+            
+        } catch (e) {
+            console.log("加载摄像头时发生异常: " + e.toString())
+            handleCameraLoadFailure()
+        }
+    }
+    
+    // 处理摄像头加载失败
+    function handleCameraLoadFailure() {
+        if (cameraRetryCount < maxCameraRetries) {
+            console.log("摄像头加载失败，" + (1000) + "ms 后重试...")
+            cameraRetryTimer.start()
+        } else {
+            console.log("摄像头加载重试次数达到上限，使用默认设置")
+            availableCameras = []
+            camerasLoaded = true
+            setupCameraComboBox()
+        }
+    }
+    
+    // 设置摄像头ComboBox
+    function setupCameraComboBox() {
+        console.log("=== 设置摄像头ComboBox ===")
+        console.log("可用摄像头数量: " + availableCameras.length)
+        
+        // 构建显示列表
+        var displayList = ["自动检测（推荐）"]
+        for (var i = 0; i < availableCameras.length; i++) {
+            displayList.push(availableCameras[i].description)
+            console.log("添加到列表: " + availableCameras[i].description)
+        }
+        
+        // 设置模型
+        console.log("设置ComboBox模型，共 " + displayList.length + " 项")
+        cameraComboBox.model = displayList
+        
+        // 延迟应用设置，确保模型更新完成
+        Qt.callLater(function() {
+            console.log("模型设置完成，延迟应用摄像头设置")
+            applyCameraSetting()
+        })
+    }
+    
+    // 应用摄像头设置
+    function applyCameraSetting() {
+        console.log("=== 应用摄像头设置 ===")
+        
+        // 从数据库读取设置
+        var savedCameraId = String(dbManager.getSetting("camera_device", "auto"))
+        console.log("数据库中的摄像头设置: [" + savedCameraId + "]")
+        console.log("设置字符串长度: " + savedCameraId.length)
+        console.log("当前ComboBox模型长度: " + cameraComboBox.model.length)
+        console.log("可用摄像头数组长度: " + availableCameras.length)
+        
+        var targetIndex = 0  // 默认自动检测
+        
+        if (savedCameraId === "auto" || savedCameraId === "") {
+            console.log("设置为自动检测模式，目标索引: 0")
+            targetIndex = 0
+        } else {
+            console.log("查找匹配的摄像头设备...")
+            console.log("要匹配的ID: [" + savedCameraId + "]")
+            var found = false
+            for (var i = 0; i < availableCameras.length; i++) {
+                var currentId = String(availableCameras[i].id)
+                console.log("比较摄像头 " + i + ":")
+                console.log("  数据库ID: [" + savedCameraId + "] (长度: " + savedCameraId.length + ")")
+                console.log("  摄像头ID: [" + currentId + "] (长度: " + currentId.length + ")")
+                console.log("  直接比较: " + (currentId === savedCameraId))
+                
+                if (currentId === savedCameraId) {
+                    targetIndex = i + 1  // +1因为第一项是自动检测
+                    found = true
+                    console.log("*** 找到匹配摄像头！***")
+                    console.log("  摄像头索引: " + i)
+                    console.log("  ComboBox目标索引: " + targetIndex)
+                    console.log("  摄像头名称: " + availableCameras[i].description)
+                    break
+                } else {
+                    console.log("  不匹配，继续查找...")
+                }
+            }
+            
+            if (!found) {
+                console.log("*** 未找到匹配的摄像头 ***")
+                console.log("搜索的ID: [" + savedCameraId + "]")
+                console.log("使用自动检测，目标索引: 0")
+                targetIndex = 0
+            }
+        }
+        
+        console.log("准备设置ComboBox索引: " + targetIndex)
+        console.log("ComboBox设置前索引: " + cameraComboBox.currentIndex)
+        
+        // 设置选中项
+        cameraComboBox.currentIndex = targetIndex
+        console.log("ComboBox设置后索引: " + cameraComboBox.currentIndex)
+        
+        // 验证设置结果
+        Qt.callLater(function() {
+            console.log("=== 设置结果验证 ===")
+            console.log("ComboBox最终索引: " + cameraComboBox.currentIndex)
+            console.log("ComboBox最终文本: " + cameraComboBox.currentText)
+            console.log("对应的设备ID: " + getCurrentCameraId())
+            
+            // 再次验证是否匹配
+            var finalCameraId = getCurrentCameraId()
+            if (finalCameraId === savedCameraId || (savedCameraId === "" && finalCameraId === "auto")) {
+                console.log("✓ 摄像头设置匹配成功")
+            } else {
+                console.log("✗ 摄像头设置不匹配！期望: [" + savedCameraId + "], 实际: [" + finalCameraId + "]")
+                
+                // 如果不匹配，强制重新设置
+                console.log("尝试强制重新设置...")
+                for (var i = 0; i < availableCameras.length; i++) {
+                    if (String(availableCameras[i].id) === savedCameraId) {
+                        var forceIndex = i + 1
+                        console.log("强制设置索引为: " + forceIndex)
+                        cameraComboBox.currentIndex = forceIndex
+                        break
+                    }
+                }
+            }
+            console.log("=== 摄像头初始化完全完成 ===")
+        })
+    }
+    
+    // 获取当前选中的摄像头ID
+    function getCurrentCameraId() {
+        var index = cameraComboBox.currentIndex
+        if (index === 0) {
+            return "auto"
+        } else if (index > 0 && index <= availableCameras.length) {
+            return availableCameras[index - 1].id
+        } else {
+            return "auto"
         }
     }
 } 

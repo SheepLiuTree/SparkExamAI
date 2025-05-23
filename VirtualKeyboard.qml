@@ -102,36 +102,7 @@ Item {
                         keyboardContainer.closed()
                     }
                 }
-            }
-            
-            // 最小化按钮
-            Rectangle {
-                id: minimizeButton
-                width: 30
-                height: 30
-                radius: 15
-                color: minimizeMouseArea.containsMouse ? "#60A0FF" : "#4080D0"
-                anchors.right: closeButton.left
-                anchors.rightMargin: 10
-                anchors.verticalCenter: parent.verticalCenter
-                
-                Text {
-                    anchors.centerIn: parent
-                    text: "−"
-                    color: "white"
-                    font.pixelSize: 20
-                    font.bold: true
-                }
-                
-                MouseArea {
-                    id: minimizeMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: {
-                        inputPanel.active = !inputPanel.active
-                    }
-                }
-            }
+            }                        
             
             // 语言切换按钮
             Rectangle {

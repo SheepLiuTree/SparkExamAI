@@ -74,18 +74,23 @@ Rectangle {
         color: "transparent"
         
         // 返回按钮，放在左侧
-        Button {
+        Rectangle {
             id: backButton
             width: 100
             height: 40
             anchors.left: parent.left
             anchors.leftMargin: 10
             anchors.verticalCenter: parent.verticalCenter
-            background: Image {
+            color: "transparent"
+            
+            Image {
+                anchors.fill: parent
                 source: "qrc:/images/button_bg.png"
                 fillMode: Image.Stretch
             }
-            contentItem: Text {
+            
+            Text {
+                anchors.centerIn: parent
                 text: "返回"
                 font.family: "阿里妈妈数黑体"
                 font.pixelSize: 18
@@ -93,70 +98,74 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
-            onClicked: {
-                // 显示确认对话框
-                confirmDialog.dialogTitle = "返回确认"
-                confirmDialog.dialogMessage = "确定要返回上一页吗？\n当前进度将不会保存。"
-                confirmDialog.confirmAction = function() {
-                    // 如果当前有用户数据，尝试更新用户的练习数据
-                    if (userData && userData.workId) {
-                        try {
-                            // 尝试直接通过根对象调用全局函数
-                            var root = stackView.parent
-                            var updateSuccess = false
-                            
-                            if (root && typeof root.updateUserData === "function") {
-                                // 尝试使用全局函数
-                                updateSuccess = root.updateUserData(userData.workId)
-                                console.log("使用根对象全局函数更新用户数据: " + updateSuccess)
-                            }
-                            
-                            // 如果全局函数调用失败，尝试直接访问mainPage
-                            if (!updateSuccess) {
-                                var mainPageItem = findMainPage(stackView)
-                                if (mainPageItem) {
-                                    console.log("找到mainPage，尝试直接访问user_practice_data")
-                                    var practiceDataItem = mainPageItem.user_practice_data
-                                    
-                                    if (practiceDataItem) {
-                                        console.log("成功找到user_practice_data")
-                                        // 先清空ID然后设置ID以确保触发变更
-                                        practiceDataItem.currentUserId = ""
-                                        practiceDataItem.currentUserId = userData.workId
-                                        practiceDataItem.loadUserPracticeData(userData.workId)
-                                        console.log("已直接调用更新用户练习数据函数，工号：" + userData.workId)
+            
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    // 显示确认对话框
+                    confirmDialog.dialogTitle = "返回确认"
+                    confirmDialog.dialogMessage = "确定要返回上一页吗？\n当前进度将不会保存。"
+                    confirmDialog.confirmAction = function() {
+                        // 如果当前有用户数据，尝试更新用户的练习数据
+                        if (userData && userData.workId) {
+                            try {
+                                // 尝试直接通过根对象调用全局函数
+                                var root = stackView.parent
+                                var updateSuccess = false
+                                
+                                if (root && typeof root.updateUserData === "function") {
+                                    // 尝试使用全局函数
+                                    updateSuccess = root.updateUserData(userData.workId)
+                                    console.log("使用根对象全局函数更新用户数据: " + updateSuccess)
+                                }
+                                
+                                // 如果全局函数调用失败，尝试直接访问mainPage
+                                if (!updateSuccess) {
+                                    var mainPageItem = findMainPage(stackView)
+                                    if (mainPageItem) {
+                                        console.log("找到mainPage，尝试直接访问user_practice_data")
+                                        var practiceDataItem = mainPageItem.user_practice_data
                                         
-                                        // 手动更新首页排序
-                                        if (mainPageItem.personal_page_column) {
-                                            console.log("尝试手动更新首页排序")
-                                            Qt.callLater(function() {
-                                                mainPageItem.personal_page_column.loadUserListFromDatabase()
-                                                console.log("已手动调用首页排序更新")
-                                            })
+                                        if (practiceDataItem) {
+                                            console.log("成功找到user_practice_data")
+                                            // 先清空ID然后设置ID以确保触发变更
+                                            practiceDataItem.currentUserId = ""
+                                            practiceDataItem.currentUserId = userData.workId
+                                            practiceDataItem.loadUserPracticeData(userData.workId)
+                                            console.log("已直接调用更新用户练习数据函数，工号：" + userData.workId)
+                                            
+                                            // 手动更新首页排序
+                                            if (mainPageItem.personal_page_column) {
+                                                console.log("尝试手动更新首页排序")
+                                                Qt.callLater(function() {
+                                                    mainPageItem.personal_page_column.loadUserListFromDatabase()
+                                                    console.log("已手动调用首页排序更新")
+                                                })
+                                            }
                                         }
                                     }
                                 }
+                            } catch (e) {
+                                console.error("更新用户数据时发生错误:", e)
                             }
-                        } catch (e) {
-                            console.error("更新用户数据时发生错误:", e)
                         }
+                        
+                        // 确保返回时显示中间列，隐藏个人数据页面
+                        var mainPage = stackView.get(0)
+                        if (mainPage) {
+                            console.log("确保返回时显示中间列，隐藏个人数据页面");
+                            if (mainPage.middle_column) {
+                                mainPage.middle_column.visible = true;
+                            }
+                            if (mainPage.user_practice_data) {
+                                mainPage.user_practice_data.visible = false;
+                            }
+                        }
+                        
+                        stackView.pop()
                     }
-                    
-                    // 确保返回时显示中间列，隐藏个人数据页面
-                    var mainPage = stackView.get(0)
-                    if (mainPage) {
-                        console.log("确保返回时显示中间列，隐藏个人数据页面");
-                        if (mainPage.middle_column) {
-                            mainPage.middle_column.visible = true;
-                        }
-                        if (mainPage.user_practice_data) {
-                            mainPage.user_practice_data.visible = false;
-                        }
-                    }
-                    
-                    stackView.pop()
+                    confirmDialog.open()
                 }
-                confirmDialog.open()
             }
         }
         
@@ -377,15 +386,20 @@ Rectangle {
                         spacing: 20
                         Layout.topMargin: 20  // 添加顶部间距
                         
-                        Button {
+                        Rectangle {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 40
                             enabled: currentQuestionIndex > 0
-                            background: Rectangle {
+                            color: "transparent"
+                            
+                            Rectangle {
+                                anchors.fill: parent
                                 color: parent.enabled ? "#2c70b7" : "#666666"
                                 radius: 4
                             }
-                            contentItem: Text {
+                            
+                            Text {
+                                anchors.centerIn: parent
                                 text: "上一题"
                                 font.family: "阿里妈妈数黑体"
                                 font.pixelSize: 16
@@ -393,22 +407,31 @@ Rectangle {
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                             }
-                            onClicked: {
-                                if (currentQuestionIndex > 0) {
-                                    currentQuestionIndex--
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    if (currentQuestionIndex > 0) {
+                                        currentQuestionIndex--
+                                    }
                                 }
                             }
                         }
                         
-                        Button {
+                        Rectangle {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 40
                             enabled: currentQuestionIndex < currentQuestions.length - 1
-                            background: Rectangle {
+                            color: "transparent"
+                            
+                            Rectangle {
+                                anchors.fill: parent
                                 color: parent.enabled ? "#2c70b7" : "#666666"
                                 radius: 4
                             }
-                            contentItem: Text {
+                            
+                            Text {
+                                anchors.centerIn: parent
                                 text: "下一题"
                                 font.family: "阿里妈妈数黑体"
                                 font.pixelSize: 16
@@ -416,9 +439,13 @@ Rectangle {
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                             }
-                            onClicked: {
-                                if (currentQuestionIndex < currentQuestions.length - 1) {
-                                    currentQuestionIndex++
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    if (currentQuestionIndex < currentQuestions.length - 1) {
+                                        currentQuestionIndex++
+                                    }
                                 }
                             }
                         }
@@ -488,15 +515,15 @@ Rectangle {
                     }
                     
                     // 提交按钮
-                    Button {
+                    Rectangle {
                         Layout.preferredWidth: 120
                         Layout.preferredHeight: 50
                         Layout.alignment: Qt.AlignHCenter
-                        background: Rectangle {
-                            color: "#4CAF50"
-                            radius: 5
-                        }
-                        contentItem: Text {
+                        color: "#4CAF50"
+                        radius: 5
+                        
+                        Text {
+                            anchors.centerIn: parent
                             text: "提交答案"
                             font.family: "阿里妈妈数黑体"
                             font.pixelSize: 18
@@ -504,8 +531,12 @@ Rectangle {
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
-                        onClicked: {
-                            submitAnswers()
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                submitAnswers()
+                            }
                         }
                     }
                 }
@@ -1052,17 +1083,17 @@ Rectangle {
                     anchors.horizontalCenter: parent.horizontalCenter
                     
                     // 退出按钮
-                    Button {
+                    Rectangle {
                         width: 150
                         height: 45
-                        background: Rectangle {
-                            radius: 8
-                            gradient: Gradient {
-                                GradientStop { position: 0.0; color: "#64748b" }
-                                GradientStop { position: 1.0; color: "#475569" }
-                            }
+                        radius: 8
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: "#64748b" }
+                            GradientStop { position: 1.0; color: "#475569" }
                         }
-                        contentItem: Text {
+                        
+                        Text {
+                            anchors.centerIn: parent
                             text: "退出"
                             font.family: "阿里妈妈数黑体"
                             font.pixelSize: 18
@@ -1071,90 +1102,94 @@ Rectangle {
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
-                        onClicked: {
-                            confirmDialog.dialogTitle = "退出确认"
-                            confirmDialog.dialogMessage = "确定要退出星火日课吗？"
-                            confirmDialog.confirmAction = function() {
-                                // 关闭结果对话框
-                                resultDialog.close()
-                                
-                                // 如果有用户数据，更新练习数据
-                                if (userData && userData.workId) {
-                                    console.log("准备更新用户数据，工号: " + userData.workId)
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                confirmDialog.dialogTitle = "退出确认"
+                                confirmDialog.dialogMessage = "确定要退出星火日课吗？"
+                                confirmDialog.confirmAction = function() {
+                                    // 关闭结果对话框
+                                    resultDialog.close()
                                     
-                                    try {
-                                        // 获取应用程序窗口并调用全局更新函数
-                                        var rootWindow = Qt.application.activeWindow
-                                        if (rootWindow && typeof rootWindow.updateUserData === "function") {
-                                            var success = rootWindow.updateUserData(userData.workId)
-                                            console.log("通过全局函数更新用户数据：" + (success ? "成功" : "失败"))
-                                            
-                                            // 同时更新首页排序
-                                            if (typeof rootWindow.updateUserListSorting === "function") {
-                                                var sortUpdateSuccess = rootWindow.updateUserListSorting()
-                                                console.log("通过全局函数更新首页排序：" + (sortUpdateSuccess ? "成功" : "失败"))
-                                            }
-                                        } else {
-                                            console.error("无法获取根窗口或更新函数不存在")
-                                            
-                                            // 备用方法：尝试手动查找组件
-                                            var mainPageItem = findMainPage(stackView)
-                                            
-                                            if (mainPageItem) {
-                                                console.log("成功找到mainPage")
-                                                // 找到user_practice_data
-                                                var practiceDataItem = null
-                                                for (var i = 0; i < mainPageItem.children.length; i++) {
-                                                    var child = mainPageItem.children[i]
-                                                    if (child.objectName === "user_practice_data") {
-                                                        practiceDataItem = child
-                                                        break
+                                    // 如果有用户数据，更新练习数据
+                                    if (userData && userData.workId) {
+                                        console.log("准备更新用户数据，工号: " + userData.workId)
+                                        
+                                        try {
+                                            // 获取应用程序窗口并调用全局更新函数
+                                            var rootWindow = Qt.application.activeWindow
+                                            if (rootWindow && typeof rootWindow.updateUserData === "function") {
+                                                var success = rootWindow.updateUserData(userData.workId)
+                                                console.log("通过全局函数更新用户数据：" + (success ? "成功" : "失败"))
+                                                
+                                                // 同时更新首页排序
+                                                if (typeof rootWindow.updateUserListSorting === "function") {
+                                                    var sortUpdateSuccess = rootWindow.updateUserListSorting()
+                                                    console.log("通过全局函数更新首页排序：" + (sortUpdateSuccess ? "成功" : "失败"))
+                                                }
+                                            } else {
+                                                console.error("无法获取根窗口或更新函数不存在")
+                                                
+                                                // 备用方法：尝试手动查找组件
+                                                var mainPageItem = findMainPage(stackView)
+                                                
+                                                if (mainPageItem) {
+                                                    console.log("成功找到mainPage")
+                                                    // 找到user_practice_data
+                                                    var practiceDataItem = null
+                                                    for (var i = 0; i < mainPageItem.children.length; i++) {
+                                                        var child = mainPageItem.children[i]
+                                                        if (child.objectName === "user_practice_data") {
+                                                            practiceDataItem = child
+                                                            break
+                                                        }
+                                                    }
+                                                    
+                                                    if (practiceDataItem) {
+                                                        console.log("成功找到user_practice_data")
+                                                        // 先清空ID然后设置ID以确保触发变更
+                                                        practiceDataItem.currentUserId = ""
+                                                        practiceDataItem.currentUserId = userData.workId
+                                                        practiceDataItem.loadUserPracticeData(userData.workId)
+                                                        console.log("已直接调用更新用户练习数据函数，工号：" + userData.workId)
+                                                    }
+                                                    
+                                                    // 手动更新首页排序
+                                                    if (mainPageItem.personal_page_column) {
+                                                        console.log("尝试手动更新首页排序")
+                                                        Qt.callLater(function() {
+                                                            mainPageItem.personal_page_column.loadUserListFromDatabase()
+                                                            console.log("已手动调用首页排序更新")
+                                                        })
                                                     }
                                                 }
-                                                
-                                                if (practiceDataItem) {
-                                                    console.log("成功找到user_practice_data")
-                                                    // 先清空ID然后设置ID以确保触发变更
-                                                    practiceDataItem.currentUserId = ""
-                                                    practiceDataItem.currentUserId = userData.workId
-                                                    practiceDataItem.loadUserPracticeData(userData.workId)
-                                                    console.log("已直接调用更新用户练习数据函数，工号：" + userData.workId)
-                                                }
-                                                
-                                                // 手动更新首页排序
-                                                if (mainPageItem.personal_page_column) {
-                                                    console.log("尝试手动更新首页排序")
-                                                    Qt.callLater(function() {
-                                                        mainPageItem.personal_page_column.loadUserListFromDatabase()
-                                                        console.log("已手动调用首页排序更新")
-                                                    })
-                                                }
                                             }
+                                        } catch (e) {
+                                            console.error("更新用户数据时发生错误:", e)
                                         }
-                                    } catch (e) {
-                                        console.error("更新用户数据时发生错误:", e)
                                     }
+                                    
+                                    // 退出到主界面
+                                    stackView.pop()
                                 }
-                                
-                                // 退出到主界面
-                                stackView.pop()
+                                confirmDialog.open()
                             }
-                            confirmDialog.open()
                         }
                     }
                     
                     // 查看错题按钮
-                    Button {
+                    Rectangle {
                         width: 150
                         height: 45
-                        background: Rectangle {
-                            radius: 8
-                            gradient: Gradient {
-                                GradientStop { position: 0.0; color: "#2563eb" }
-                                GradientStop { position: 1.0; color: "#1d4ed8" }
-                            }
+                        radius: 8
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: "#2563eb" }
+                            GradientStop { position: 1.0; color: "#1d4ed8" }
                         }
-                        contentItem: Text {
+                        
+                        Text {
+                            anchors.centerIn: parent
                             text: "查看错题"
                             font.family: "阿里妈妈数黑体"
                             font.pixelSize: 18
@@ -1163,9 +1198,13 @@ Rectangle {
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
-                        onClicked: {
-                            resultDialog.close()
-                            wrongQuestionsDialog.open()
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                resultDialog.close()
+                                wrongQuestionsDialog.open()
+                            }
                         }
                     }
                 }
@@ -1512,18 +1551,18 @@ Rectangle {
                 }
                 
                 // 关闭按钮
-                Button {
+                Rectangle {
                     width: 150
                     height: 45
                     anchors.horizontalCenter: parent.horizontalCenter
-                    background: Rectangle {
-                        radius: 8
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: "#0891b2" }
-                            GradientStop { position: 1.0; color: "#0e7490" }
-                        }
+                    radius: 8
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#0891b2" }
+                        GradientStop { position: 1.0; color: "#0e7490" }
                     }
-                    contentItem: Text {
+                    
+                    Text {
+                        anchors.centerIn: parent
                         text: "返回结果页面"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 18
@@ -1532,9 +1571,13 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: {
-                        wrongQuestionsDialog.close()
-                        resultDialog.open()
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            wrongQuestionsDialog.close()
+                            resultDialog.open()
+                        }
                     }
                 }
             }
@@ -1624,18 +1667,18 @@ Rectangle {
                 }
                 
                 // 确定按钮
-                Button {
+                Rectangle {
                     width: 120
                     height: 40
                     anchors.horizontalCenter: parent.horizontalCenter
-                    background: Rectangle {
-                        radius: 6
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: "#e11d48" }
-                            GradientStop { position: 1.0; color: "#be123c" }
-                        }
+                    radius: 6
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#e11d48" }
+                        GradientStop { position: 1.0; color: "#be123c" }
                     }
-                    contentItem: Text {
+                    
+                    Text {
+                        anchors.centerIn: parent
                         text: "确定"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
@@ -1644,8 +1687,12 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: {
-                        messageDialog.close()
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            messageDialog.close()
+                        }
                     }
                 }
                 
@@ -1719,17 +1766,17 @@ Rectangle {
                 spacing: 30
                 
                 // 取消按钮
-                Button {
+                Rectangle {
                     width: 120
                     height: 40
-                    background: Rectangle {
-                        radius: 6
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: "#64748b" }
-                            GradientStop { position: 1.0; color: "#475569" }
-                        }
+                    radius: 6
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#64748b" }
+                        GradientStop { position: 1.0; color: "#475569" }
                     }
-                    contentItem: Text {
+                    
+                    Text {
+                        anchors.centerIn: parent
                         text: "取消"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
@@ -1737,23 +1784,27 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: {
-                        confirmDialog.close()
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            confirmDialog.close()
+                        }
                     }
                 }
                 
                 // 确认按钮
-                Button {
+                Rectangle {
                     width: 120
                     height: 40
-                    background: Rectangle {
-                        radius: 6
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: "#0891b2" }
-                            GradientStop { position: 1.0; color: "#0e7490" }
-                        }
+                    radius: 6
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#0891b2" }
+                        GradientStop { position: 1.0; color: "#0e7490" }
                     }
-                    contentItem: Text {
+                    
+                    Text {
+                        anchors.centerIn: parent
                         text: "确认"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
@@ -1762,9 +1813,13 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: {
-                        confirmDialog.confirmAction()
-                        confirmDialog.close()
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            confirmDialog.confirmAction()
+                            confirmDialog.close()
+                        }
                     }
                 }
             }

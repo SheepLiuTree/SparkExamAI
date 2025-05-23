@@ -947,18 +947,23 @@ Rectangle {
         color: "transparent"
         
         // 返回按钮，放在左侧
-        Button {
+        Rectangle {
             id: backButton
             width: 100
             height: 40
             anchors.left: parent.left
             anchors.leftMargin: 10
             anchors.verticalCenter: parent.verticalCenter
-            background: Image {
+            color: "transparent"
+            
+            Image {
+                anchors.fill: parent
                 source: "qrc:/images/button_bg.png"
                 fillMode: Image.Stretch
             }
-            contentItem: Text {
+            
+            Text {
+                anchors.centerIn: parent
                 text: "返回"
                 font.family: "阿里妈妈数黑体"
                 font.pixelSize: 18
@@ -966,26 +971,30 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
-            onClicked: {
-                // 显示确认对话框
-                confirmDialog.dialogTitle = "返回确认"
-                confirmDialog.dialogMessage = "确定要返回题库列表吗？\n当前练习进度将会保存。"
-                confirmDialog.confirmAction = function() {
-                    // 保存临时选择
-                    saveTemporarySelections()
-                    
-                    // 保存答题记录
-                    saveAnswerRecord()
-                    
-                    // 返回上一页
-                    stackView.pop()
+            
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    // 显示确认对话框
+                    confirmDialog.dialogTitle = "返回确认"
+                    confirmDialog.dialogMessage = "确定要返回题库列表吗？\n当前练习进度将会保存。"
+                    confirmDialog.confirmAction = function() {
+                        // 保存临时选择
+                        saveTemporarySelections()
+                        
+                        // 保存答题记录
+                        saveAnswerRecord()
+                        
+                        // 返回上一页
+                        stackView.pop()
+                    }
+                    confirmDialog.open()
                 }
-                confirmDialog.open()
             }
         }
         
         // 清空数据按钮，放在返回按钮右侧（只在非错题模式下显示）
-        Button {
+        Rectangle {
             id: clearDataButton
             width: 150
             height: 40
@@ -993,11 +1002,16 @@ Rectangle {
             anchors.leftMargin: 10
             anchors.verticalCenter: parent.verticalCenter
             visible: !wrongQuestionsMode // 只在顺序练习模式下显示
-            background: Image {
+            color: "transparent"
+            
+            Image {
+                anchors.fill: parent
                 source: "qrc:/images/button_bg.png"
                 fillMode: Image.Stretch
             }
-            contentItem: Text {
+            
+            Text {
+                anchors.centerIn: parent
                 text: "清空答题数据"
                 font.family: "阿里妈妈数黑体"
                 font.pixelSize: 18
@@ -1005,15 +1019,19 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
-            onClicked: {
-                // 显示确认对话框
-                confirmDialog.dialogTitle = "清空数据确认"
-                confirmDialog.dialogMessage = "确定要清空该题库的所有答题数据吗？\n注意：错题集不会被清空。"
-                confirmDialog.confirmAction = function() {
-                    // 清空用户题库进度
-                    clearUserProgress()
+            
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    // 显示确认对话框
+                    confirmDialog.dialogTitle = "清空数据确认"
+                    confirmDialog.dialogMessage = "确定要清空该题库的所有答题数据吗？\n注意：错题集不会被清空。"
+                    confirmDialog.confirmAction = function() {
+                        // 清空用户题库进度
+                        clearUserProgress()
+                    }
+                    confirmDialog.open()
                 }
-                confirmDialog.open()
             }
         }
         
@@ -1193,17 +1211,17 @@ Rectangle {
                         }
                         
                         // 多选题提交按钮
-                        Button {
+                        Rectangle {
                             visible: optionsColumn.isMultiSelect && !answerPanel.visible
                             width: 120
                             height: 40
                             anchors.right: parent.right
                             anchors.rightMargin: 10
-                            background: Rectangle {
-                                color: "#0078d7"
-                                radius: 5
-                            }
-                            contentItem: Text {
+                            color: "#0078d7"
+                            radius: 5
+                            
+                            Text {
+                                anchors.centerIn: parent
                                 text: "提交答案"
                                 font.family: "阿里妈妈数黑体"
                                 font.pixelSize: 16
@@ -1211,9 +1229,13 @@ Rectangle {
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                             }
-                            onClicked: {
-                                if (currentMultiSelections.length > 0) {
-                                    submitMultiAnswer();
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    if (currentMultiSelections.length > 0) {
+                                        submitMultiAnswer();
+                                    }
                                 }
                             }
                         }
@@ -1258,15 +1280,15 @@ Rectangle {
                                 }
                             }
                             
-                            Button {
+                            Rectangle {
                                 Layout.alignment: Qt.AlignRight
                                 width: 100
                                 height: 30
-                                background: Rectangle {
-                                    color: "#0078d7"
-                                    radius: 5
-                                }
-                                contentItem: Text {
+                                color: "#0078d7"
+                                radius: 5
+                                
+                                Text {
+                                    anchors.centerIn: parent
                                     text: "提交"
                                     font.family: "阿里妈妈数黑体"
                                     font.pixelSize: 16
@@ -1274,9 +1296,13 @@ Rectangle {
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
                                 }
-                                onClicked: {
-                                    if (!answerPanel.visible && fillAnswerInput.text.trim() !== "") {
-                                        submitAnswer(fillAnswerInput.text.trim())
+                                
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        if (!answerPanel.visible && fillAnswerInput.text.trim() !== "") {
+                                            submitAnswer(fillAnswerInput.text.trim())
+                                        }
                                     }
                                 }
                             }
@@ -1347,16 +1373,16 @@ Rectangle {
                     width: parent.width * 0.7
                     spacing: 30
                     
-                    Button {
+                    Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 40
                         enabled: currentQuestionIndex > 0
                         opacity: enabled ? 1.0 : 0.6
-                        background: Rectangle {
-                            color: parent.enabled ? "#2c70b7" : "#666666"
-                            radius: 4
-                        }
-                        contentItem: Text {
+                        color: enabled ? "#2c70b7" : "#666666"
+                        radius: 4
+                        
+                        Text {
+                            anchors.centerIn: parent
                             text: "上一题"
                             font.family: "阿里妈妈数黑体"
                             font.pixelSize: 18
@@ -1364,22 +1390,26 @@ Rectangle {
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
-                        onClicked: {
-                            previousQuestion()
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                previousQuestion()
+                            }
                         }
                     }
                     
-                    Button {
+                    Rectangle {
                         id: nextButton
                         Layout.fillWidth: true
                         Layout.preferredHeight: 40
                         enabled: answerPanel.visible || currentQuestionIndex < currentQuestions.length - 1
                         opacity: enabled ? 1.0 : 0.6
-                        background: Rectangle {
-                            color: parent.enabled ? "#2c70b7" : "#666666"
-                            radius: 4
-                        }
-                        contentItem: Text {
+                        color: enabled ? "#2c70b7" : "#666666"
+                        radius: 4
+                        
+                        Text {
+                            anchors.centerIn: parent
                             text: currentQuestionIndex < currentQuestions.length - 1 ? "下一题" : "完成"
                             font.family: "阿里妈妈数黑体"
                             font.pixelSize: 18
@@ -1387,8 +1417,12 @@ Rectangle {
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
-                        onClicked: {
-                            nextQuestion()
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                nextQuestion()
+                            }
                         }
                     }
                 }
@@ -1453,14 +1487,14 @@ Rectangle {
                 anchors.centerIn: parent
                 spacing: 20
                 
-                Button {
+                Rectangle {
                     width: 100
                     height: 40
-                    background: Rectangle {
-                        color: "#666666"
-                        radius: 5
-                    }
-                    contentItem: Text {
+                    color: "#666666"
+                    radius: 5
+                    
+                    Text {
+                        anchors.centerIn: parent
                         text: "取消"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
@@ -1468,19 +1502,23 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: {
-                        confirmDialog.close()
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            confirmDialog.close()
+                        }
                     }
                 }
                 
-                Button {
+                Rectangle {
                     width: 100
                     height: 40
-                    background: Rectangle {
-                        color: "#0078d7"
-                        radius: 5
-                    }
-                    contentItem: Text {
+                    color: "#0078d7"
+                    radius: 5
+                    
+                    Text {
+                        anchors.centerIn: parent
                         text: "确定"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
@@ -1488,9 +1526,13 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: {
-                        confirmDialog.confirmAction()
-                        confirmDialog.close()
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            confirmDialog.confirmAction()
+                            confirmDialog.close()
+                        }
                     }
                 }
             }
@@ -1552,14 +1594,14 @@ Rectangle {
                 anchors.centerIn: parent
                 spacing: 20
                 
-                Button {
+                Rectangle {
                     width: 150
                     height: 40
-                    background: Rectangle {
-                        color: "#0078d7"
-                        radius: 5
-                    }
-                    contentItem: Text {
+                    color: "#0078d7"
+                    radius: 5
+                    
+                    Text {
+                        anchors.centerIn: parent
                         text: "返回题库列表"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
@@ -1567,9 +1609,13 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: {
-                        completionDialog.close()
-                        stackView.pop()
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            completionDialog.close()
+                            stackView.pop()
+                        }
                     }
                 }
             }

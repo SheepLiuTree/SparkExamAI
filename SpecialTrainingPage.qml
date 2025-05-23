@@ -159,18 +159,23 @@ Rectangle {
         color: "transparent"
         
         // 返回按钮，放在左侧
-        Button {
+        Rectangle {
             id: backButton
             width: 100
             height: 40
             anchors.left: parent.left
             anchors.leftMargin: 10
             anchors.verticalCenter: parent.verticalCenter
-            background: Image {
+            color: "transparent"
+            
+            Image {
+                anchors.fill: parent
                 source: "qrc:/images/button_bg.png"
                 fillMode: Image.Stretch
             }
-            contentItem: Text {
+            
+            Text {
+                anchors.centerIn: parent
                 text: "返回"
                 font.family: "阿里妈妈数黑体"
                 font.pixelSize: 18
@@ -178,70 +183,74 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
-            onClicked: {
-                // 显示确认对话框
-                confirmDialog.dialogTitle = "返回确认"
-                confirmDialog.dialogMessage = "确定要返回上一页吗？"
-                confirmDialog.confirmAction = function() {
-                    // 如果当前有用户数据，尝试更新用户的练习数据
-                    if (userData && userData.workId) {
-                        try {
-                            // 尝试直接通过根对象调用全局函数
-                            var root = stackView.parent
-                            var updateSuccess = false
-                            
-                            if (root && typeof root.updateUserData === "function") {
-                                // 尝试使用全局函数
-                                updateSuccess = root.updateUserData(userData.workId)
-                                console.log("使用根对象全局函数更新用户数据: " + updateSuccess)
-                            }
-                            
-                            // 如果全局函数调用失败，尝试直接访问mainPage
-                            if (!updateSuccess) {
-                                var mainPageItem = findMainPage(stackView)
-                                if (mainPageItem) {
-                                    console.log("找到mainPage，尝试直接访问user_practice_data")
-                                    var practiceDataItem = mainPageItem.user_practice_data
-                                    
-                                    if (practiceDataItem) {
-                                        console.log("成功找到user_practice_data")
-                                        // 先清空ID然后设置ID以确保触发变更
-                                        practiceDataItem.currentUserId = ""
-                                        practiceDataItem.currentUserId = userData.workId
-                                        practiceDataItem.loadUserPracticeData(userData.workId)
-                                        console.log("已直接调用更新用户练习数据函数，工号：" + userData.workId)
+            
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    // 显示确认对话框
+                    confirmDialog.dialogTitle = "返回确认"
+                    confirmDialog.dialogMessage = "确定要返回上一页吗？"
+                    confirmDialog.confirmAction = function() {
+                        // 如果当前有用户数据，尝试更新用户的练习数据
+                        if (userData && userData.workId) {
+                            try {
+                                // 尝试直接通过根对象调用全局函数
+                                var root = stackView.parent
+                                var updateSuccess = false
+                                
+                                if (root && typeof root.updateUserData === "function") {
+                                    // 尝试使用全局函数
+                                    updateSuccess = root.updateUserData(userData.workId)
+                                    console.log("使用根对象全局函数更新用户数据: " + updateSuccess)
+                                }
+                                
+                                // 如果全局函数调用失败，尝试直接访问mainPage
+                                if (!updateSuccess) {
+                                    var mainPageItem = findMainPage(stackView)
+                                    if (mainPageItem) {
+                                        console.log("找到mainPage，尝试直接访问user_practice_data")
+                                        var practiceDataItem = mainPageItem.user_practice_data
                                         
-                                        // 手动更新首页排序
-                                        if (mainPageItem.personal_page_column) {
-                                            console.log("尝试手动更新首页排序")
-                                            Qt.callLater(function() {
-                                                mainPageItem.personal_page_column.loadUserListFromDatabase()
-                                                console.log("已手动调用首页排序更新")
-                                            })
+                                        if (practiceDataItem) {
+                                            console.log("成功找到user_practice_data")
+                                            // 先清空ID然后设置ID以确保触发变更
+                                            practiceDataItem.currentUserId = ""
+                                            practiceDataItem.currentUserId = userData.workId
+                                            practiceDataItem.loadUserPracticeData(userData.workId)
+                                            console.log("已直接调用更新用户练习数据函数，工号：" + userData.workId)
+                                            
+                                            // 手动更新首页排序
+                                            if (mainPageItem.personal_page_column) {
+                                                console.log("尝试手动更新首页排序")
+                                                Qt.callLater(function() {
+                                                    mainPageItem.personal_page_column.loadUserListFromDatabase()
+                                                    console.log("已手动调用首页排序更新")
+                                                })
+                                            }
                                         }
                                     }
                                 }
+                            } catch (e) {
+                                console.error("更新用户数据时发生错误:", e)
                             }
-                        } catch (e) {
-                            console.error("更新用户数据时发生错误:", e)
                         }
+                        
+                        // 确保返回时显示中间列，隐藏个人数据页面
+                        var mainPage = stackView.get(0)
+                        if (mainPage) {
+                            console.log("确保返回时显示中间列，隐藏个人数据页面");
+                            if (mainPage.middle_column) {
+                                mainPage.middle_column.visible = true;
+                            }
+                            if (mainPage.user_practice_data) {
+                                mainPage.user_practice_data.visible = false;
+                            }
+                        }
+                        
+                        stackView.pop()
                     }
-                    
-                    // 确保返回时显示中间列，隐藏个人数据页面
-                    var mainPage = stackView.get(0)
-                    if (mainPage) {
-                        console.log("确保返回时显示中间列，隐藏个人数据页面");
-                        if (mainPage.middle_column) {
-                            mainPage.middle_column.visible = true;
-                        }
-                        if (mainPage.user_practice_data) {
-                            mainPage.user_practice_data.visible = false;
-                        }
-                    }
-                    
-                    stackView.pop()
+                    confirmDialog.open()
                 }
-                confirmDialog.open()
             }
         }
         
@@ -373,14 +382,19 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                             spacing: 10
                             
-                            Button {
+                            Rectangle {
                                 width: 120
                                 height: 40
-                                background: Image {
+                                color: "transparent"
+                                
+                                Image {
+                                    anchors.fill: parent
                                     source: "qrc:/images/button_bg.png"
                                     fillMode: Image.Stretch
                                 }
-                                contentItem: Text {
+                                
+                                Text {
+                                    anchors.centerIn: parent
                                     text: "顺序刷题"
                                     font.family: "阿里妈妈数黑体"
                                     font.pixelSize: 16
@@ -388,19 +402,28 @@ Rectangle {
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
                                 }
-                                onClicked: {
-                                    startSequentialPractice(model.id, model.name)
+                                
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        startSequentialPractice(model.id, model.name)
+                                    }
                                 }
                             }
                             
-                            Button {
+                            Rectangle {
                                 width: 120
                                 height: 40
-                                background: Image {
+                                color: "transparent"
+                                
+                                Image {
+                                    anchors.fill: parent
                                     source: "qrc:/images/button_bg.png"
                                     fillMode: Image.Stretch
                                 }
-                                contentItem: Text {
+                                
+                                Text {
+                                    anchors.centerIn: parent
                                     text: "错题刷题"
                                     font.family: "阿里妈妈数黑体"
                                     font.pixelSize: 16
@@ -408,8 +431,12 @@ Rectangle {
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
                                 }
-                                onClicked: {
-                                    startWrongQuestionsPractice(model.id, model.name)
+                                
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        startWrongQuestionsPractice(model.id, model.name)
+                                    }
                                 }
                             }
                         }
@@ -486,14 +513,14 @@ Rectangle {
                 anchors.centerIn: parent
                 spacing: 20
                 
-                Button {
+                Rectangle {
                     width: 100
                     height: 40
-                    background: Rectangle {
-                        color: "#666666"
-                        radius: 5
-                    }
-                    contentItem: Text {
+                    color: "#666666"
+                    radius: 5
+                    
+                    Text {
+                        anchors.centerIn: parent
                         text: "取消"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
@@ -501,19 +528,23 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: {
-                        confirmDialog.close()
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            confirmDialog.close()
+                        }
                     }
                 }
                 
-                Button {
+                Rectangle {
                     width: 100
                     height: 40
-                    background: Rectangle {
-                        color: "#0078d7"
-                        radius: 5
-                    }
-                    contentItem: Text {
+                    color: "#0078d7"
+                    radius: 5
+                    
+                    Text {
+                        anchors.centerIn: parent
                         text: "确定"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
@@ -521,9 +552,13 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: {
-                        confirmDialog.confirmAction()
-                        confirmDialog.close()
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            confirmDialog.confirmAction()
+                            confirmDialog.close()
+                        }
                     }
                 }
             }

@@ -67,7 +67,7 @@ Rectangle {
     }
     
     // 返回按钮
-    Button {
+    Rectangle {
         id: backButton
         anchors.top: parent.top
         anchors.topMargin: 20
@@ -75,21 +75,30 @@ Rectangle {
         anchors.leftMargin: 20
         width: 100
         height: 40
-        background: Image {
+        color: "transparent"
+        radius: 5
+        
+        Image {
+            id: buttonBg
+            anchors.fill: parent
             source: "qrc:/images/button_bg.png"
             fillMode: Image.Stretch
         }
-        contentItem: Text {
+        
+        Text {
+            anchors.centerIn: parent
             text: "返回"
             font.family: "阿里妈妈数黑体"
             font.pixelSize: 18
             color: "white"
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
         }
-        onClicked: {
-            // 显示确认对话框
-            confirmDialog.open()
+        
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                // 显示确认对话框
+                confirmDialog.open()
+            }
         }
     }
     
@@ -350,75 +359,79 @@ Rectangle {
                 spacing: 30
                 
                 // 取消按钮
-                Button {
+                Rectangle {
                     width: 120
                     height: 40
-                    background: Rectangle {
-                        radius: 6
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: "#64748b" }
-                            GradientStop { position: 1.0; color: "#475569" }
-                        }
+                    radius: 6
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#64748b" }
+                        GradientStop { position: 1.0; color: "#475569" }
                     }
-                    contentItem: Text {
+                    
+                    Text {
+                        anchors.centerIn: parent
                         text: "取消"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
                         color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: {
-                        confirmDialog.close()
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            confirmDialog.close()
+                        }
                     }
                 }
                 
                 // 确认按钮
-                Button {
+                Rectangle {
                     width: 120
                     height: 40
-                    background: Rectangle {
-                        radius: 6
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: "#0891b2" }
-                            GradientStop { position: 1.0; color: "#0e7490" }
-                        }
+                    radius: 6
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#0891b2" }
+                        GradientStop { position: 1.0; color: "#0e7490" }
                     }
-                    contentItem: Text {
+                    
+                    Text {
+                        anchors.centerIn: parent
                         text: "确认"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
                         font.bold: true
                         color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
                     }
-                    onClicked: {
-                        // 返回前确保首页用户列表会重新加载以应用新的排序设置
-                        var mainPage = stackView.get(0)
-                        console.log("返回前尝试刷新首页用户列表");
-                        if (mainPage && mainPage.personal_page_column) {
-                            console.log("找到首页personal_page_column，调用loadUserListFromDatabase");
-                            mainPage.personal_page_column.loadUserListFromDatabase();
-                        }
-                        
-                        // 确保返回时显示中间列，隐藏个人数据页面
-                        if (mainPage) {
-                            console.log("确保返回时显示中间列，隐藏个人数据页面");
-                            if (mainPage.middle_column) {
-                                mainPage.middle_column.visible = true;
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            // 返回前确保首页用户列表会重新加载以应用新的排序设置
+                            var mainPage = stackView.get(0)
+                            console.log("返回前尝试刷新首页用户列表");
+                            if (mainPage && mainPage.personal_page_column) {
+                                console.log("找到首页personal_page_column，调用loadUserListFromDatabase");
+                                mainPage.personal_page_column.loadUserListFromDatabase();
                             }
-                            if (mainPage.user_practice_data) {
-                                mainPage.user_practice_data.visible = false;
+                            
+                            // 确保返回时显示中间列，隐藏个人数据页面
+                            if (mainPage) {
+                                console.log("确保返回时显示中间列，隐藏个人数据页面");
+                                if (mainPage.middle_column) {
+                                    mainPage.middle_column.visible = true;
+                                }
+                                if (mainPage.user_practice_data) {
+                                    mainPage.user_practice_data.visible = false;
+                                }
                             }
+                            
+                            // 返回到主界面
+                            stackView.pop(null)
+                            
+                            // 返回上一页
+                            console.log("返回上一页")
+                            confirmDialog.close()
                         }
-                        
-                        // 返回到主界面
-                        stackView.pop(null)
-                        
-                        // 返回上一页
-                        console.log("返回上一页")
-                        confirmDialog.close()
                     }
                 }
             }

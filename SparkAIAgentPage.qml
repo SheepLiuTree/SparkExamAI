@@ -1144,7 +1144,7 @@ Rectangle {
                 simulateTypingUsername(nextCharIndex)
             } else if (inputType === "password") {
                 simulateTypingPassword(nextCharIndex)
-            }
         }
+    }
     }
 } 
