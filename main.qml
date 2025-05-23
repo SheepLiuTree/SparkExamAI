@@ -441,7 +441,7 @@ Window {
                         fillMode: Image.Stretch
                     }
                     contentItem: Text {
-                        text: "题策引擎"
+                        text: "策略引擎"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 24
                         color: "white"
@@ -754,11 +754,11 @@ Window {
                 anchors.bottomMargin: -parent.height / 90
 
                 // 智点标题
-                        Text {
+                Text {
                     id: knowledge_point_title
                     anchors.top: parent.top
-                    anchors.topMargin: 20
-                            anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.topMargin: 40
+                    anchors.horizontalCenter: parent.horizontalCenter
                     text: "加载中..."
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 24

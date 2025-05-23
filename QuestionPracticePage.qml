@@ -18,6 +18,12 @@ Rectangle {
     // 新增：记录本次新产生的错题ID集合
     property var newWrongQuestionIds: []
     
+    // 新增：记录本次进入时已答过的题目ID集合（用于区分本次新答的题目）
+    property var previouslyAnsweredQuestionIds: []
+    
+    // 新增：记录本次会话中新答的题目数量
+    property int sessionAnsweredCount: 0
+    
     // 当前多选题选中的选项
     property var currentMultiSelections: []
     
@@ -28,6 +34,10 @@ Rectangle {
         
         // 重置新产生的错题ID
         newWrongQuestionIds = []
+        
+        // 新增：重置本次会话状态
+        sessionAnsweredCount = 0
+        previouslyAnsweredQuestionIds = []
         
         if (wrongQuestionsMode) {
             // 加载错题
@@ -122,7 +132,13 @@ Rectangle {
                 var savedAnswers = JSON.parse(progress.userAnswers || "{}")
                 userAnswers = savedAnswers
                 
+                // 新增：记录进入时已经答过的题目ID（这些不计入本次会话）
+                for (var questionId in savedAnswers) {
+                    previouslyAnsweredQuestionIds.push(parseInt(questionId))
+                }
+                
                 console.log("已恢复用户进度，当前题目索引:", currentQuestionIndex, "已答题数:", Object.keys(userAnswers).length)
+                console.log("本次进入时已答过的题目ID:", previouslyAnsweredQuestionIds)
                 
                 // 恢复当前题目的状态
                 restoreTemporarySelections()
@@ -185,51 +201,56 @@ Rectangle {
     
     // 保存答题记录和更新错题集
     function saveAnswerRecord() {
-        if (!userData || !userData.workId || Object.keys(userAnswers).length === 0) {
-            console.log("无需保存答题记录")
+        if (!userData || !userData.workId) {
+            console.log("无需保存答题记录：用户未登录")
+            return
+        }
+        
+        // 新增：检查本次会话是否有新答的题目
+        if (sessionAnsweredCount === 0) {
+            console.log("本次会话没有新答的题目，不保存记录")
             return
         }
         
         var correctCount = 0
-        var totalAnswered = 0
-        var wrongQuestions = []
+        var sessionWrongQuestions = []
         
-        // 计算正确题目数量和收集错题
+        // 新增：只统计本次会话新答的题目
+        var sessionAnswerData = {}
+        var sessionQuestionBankInfo = {}
+        
+        // 计算本次会话的正确题目数量和收集错题
         for (var questionId in userAnswers) {
-            totalAnswered++
-            if (userAnswers[questionId].correct) {
-                correctCount++
-            } else {
-                // 收集错题ID
-                wrongQuestions.push(parseInt(questionId))
+            var questionIdInt = parseInt(questionId)
+            // 只统计本次会话新答的题目（不在进入时已答题目列表中）
+            if (previouslyAnsweredQuestionIds.indexOf(questionIdInt) === -1) {
+                sessionAnswerData[questionId] = userAnswers[questionId]
+                sessionQuestionBankInfo[questionId] = questionBankId
+                
+                if (userAnswers[questionId].correct) {
+                    correctCount++
+                } else {
+                    // 收集错题ID
+                    sessionWrongQuestions.push(questionIdInt)
+                }
             }
         }
         
-        if (totalAnswered === 0) {
-            console.log("没有回答任何题目，不保存记录")
-            return
-        }
-        
-        // 准备题库信息，记录每个题目属于哪个题库
-        var questionBankInfo = {}
-        for (var i = 0; i < currentQuestions.length; i++) {
-            var question = currentQuestions[i]
-            questionBankInfo[question.id] = questionBankId
-        }
-        
-        // 保存答题记录
+        // 保存答题记录（只记录本次会话新答的题目）
         var examType = wrongQuestionsMode ? "错题练习" : "顺序练习"
         var success = dbManager.saveUserAnswerRecord(
             userData.workId,
             userData.name,
             examType + "-" + questionBankName,
-            totalAnswered,
+            sessionAnsweredCount,  // 使用本次会话答题数量
             correctCount,
-            JSON.stringify(userAnswers),
-            JSON.stringify(questionBankInfo)
+            JSON.stringify(sessionAnswerData),
+            JSON.stringify(sessionQuestionBankInfo)
         )
         
-        console.log("保存答题记录" + (success ? "成功" : "失败"))
+        console.log("保存答题记录" + (success ? "成功" : "失败") + 
+                   "，本次会话答题数量:", sessionAnsweredCount, 
+                   "正确数量:", correctCount)
         
         // 顺序刷题模式下，保存本次新产生的错题
         if (!wrongQuestionsMode && newWrongQuestionIds.length > 0) {
@@ -412,11 +433,21 @@ Rectangle {
         
         var isCorrect = (correctAnswer === answerForCheck)
         
+        // 新增：检查这道题是否是本次会话首次作答
+        var isFirstTimeAnswered = !userAnswers.hasOwnProperty(questionId) && 
+                                  previouslyAnsweredQuestionIds.indexOf(questionId) === -1
+        
         // 记录用户答案（保存转换后的答案以确保正确性检查）
         userAnswers[questionId] = {
             userAnswer: answerForCheck,
             correct: isCorrect,
             correctAnswer: correctAnswer
+        }
+        
+        // 新增：如果是本次会话首次作答，增加会话计数
+        if (isFirstTimeAnswered) {
+            sessionAnsweredCount++
+            console.log("本次会话新答题目:", questionId, "会话答题总数:", sessionAnsweredCount)
         }
         
         // 通知答题卡更新
@@ -459,7 +490,8 @@ Rectangle {
                    "用户选择:", answer, 
                    "转换后答案:", answerForCheck, 
                    "正确答案:", correctAnswer, 
-                   "是否正确:", isCorrect)
+                   "是否正确:", isCorrect,
+                   "是否首次作答:", isFirstTimeAnswered)
         
         // 保存用户题库进度
         saveUserProgress()
@@ -494,11 +526,20 @@ Rectangle {
         if (questionRemoved) {
             // 记录该题目已从错题集移除
             var questionIdStr = questionId.toString();
+            var isFirstTimeAnswered = !userAnswers[questionIdStr] && 
+                                      previouslyAnsweredQuestionIds.indexOf(questionId) === -1;
+            
             if (!userAnswers[questionIdStr]) {
                 userAnswers[questionIdStr] = { 
                     removedFromWrongQuestions: true,
                     correct: true  // 确保此题被标记为正确答案
                 };
+                
+                // 新增：如果是本次会话首次作答，增加会话计数
+                if (isFirstTimeAnswered) {
+                    sessionAnsweredCount++;
+                    console.log("错题模式下本次会话新答题目:", questionId, "会话答题总数:", sessionAnsweredCount);
+                }
             } else {
                 userAnswers[questionIdStr].removedFromWrongQuestions = true;
                 userAnswers[questionIdStr].correct = true;  // 确保此题被标记为正确答案
@@ -513,23 +554,28 @@ Rectangle {
                 
                 // 延迟显示完成对话框
                 Qt.setTimeout(function() {
-                    var correctCount = 0;
-                    var totalAnswered = Object.keys(userAnswers).length;
-                    var removedCount = 0;
+                    // 新增：计算本次会话的统计信息
+                    var sessionCorrectCount = 0;
+                    var sessionRemovedCount = 0;
                     
+                    // 只统计本次会话新答的题目
                     for (var qId in userAnswers) {
-                        if (userAnswers[qId].correct) {
-                            correctCount++;
+                        var questionIdInt = parseInt(qId);
+                        // 只统计本次会话新答的题目（不在进入时已答题目列表中）
+                        if (previouslyAnsweredQuestionIds.indexOf(questionIdInt) === -1) {
+                            if (userAnswers[qId].correct) {
+                                sessionCorrectCount++;
+                            }
                         }
                         if (userAnswers[qId].removedFromWrongQuestions) {
-                            removedCount++;
+                            sessionRemovedCount++;
                         }
                     }
                     
                     completionDialog.dialogMessage = "错题练习完成！\n" + 
-                        "共练习 " + totalAnswered + " 道错题\n" +
-                        "本次答对 " + correctCount + " 道\n" +
-                        "已从错题集移除 " + removedCount + " 道题";
+                        "本次会话共练习 " + sessionAnsweredCount + " 道错题\n" +
+                        "本次答对 " + sessionCorrectCount + " 道\n" +
+                        "已从错题集移除 " + sessionRemovedCount + " 道题";
                     
                     completionDialog.open();
                 }, 2000); // 2秒后显示完成对话框
@@ -570,36 +616,47 @@ Rectangle {
             saveTemporarySelections();
             saveAnswerRecord();
             
-            // 错题刷题模式下，显示不同的完成信息
-            var correctCount = 0;
-            var totalAnswered = Object.keys(userAnswers).length;
-            var removedCount = 0;
+            // 新增：计算本次会话的统计信息
+            var sessionCorrectCount = 0;
+            var sessionWrongCount = 0;
+            var sessionRemovedCount = 0;
             
+            // 只统计本次会话新答的题目
             for (var questionId in userAnswers) {
-                if (userAnswers[questionId].correct) {
-                    correctCount++;
+                var questionIdInt = parseInt(questionId);
+                // 只统计本次会话新答的题目（不在进入时已答题目列表中）
+                if (previouslyAnsweredQuestionIds.indexOf(questionIdInt) === -1) {
+                    if (userAnswers[questionId].correct) {
+                        sessionCorrectCount++;
+                    } else {
+                        sessionWrongCount++;
+                    }
                 }
                 if (userAnswers[questionId].removedFromWrongQuestions) {
-                    removedCount++;
+                    sessionRemovedCount++;
                 }
             }
             
             if (wrongQuestionsMode) {
                 completionDialog.dialogMessage = "错题练习完成！\n" + 
-                    "共练习 " + totalAnswered + " 道错题\n" +
-                    "本次答对 " + correctCount + " 道\n" +
-                    "已从错题集移除 " + removedCount + " 道题";
+                    "本次会话共练习 " + sessionAnsweredCount + " 道错题\n" +
+                    "本次答对 " + sessionCorrectCount + " 道\n" +
+                    "已从错题集移除 " + sessionRemovedCount + " 道题";
                 
-                console.log("错题练习结束统计 - 总题数:", totalAnswered, 
-                           "答对:", correctCount, 
-                           "移除:", removedCount);
+                console.log("错题练习结束统计 - 本次会话题数:", sessionAnsweredCount, 
+                           "答对:", sessionCorrectCount, 
+                           "移除:", sessionRemovedCount);
             } else {
-                var wrongCount = totalAnswered - correctCount;
                 var newWrongCount = newWrongQuestionIds.length;
                 completionDialog.dialogMessage = "练习完成！\n" + 
-                    "共完成 " + totalAnswered + " 道题目\n" + 
-                    "正确 " + correctCount + " 道，错误 " + wrongCount + " 道\n" +
+                    "本次会话共完成 " + sessionAnsweredCount + " 道题目\n" + 
+                    "正确 " + sessionCorrectCount + " 道，错误 " + sessionWrongCount + " 道\n" +
                     "本次新增错题 " + newWrongCount + " 道";
+                
+                console.log("顺序练习结束统计 - 本次会话题数:", sessionAnsweredCount, 
+                           "答对:", sessionCorrectCount, 
+                           "答错:", sessionWrongCount,
+                           "新增错题:", newWrongCount);
             }
             
             completionDialog.open();
@@ -1552,52 +1609,86 @@ Rectangle {
         Rectangle {
             id: answerStats
             width: parent.width
-            height: 60
+            height: 80
             anchors.top: answerCardTitle.bottom
             anchors.topMargin: 10
             color: "transparent"
             
-            Row {
+            Column {
                 anchors.centerIn: parent
-                spacing: 20
+                spacing: 10
                 
-                // 已答题数
-                Column {
-                    spacing: 5
-                    Text {
-                        text: Object.keys(userAnswers).length
-                        font.family: "阿里妈妈数黑体"
-                        font.pixelSize: 20
-                        color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
+                // 第一行：总体统计
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
+                    
+                    // 已答题数
+                    Column {
+                        spacing: 5
+                        Text {
+                            text: Object.keys(userAnswers).length
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 20
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        Text {
+                            text: "已答题"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "#cccccc"
+                            horizontalAlignment: Text.AlignHCenter
+                        }
                     }
-                    Text {
-                        text: "已答题"
-                        font.family: "阿里妈妈数黑体"
-                        font.pixelSize: 14
-                        color: "#cccccc"
-                        horizontalAlignment: Text.AlignHCenter
+                    
+                    // 未答题数
+                    Column {
+                        spacing: 5
+                        Text {
+                            text: currentQuestions.length - Object.keys(userAnswers).length
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 20
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        Text {
+                            text: "未答题"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 14
+                            color: "#cccccc"
+                            horizontalAlignment: Text.AlignHCenter
+                        }
                     }
                 }
                 
-                // 未答题数
-                Column {
+                // 第二行：本次会话统计
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 5
+                    
                     Text {
-                        text: currentQuestions.length - Object.keys(userAnswers).length
-                        font.family: "阿里妈妈数黑体"
-                        font.pixelSize: 20
-                        color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                    Text {
-                        text: "未答题"
+                        text: "本次答题："
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 14
                         color: "#cccccc"
-                        horizontalAlignment: Text.AlignHCenter
+                    }
+                    
+                    Text {
+                        text: sessionAnsweredCount
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        color: "#FFD700"
+                        font.bold: true
+                    }
+                    
+                    Text {
+                        text: "题"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 14
+                        color: "#cccccc"
                     }
                 }
             }
