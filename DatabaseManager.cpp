@@ -3331,7 +3331,7 @@ QVariantList DatabaseManager::getAllAccounts()
     
     QSqlQuery query(m_database);
     query.prepare(
-        "SELECT id, username, work_id, created_at, last_login, is_active "
+        "SELECT id, username, work_id, password, created_at, last_login, is_active "
         "FROM accounts "
         "ORDER BY created_at DESC"
     );
@@ -3346,6 +3346,7 @@ QVariantList DatabaseManager::getAllAccounts()
         account["id"] = query.value("id").toInt();
         account["username"] = query.value("username").toString();
         account["workId"] = query.value("work_id").toString();
+        account["password"] = query.value("password").toString();  // 添加密码字段
         account["createdAt"] = query.value("created_at").toString();
         account["lastLogin"] = query.value("last_login").toString();
         account["isActive"] = query.value("is_active").toBool();

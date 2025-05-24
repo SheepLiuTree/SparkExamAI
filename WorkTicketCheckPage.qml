@@ -307,9 +307,38 @@ Rectangle {
                                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                                     onClicked: function(mouse) {
                                         if (mouse.button === Qt.LeftButton) {
-                                            // 处理账户选择逻辑
-                                            workTicketCheckPage.isLoggedIn = true
+                                            // 处理账户选择逻辑        
+                                            // 更新按钮文本为"登录中..."
+                                            loginButtonText.text = "登录中..."
+                                            loginButton.enabled = false                                    
                                             loginDialog.visible = false
+                                            
+                                            // 在网页中填写工号和密码
+                                            webView.runJavaScript(
+                                                "document.getElementById('p_username').value = '" + model.workId + "';" +
+                                                "document.getElementById('p_password').value = '" + model.password + "';" +
+                                                "document.querySelector('button#login.log-btn[type=\"submit\"]').click();"
+                                            )
+                                            // 创建定时器监测登录状态
+                                            var checkLoginTimer = Qt.createQmlObject('import QtQuick 2.0; Timer {}', loginButton, "checkLoginTimer");
+                                            checkLoginTimer.interval = 1000; // 每秒检查一次
+                                            checkLoginTimer.repeat = true;
+                                            checkLoginTimer.triggered.connect(function() {
+                                                webView.runJavaScript(
+                                                    "document.documentElement.outerHTML",
+                                                    function(result) {
+                                                        if (result.indexOf("施工调度管理二期系统【正式环境】") !== -1) {
+                                                            // 登录成功
+                                                            isLoggedIn = true;
+                                                            checkLoginTimer.stop();
+                                                            checkLoginTimer.destroy();
+                                                            loginButtonText.text = "登录成功-"+ model.username;
+                                                            loginButton.enabled = true;
+                                                        }
+                                                    }
+                                                );
+                                            });
+                                            checkLoginTimer.start();
                                         } else if (mouse.button === Qt.RightButton) {
                                             // 显示右键菜单
                                             contextMenu.popup()
@@ -328,7 +357,8 @@ Rectangle {
                     for (var i = 0; i < accounts.length; i++) {
                         accountModel.append({
                             "username": accounts[i].username,
-                            "workId": accounts[i].workId  // 确保添加workId
+                            "workId": accounts[i].workId,  // 确保添加workId
+                            "password": accounts[i].password  // 添加password字段
                         })
                     }
                 }
@@ -696,7 +726,7 @@ Rectangle {
         // 中间登录按钮
         Rectangle {
             id: loginButton
-            width: 120
+            width: 180
             height: 40
             radius: 15
             color: loginMouseArea.pressed ? "#4a90e2" : "#2196F3"
@@ -705,6 +735,7 @@ Rectangle {
             opacity: 0.7    // 初始状态半透明
 
             Text {
+                id: loginButtonText
                 anchors.centerIn: parent
                 text: workTicketCheckPage.isLoggedIn ? "已登录" : "登录"
                 font.family: "阿里妈妈数黑体"
@@ -718,8 +749,6 @@ Rectangle {
                 onClicked: { 
                     if (!workTicketCheckPage.isLoggedIn) {
                         loginDialog.visible = true
-                    } else {
-                        workTicketCheckPage.isLoggedIn = false
                     }
                 }
             }
