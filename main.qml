@@ -23,6 +23,11 @@ Window {
     // 虚拟键盘设置属性
     property bool enableVirtualKeyboard: true
 
+    // 显示菜单
+    // 0: 全部显示
+    // 1: 只显示测评内容
+    // 2: 只显示核对内容
+    property int show_menu: 0
     
     
     // 附加属性确保样式应用到所有控件
@@ -175,7 +180,7 @@ Window {
             anchors.top: parent.top
             anchors.topMargin: 10
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "星火智能评测系统"
+            text: Window.show_menu === 1 ? "星火智能评测系统" : "星火智能提升系统"
             font.family: "阿里妈妈数黑体"
             font.pixelSize: 48
             color: "white"

@@ -225,6 +225,12 @@ public:
 
     // 添加新账户
     Q_INVOKABLE bool addAccount(const QString &username, const QString &workId, const QString &password);
+    
+    // 获取所有账户
+    Q_INVOKABLE QVariantList getAllAccounts();
+    
+    // 删除账户
+    Q_INVOKABLE bool deleteAccount(const QString &workId);
 
 private:
     QSqlDatabase m_database;

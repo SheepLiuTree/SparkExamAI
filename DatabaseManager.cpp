@@ -322,7 +322,7 @@ bool DatabaseManager::createTables()
         qDebug() << "Failed to create accounts table:" << query.lastError().text();
         return false;
     }
-    
+
     return true;
 }
 
@@ -3310,6 +3310,69 @@ bool DatabaseManager::addAccount(const QString &username, const QString &workId,
     
     if (!query.exec()) {
         qDebug() << "Failed to add account:" << query.lastError().text();
+        return false;
+    }
+    
+    return true;
+}
+
+// 获取所有账户
+QVariantList DatabaseManager::getAllAccounts()
+{
+    QVariantList result;
+    
+    if (!m_database.isOpen()) {
+        qDebug() << "数据库未打开，尝试重新打开";
+        if (!m_database.open()) {
+            qDebug() << "无法打开数据库:" << m_database.lastError().text();
+            return result;
+        }
+    }
+    
+    QSqlQuery query(m_database);
+    query.prepare(
+        "SELECT id, username, work_id, created_at, last_login, is_active "
+        "FROM accounts "
+        "ORDER BY created_at DESC"
+    );
+    
+    if (!query.exec()) {
+        qDebug() << "获取账户列表失败:" << query.lastError().text();
+        return result;
+    }
+    
+    while (query.next()) {
+        QVariantMap account;
+        account["id"] = query.value("id").toInt();
+        account["username"] = query.value("username").toString();
+        account["workId"] = query.value("work_id").toString();
+        account["createdAt"] = query.value("created_at").toString();
+        account["lastLogin"] = query.value("last_login").toString();
+        account["isActive"] = query.value("is_active").toBool();
+        
+        result.append(account);
+    }
+    
+    return result;
+}
+
+// 删除账户
+bool DatabaseManager::deleteAccount(const QString &workId)
+{
+    if (!m_database.isOpen()) {
+        qDebug() << "数据库未打开，尝试重新打开";
+        if (!m_database.open()) {
+            qDebug() << "无法打开数据库:" << m_database.lastError().text();
+            return false;
+        }
+    }
+    
+    QSqlQuery query(m_database);
+    query.prepare("DELETE FROM accounts WHERE work_id = ?");
+    query.addBindValue(workId);
+    
+    if (!query.exec()) {
+        qDebug() << "删除账户失败:" << query.lastError().text();
         return false;
     }
     

@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls.Material 2.15
+import QtWebEngine 1.8
 
 Rectangle {
     id: workTicketCheckPage
@@ -31,6 +32,8 @@ Rectangle {
 
             // 声明message属性
             property string message: ""
+            // 声明确认信号
+            signal confirmed()
 
             // 标题栏
             Rectangle {
@@ -42,7 +45,7 @@ Rectangle {
 
                 Text {
                     anchors.centerIn: parent
-                    text: "错误"
+                    text: "提示"
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 18
                     color: "white"
@@ -64,24 +67,51 @@ Rectangle {
                     color: "#666666"
                 }
 
-                Rectangle {
-                    width: 100
-                    height: 36
-                    radius: 18
-                    color: "#2196F3"
+                Row {
                     anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
 
-                    Text {
-                        anchors.centerIn: parent
-                        text: "确定"
-                        font.family: "阿里妈妈数黑体"
-                        font.pixelSize: 16
-                        color: "white"
+                    Rectangle {
+                        width: 100
+                        height: 36
+                        radius: 18
+                        color: "#808080"
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "取消"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 16
+                            color: "white"
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: dialog.close()
+                        }
                     }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: dialog.close()
+                    Rectangle {
+                        width: 100
+                        height: 36
+                        radius: 18
+                        color: "#2196F3"
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "确定"
+                            font.family: "阿里妈妈数黑体"
+                            font.pixelSize: 16
+                            color: "white"
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                dialog.confirmed()
+                                dialog.close()
+                            }
+                        }
                     }
                 }
             }
@@ -167,6 +197,8 @@ Rectangle {
             anchors.top: titleBar.bottom
             anchors.topMargin: 30
             anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 20
             spacing: 20
             width: parent.width * 0.8
             visible: !loginDialog.showAddAccount
@@ -190,6 +222,114 @@ Rectangle {
                     anchors.fill: parent
                     onClicked: {
                         loginDialog.showAddAccount = true
+                    }
+                }
+            }
+
+            // 账户列表
+            Rectangle {
+                width: parent.width
+                height: parent.height - titleBar.height - 15  // 减去标题栏高度和上下边距
+                color: "#F5F5F5"
+                radius: 5
+
+                ScrollView {
+                    anchors.fill: parent
+                    anchors.margins: 5
+                    clip: true
+                    ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+                    Column {
+                        width: parent.width
+                        spacing: 8
+
+                        Repeater {
+                            model: ListModel { id: accountModel }
+
+                            Rectangle {
+                                width: parent.width
+                                height: 40
+                                radius: 5
+                                color: mouseArea.containsMouse ? "#E3F2FD" : "#FFFFFF"
+
+                                Row {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 15
+                                    anchors.rightMargin: 15
+                                    spacing: 10
+
+                                    Text {
+                                        id: usernameText
+                                        width: parent.width
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: model.username
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 14
+                                        color: "#333333"
+                                        elide: Text.ElideRight
+                                    }
+                                }
+
+                                // 右键菜单
+                                Menu {
+                                    id: contextMenu
+                                    MenuItem {
+                                        text: "删除账户"
+                                        onTriggered: {
+                                            // 显示确认对话框
+                                            var dialog = messageDialog.createObject(workTicketCheckPage, {
+                                                "message": "确定要删除账户 " + model.username + " 吗？"
+                                            })
+                                            
+                                            // 连接对话框的确认按钮点击事件
+                                            dialog.confirmed.connect(function() {
+                                                // 删除账户
+                                                if (dbManager.deleteAccount(model.workId)) {
+                                                    // 从列表中移除
+                                                    accountModel.remove(index)
+                                                    showMessage("提示", "账户删除成功")
+                                                } else {
+                                                    showMessage("错误", "账户删除失败")
+                                                }
+                                            })
+                                            
+                                            dialog.open()
+                                        }
+                                    }
+                                }
+
+                                // 将登录点击区域限制在用户名区域
+                                MouseArea {
+                                    id: mouseArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                    onClicked: function(mouse) {
+                                        if (mouse.button === Qt.LeftButton) {
+                                            // 处理账户选择逻辑
+                                            workTicketCheckPage.isLoggedIn = true
+                                            loginDialog.visible = false
+                                        } else if (mouse.button === Qt.RightButton) {
+                                            // 显示右键菜单
+                                            contextMenu.popup()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 组件加载时从数据库加载账户列表
+                Component.onCompleted: {
+                    var accounts = dbManager.getAllAccounts()
+                    accountModel.clear()
+                    for (var i = 0; i < accounts.length; i++) {
+                        accountModel.append({
+                            "username": accounts[i].username,
+                            "workId": accounts[i].workId  // 确保添加workId
+                        })
                     }
                 }
             }
@@ -373,11 +513,20 @@ Rectangle {
                             );
                             
                             if (success) {
-                                // 保存成功，清空表单并返回登录界面
+                                // 保存成功，添加到账户列表
+                                accountModel.append({
+                                    "username": newUsernameInput.text,
+                                    "workId": workIdInput.text
+                                })
+                                
+                                // 清空表单并返回登录界面
                                 newUsernameInput.text = ""
                                 workIdInput.text = ""
                                 newPasswordInput.text = ""
                                 loginDialog.showAddAccount = false
+                                
+                                // 显示成功提示
+                                showMessage("提示", "账户添加成功")
                             } else {
                                 // 保存失败，显示错误信息
                                 showMessage("错误", "保存失败，工号可能已存在")
@@ -435,6 +584,48 @@ Rectangle {
         font.pixelSize: 36
         color: "white"
         font.bold: true
+    }
+
+    // 添加网页加载组件
+    Rectangle {
+        id: webViewContainer
+        anchors.left: pageTitle.right
+        anchors.leftMargin: 20
+        anchors.verticalCenter: pageTitle.verticalCenter
+        width: 300
+        height: 250
+        color: "#33ffffff"
+        radius: 5
+
+        WebEngineView {
+            id: webView
+            anchors.fill: parent
+            url: "http://172.16.200.120/qdsg2/login.jsp"
+        }
+    }
+
+    // 定时器用于定期检查页面内容
+    Timer {
+        id: checkTimer
+        interval: 1000  // 每秒检查一次
+        repeat: true
+        running: true
+        onTriggered: {
+            if (webView.loading) return
+            webView.runJavaScript("document.body.innerHTML", function(result) {
+                if (result && result.includes("请输入用户名")) {
+                    // 启用登录按钮
+                    loginButton.enabled = true
+                    loginButton.opacity = 1.0
+                    // 停止定时器
+                    checkTimer.stop()
+                } else {
+                    // 禁用登录按钮
+                    loginButton.enabled = false
+                    loginButton.opacity = 0.7
+                }
+            })
+        }
     }
 
     // 菜单区域
@@ -504,11 +695,14 @@ Rectangle {
 
         // 中间登录按钮
         Rectangle {
+            id: loginButton
             width: 120
             height: 40
             radius: 15
             color: loginMouseArea.pressed ? "#4a90e2" : "#2196F3"
             anchors.centerIn: parent
+            enabled: false  // 初始状态禁用
+            opacity: 0.7    // 初始状态半透明
 
             Text {
                 anchors.centerIn: parent
