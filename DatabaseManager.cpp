@@ -305,6 +305,24 @@ bool DatabaseManager::createTables()
         return false;
     }
 
+    // 创建账户信息表
+    success = query.exec(
+        "CREATE TABLE IF NOT EXISTS accounts ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "username TEXT NOT NULL, "
+        "work_id TEXT NOT NULL UNIQUE, "
+        "password TEXT NOT NULL, "
+        "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+        "last_login TIMESTAMP, "
+        "is_active BOOLEAN DEFAULT 1"
+        ")"
+    );
+
+    if (!success) {
+        qDebug() << "Failed to create accounts table:" << query.lastError().text();
+        return false;
+    }
+    
     return true;
 }
 
@@ -3263,4 +3281,37 @@ bool DatabaseManager::deleteUserBankProgress(const QString &workId, int bankId)
     }
     
     return success;
+}
+
+// 添加新账户
+bool DatabaseManager::addAccount(const QString &username, const QString &workId, const QString &password)
+{
+    QSqlQuery query(m_database);
+    
+    // 检查工号是否已存在
+    query.prepare("SELECT work_id FROM accounts WHERE work_id = ?");
+    query.addBindValue(workId);
+    
+    if (!query.exec()) {
+        qDebug() << "Failed to check existing work_id:" << query.lastError().text();
+        return false;
+    }
+    
+    if (query.next()) {
+        qDebug() << "Work ID already exists";
+        return false;
+    }
+    
+    // 插入新账户
+    query.prepare("INSERT INTO accounts (username, work_id, password) VALUES (?, ?, ?)");
+    query.addBindValue(username);
+    query.addBindValue(workId);
+    query.addBindValue(password);
+    
+    if (!query.exec()) {
+        qDebug() << "Failed to add account:" << query.lastError().text();
+        return false;
+    }
+    
+    return true;
 }

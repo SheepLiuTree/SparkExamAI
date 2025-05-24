@@ -15,6 +15,87 @@ Rectangle {
         Material.accent = Material.Blue
     }
 
+    // 自定义提示对话框组件
+    Component {
+        id: messageDialog
+        Dialog {
+            id: dialog
+            modal: true
+            anchors.centerIn: parent
+            width: 300
+            height: 180
+            background: Rectangle {
+                color: "#FFFFFF"
+                radius: 10
+            }
+
+            // 声明message属性
+            property string message: ""
+
+            // 标题栏
+            Rectangle {
+                id: titleBar
+                width: parent.width
+                height: 40
+                color: "red"
+                radius: 10
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "错误"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 18
+                    color: "white"
+                }
+            }
+
+            // 内容区域
+            Column {
+                width: parent.width
+                anchors.top: titleBar.bottom
+                anchors.topMargin: 20
+                spacing: 20
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: dialog.message
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 16
+                    color: "#666666"
+                }
+
+                Rectangle {
+                    width: 100
+                    height: 36
+                    radius: 18
+                    color: "#2196F3"
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "确定"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        color: "white"
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: dialog.close()
+                    }
+                }
+            }
+        }
+    }
+
+    // 显示提示对话框的函数
+    function showMessage(title, message) {
+        var dialog = messageDialog.createObject(workTicketCheckPage, {
+            "message": message
+        })
+        dialog.open()
+    }
+
     // 登录弹窗
     Rectangle {
         id: loginDialog
@@ -218,7 +299,6 @@ Rectangle {
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 16
                         verticalAlignment: TextInput.AlignVCenter
-                        echoMode: TextInput.Password
                     }
                 }
             }
@@ -271,13 +351,36 @@ Rectangle {
                         id: saveButtonMouseArea
                         anchors.fill: parent
                         onClicked: {
-                            if (newUsernameInput.text && workIdInput.text && newPasswordInput.text) {
-                                // TODO: 实现保存新账户的逻辑
-                                console.log("保存新账户:", newUsernameInput.text, workIdInput.text)
-                                loginDialog.showAddAccount = false
+                            // 检查表单是否为空
+                            if (!newUsernameInput.text) {
+                                showMessage("错误", "用户名不能为空")
+                                return
+                            }
+                            if (!workIdInput.text) {
+                                showMessage("错误", "工号不能为空")
+                                return
+                            }
+                            if (!newPasswordInput.text) {
+                                showMessage("错误", "密码不能为空")
+                                return
+                            }
+
+                            // 调用数据库管理器保存账户信息
+                            var success = dbManager.addAccount(
+                                newUsernameInput.text,
+                                workIdInput.text,
+                                newPasswordInput.text
+                            );
+                            
+                            if (success) {
+                                // 保存成功，清空表单并返回登录界面
                                 newUsernameInput.text = ""
                                 workIdInput.text = ""
                                 newPasswordInput.text = ""
+                                loginDialog.showAddAccount = false
+                            } else {
+                                // 保存失败，显示错误信息
+                                showMessage("错误", "保存失败，工号可能已存在")
                             }
                         }
                     }

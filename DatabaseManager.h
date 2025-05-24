@@ -223,6 +223,9 @@ public:
     // 删除用户题库进度
     Q_INVOKABLE bool deleteUserBankProgress(const QString &workId, int bankId);
 
+    // 添加新账户
+    Q_INVOKABLE bool addAccount(const QString &username, const QString &workId, const QString &password);
+
 private:
     QSqlDatabase m_database;
     QString m_dbPath;
