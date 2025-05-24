@@ -10,6 +10,7 @@
         <file>SparkAIAgentPage.qml</file>
         <file>SpecialTrainingPage.qml</file>
         <file>QuestionPracticePage.qml</file>
+        <file>WorkTicketCheckPage.qml</file>
         <file>QuestionEngineSettings/GeneralSettings.qml</file>
         <file>QuestionEngineSettings/StrategiesSettings.qml</file>
         <file>QuestionEngineSettings/KnowledgePointSettings.qml</file>

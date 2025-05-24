@@ -490,6 +490,27 @@ Window {
                         }
                     }
                 }
+
+                Button {
+                    width: 200
+                    height: 70
+                    background: Image {
+                        source: "qrc:/images/button_bg.png"
+                        fillMode: Image.Stretch
+                    }
+                    contentItem: Text {
+                        text: "工作票核对"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 24
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("工作票核对 clicked")
+                        stackView.push("WorkTicketCheckPage.qml")
+                    }
+                }
             }
         }
 
