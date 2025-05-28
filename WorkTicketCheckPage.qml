@@ -665,7 +665,7 @@ Rectangle {
         anchors.topMargin: 30
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width * 0.9
-        height: 80
+        height: 60
         color: "#33ffffff"
         radius: 20
 
@@ -765,8 +765,7 @@ Rectangle {
                 width: 140
                 height: 40
                 radius: 15
-                color: !workTicketCheckPage.isLoggedIn ? "#CCCCCC" : (mouseArea3.pressed ? "#4a90e2" : "#2196F3")
-                opacity: !workTicketCheckPage.isLoggedIn ? 0.7 : 1.0
+                color: mouseArea3.pressed ? "#4a90e2" : "#2196F3"
 
                 Text {
                     anchors.centerIn: parent
@@ -779,7 +778,6 @@ Rectangle {
                 MouseArea {
                     id: mouseArea3
                     anchors.fill: parent
-                    enabled: workTicketCheckPage.isLoggedIn
                     onClicked: { /* TODO: 变电所配置逻辑 */ }
                 }
             }
@@ -788,8 +786,7 @@ Rectangle {
                 width: 140
                 height: 40
                 radius: 15
-                color: !workTicketCheckPage.isLoggedIn ? "#CCCCCC" : (mouseArea4.pressed ? "#4a90e2" : "#2196F3")
-                opacity: !workTicketCheckPage.isLoggedIn ? 0.7 : 1.0
+                color: mouseArea4.pressed ? "#4a90e2" : "#2196F3"
 
                 Text {
                     anchors.centerIn: parent
@@ -802,7 +799,6 @@ Rectangle {
                 MouseArea {
                     id: mouseArea4
                     anchors.fill: parent
-                    enabled: workTicketCheckPage.isLoggedIn
                     onClicked: { /* TODO: 工作票模板管理逻辑 */ }
                 }
             }

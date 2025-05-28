@@ -7,13 +7,13 @@ import Qt5Compat.GraphicalEffects
 import QtQuick.Dialogs
 
 Window {
-    width: Screen.width
-    height: Screen.height
-    // width: 1440
-    // height: 1024
+    //width: Screen.width
+    //height: Screen.height
+    width: 1280
+    height: 1024
     visible: true
-    visibility: Window.FullScreen
-    flags: Qt.Window | Qt.FramelessWindowHint
+    //visibility: Window.FullScreen
+    //flags: Qt.Window | Qt.FramelessWindowHint
     title: qsTr("星火智能评测系统")
     
     // 应用Material样式 - 确保全局应用
@@ -27,7 +27,7 @@ Window {
     // 0: 全部显示
     // 1: 只显示测评内容
     // 2: 只显示核对内容
-    property int show_menu: 0
+    property int show_menu: 1
     
     
     // 附加属性确保样式应用到所有控件
@@ -180,7 +180,7 @@ Window {
             anchors.top: parent.top
             anchors.topMargin: 10
             anchors.horizontalCenter: parent.horizontalCenter
-            text: Window.show_menu === 1 ? "星火智能评测系统" : "星火智能提升系统"
+            text: show_menu === 1 ? "星火智能评测系统" : "星火智能提升系统"
             font.family: "阿里妈妈数黑体"
             font.pixelSize: 48
             color: "white"
@@ -497,6 +497,7 @@ Window {
                 }
 
                 Button {
+                    visible: show_menu !== 1
                     width: 200
                     height: 70
                     background: Image {
@@ -516,6 +517,28 @@ Window {
                         stackView.push("WorkTicketCheckPage.qml")
                     }
                 }
+
+                Button {
+                    visible: show_menu !== 1
+                    width: 200
+                    height: 70
+                    background: Image {
+                        source: "qrc:/images/button_bg.png"
+                        fillMode: Image.Stretch
+                    }
+                    contentItem: Text {
+                        text: "施工计划核对"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 24
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("施工计划核对 clicked")
+                        stackView.push("ConstructionPlanCheckPage.qml")
+                    }
+                }
             }
         }
 
@@ -528,48 +551,28 @@ Window {
             anchors.right: personal_page_background.left
             anchors.horizontalCenter: parent.horizontalCenter
             color: "transparent"
-            visible: true // Default to visible
-            // 标题背景图
-            Image {      
-                id: monthly_ranking_bg_image
-                source: "qrc:/images/title_bg.png"
-                width: 350
-                height: 200
-                fillMode: Image.PreserveAspectFit
-                anchors.horizontalCenter: parent.horizontalCenter   
-                anchors.top: parent.top
-                anchors.topMargin: -70
-                // 智点速览文本
-                Text {
-                    text: "月度排行榜"
-                    font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 26
-                    color: "white"
-                    anchors.centerIn: parent
-                    anchors.verticalCenter: parent.verticalCenter
+            visible: true // Default to visible               
+                 // 标题背景图
+                Image {      
+                    id: monthly_ranking_bg_image
+                    source: "qrc:/images/title_bg.png"
+                    width: 350
+                    height: 200
+                    fillMode: Image.PreserveAspectFit
+                    anchors.horizontalCenter: parent.horizontalCenter   
+                    anchors.top: parent.top
+                    anchors.topMargin: -70
+                    // 智点速览文本
+                    Text {
+                        text: "月度排行榜"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 26
+                        color: "white"
+                        anchors.centerIn: parent
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
                 }
-            }
-
-
-            Rectangle {
-                id: monthly_ranking
-                anchors.top: monthly_ranking_bg_image.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: title_bg_image.top                
-                anchors.topMargin: -30
-                color: "transparent"
-                
-                //背景
-                Image {                    
-                    source: "qrc:/images/RankingList_bg.png"
-                    width: parent.width / 4 *3
-                    height: width / 3
-                    fillMode: Image.Stretch
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: -50
-                }
+                                
                 //第一名背景
                 Image {                    
                     source: "qrc:/images/ranking_bg.png"
@@ -577,8 +580,8 @@ Window {
                     height: width / 3 * 2 
                     fillMode: Image.PreserveAspectFit
                     anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 100
+                    anchors.top: monthly_ranking_bg_image.bottom
+                    anchors.topMargin: 50
                     Image {                    
                         source: "qrc:/images/avatar_bg.png"
                         width: parent.width 
@@ -637,8 +640,8 @@ Window {
                     fillMode: Image.PreserveAspectFit
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.horizontalCenterOffset: parent.width / 5
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 50
+                    anchors.top: monthly_ranking_bg_image.bottom
+                    anchors.topMargin: 100
                     Image {                    
                         source: "qrc:/images/avatar_bg.png"
                         width: parent.width
@@ -690,15 +693,16 @@ Window {
                     }
                 }
                 //第三名背景
-                Image {                    
+                Image {          
+                    id: third_place_ranking_bg
                     source: "qrc:/images/ranking_bg.png"
                     width: parent.width / 4
                     height: width / 3 * 2 
                     fillMode: Image.PreserveAspectFit
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.horizontalCenterOffset: -parent.width / 5
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 50
+                    anchors.top: monthly_ranking_bg_image.bottom
+                    anchors.topMargin: 100
                     Image {                    
                         source: "qrc:/images/avatar_bg.png"
                         width: parent.width
@@ -749,8 +753,18 @@ Window {
                         }
                     }
                 }
-            }
-            // 标题背景图
+                //背景
+                Image {     
+                    id: ranking_list_bg
+                    source: "qrc:/images/RankingList_bg.png"
+                    width: parent.width / 4 *3
+                    height: width / 3
+                    fillMode: Image.Stretch
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: third_place_ranking_bg.top
+                    anchors.topMargin: third_place_ranking_bg.height/13
+                }
+                // 标题背景图
             Image {
                 id: title_bg_image
                 source: "qrc:/images/title_bg.png"
@@ -758,8 +772,8 @@ Window {
                 height: 200
                 fillMode: Image.PreserveAspectFit
                 anchors.horizontalCenter: parent.horizontalCenter   
-                anchors.bottom: knowledge_point_bg_image.top
-                anchors.bottomMargin: -50
+                anchors.top: ranking_list_bg.bottom
+                anchors.topMargin: -50
                 // 智点速览文本
                 Text {
                     text: "智 点 速 览"
@@ -769,19 +783,19 @@ Window {
                     anchors.centerIn: parent
                     anchors.verticalCenter: parent.verticalCenter
                 }
-            }
+            }            
 
             // 知识点背景图
             Image {
                 id: knowledge_point_bg_image
                 source: "qrc:/images/KnowledgePoint_bg.png"
-                // 设置宽度为窗口的三分之一
-                width: parent.width / 8 * 5 
-                height: parent.height / 3
-                // fillMode: Image.PreserveAspectFit
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: -parent.height / 90
+                width: middle_column.width * 2 /3   // 设置为父容器宽度的四分之三
+                height: middle_column.height / 4  // 设置高度为剩余空间减去边距
+                anchors.top: title_bg_image.bottom  // 与title_bg_image底部对齐
+                anchors.horizontalCenter: parent.horizontalCenter  // 水平居中
+                //fillMode: Image.PreserveAspectFit  // 保持图片比例
+                anchors.topMargin: -50   
+                anchors.bottomMargin: 50
 
                 // 智点标题
                 Text {
@@ -891,7 +905,9 @@ Window {
                         knowledge_point_timer.stop()
                     }
                 }
-            }            
+            }     
+            
+                   
         }
 
         // 用户练习数据显示区域 (添加新组件)
