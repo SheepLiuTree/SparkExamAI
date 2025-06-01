@@ -3129,7 +3129,7 @@ Window {
                 }
                 
                 Text {
-                    text: "权限：" + (userVerificationDialog.userData ? (userVerificationDialog.userData.permission === "1" ? "管理员" : "普通用户") : "")
+                    text: "权限：" + (userVerificationDialog.userData ? (userVerificationDialog.userData.isAdmin ? "管理员" : "普通用户") : "")
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 18
                     color: "white"
@@ -3165,7 +3165,7 @@ Window {
                         if (faceRecognitionPopup.targetPage !== "") {
                             // 检查是否是策略引擎页面且用户不是管理员
                             if (faceRecognitionPopup.targetPage === "QuestionEnginePage.qml" && 
-                                userVerificationDialog.userData.permission !== "1") {
+                                !userVerificationDialog.userData.isAdmin) {
                                 // 显示权限不足提示
                                 errorDialog.title = "权限不足"
                                 errorMessageText.text = "策略引擎仅限管理员访问"

@@ -1069,7 +1069,8 @@ void DatabaseManager::initDefaultSettings()
         
         // AI智能体地址设置
         setSetting("ai_agent_address", "https://www.coze.cn/store/agent/7485277516954271795?bot_id=true");
-        
+        setSetting("ai_agent_username", "变电三工班");
+        setSetting("ai_agent_password", "Biandian3");
         // 五芒图默认标题设置
         setSetting("pentagon_title_1", "基础认知");
         setSetting("pentagon_title_2", "原理理解");
