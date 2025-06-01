@@ -73,6 +73,8 @@ set(PROJECT_SOURCES
         DatabaseManager.h
         FaceRecognizer.cpp
         FaceRecognizer.h
+        LogManager.h
+        LogManager.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

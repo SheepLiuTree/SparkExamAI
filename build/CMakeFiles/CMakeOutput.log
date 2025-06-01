@@ -26,16 +26,16 @@ The CXX compiler identification is MSVC, found in "E:/SparkExamAI/SparkExamAI/Sp
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/Tools/ninja/ninja.exe cmTC_9149e && [1/2] Building CXX object CMakeFiles\cmTC_9149e.dir\CMakeCXXCompilerABI.cpp.obj
+Run Build Command(s):C:/Tools/ninja/ninja.exe cmTC_1ba5f && [1/2] Building CXX object CMakeFiles\cmTC_1ba5f.dir\CMakeCXXCompilerABI.cpp.obj
 注意: 包含文件:  C:\Qt\Tools\CMake_64\share\cmake-3.24\Modules\CMakeCompilerABI.h
-[2/2] Linking CXX executable cmTC_9149e.exe
+[2/2] Linking CXX executable cmTC_1ba5f.exe
 
 
 
 Performing C++ SOURCE FILE Test HAVE_STDATOMIC succeeded with the following output:
 Change Dir: E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/Tools/ninja/ninja.exe cmTC_78a29 && [1/2] Building CXX object CMakeFiles\cmTC_78a29.dir\src.cxx.obj
+Run Build Command(s):C:/Tools/ninja/ninja.exe cmTC_8bae8 && [1/2] Building CXX object CMakeFiles\cmTC_8bae8.dir\src.cxx.obj
 注意: 包含文件:  C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\atomic
 注意: 包含文件:   C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\yvals.h
 注意: 包含文件:    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\yvals_core.h
@@ -82,7 +82,7 @@ Run Build Command(s):C:/Tools/ninja/ninja.exe cmTC_78a29 && [1/2] Building CXX o
 注意: 包含文件:     C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\ctime
 注意: 包含文件:      D:\Windows Kits\10\include\10.0.26100.0\ucrt\time.h
 注意: 包含文件:       D:\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt_wtime.h
-[2/2] Linking CXX executable cmTC_78a29.exe
+[2/2] Linking CXX executable cmTC_8bae8.exe
 
 
 Source file was:

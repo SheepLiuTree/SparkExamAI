@@ -285,154 +285,112 @@ Rectangle {
         }
     
     
-    // 批量导入对话框 - 使用Popup替代Dialog
-    Popup {
+    // 批量导入对话框 - 使用Rectangle替代Popup
+    Rectangle {
+        id: batchImportDialogMask
+        anchors.fill: parent
+        color: "#80000000"
+        visible: false
+        z: 1000
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                // 点击遮罩层不关闭对话框
+            }
+        }
+    }
+
+    Rectangle {
         id: batchImportDialog
         width: 600
-        height: 550  // 减小高度，因为去掉了表头预览
+        height: 550
         anchors.centerIn: parent
-        modal: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        visible: false
+        z: 1001
+        color: "#f5f5f5"
+        radius: 8
         
         property bool isValidExcel: false
-        
-        contentItem: Rectangle {
-            color: "#f5f5f5"
+
+        // 添加关闭按钮
+        Rectangle {
+            width: 30
+            height: 30
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 10
+            color: "transparent"
             
-            ColumnLayout {
+            Text {
+                text: "×"
+                font.pixelSize: 24
+                color: "#666666"
+                anchors.centerIn: parent
+            }
+            
+            MouseArea {
                 anchors.fill: parent
-                anchors.margins: 20
-                spacing: 15
-                
-                // 添加标题
-                Text {
-                    text: "批量导入题目"
-                    font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 20
-                    font.bold: true
-                    color: "#333333"
-                    Layout.alignment: Qt.AlignHCenter
+                onClicked: {
+                    batchImportDialog.visible = false
+                    batchImportDialogMask.visible = false
                 }
-                
-                Text {
-                    text: "请选择要导入的Excel文件"
-                    font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 16
-                    color: "#333333"
-                }
-                
-                Rectangle {
-                    Layout.fillWidth: true
-                    height: 50
-                    color: "#ffffff"
-                    border.color: "#cccccc"
-                    border.width: 1
-                    radius: 4
-                    
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: 5
-                        spacing: 10
-                        
-                        TextField {
-                            id: excelFilePath
-                            Layout.fillWidth: true
-                            readOnly: true
-                            placeholderText: "请选择Excel文件"
-                            placeholderTextColor: "#cccccc"
-                            font.family: "阿里妈妈数黑体"
-                            font.pixelSize: 14
-                            
-                            background: Rectangle {
-                                color: "transparent"
-                            }
-                        }
-                        
-                        Button {
-                            Layout.preferredWidth: 100
-                            Layout.preferredHeight: 40
-                            text: "浏览..."
-                            
-                            background: Rectangle {
-                                color: "#f0f0f0"
-                                radius: 4
-                                border.color: "#cccccc"
-                                border.width: 1
-                            }
-                            
-                            onClicked: {
-                                // 使用QML原生FileDialog而不是C++ QFileDialog
-                                fileDialog.open()
-                            }
-                        }
-                    }
-                }
-                
-                // 状态信息
-                Text {
-                    id: excelValidationText
-                    text: batchImportDialog.isValidExcel ? 
-                          "✅ Excel文件格式正确，可以导入" : 
-                          (excelFilePath.text === "" ? "" : "❌ Excel文件格式不正确，请检查表头格式")
-                    font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 14
-                    color: batchImportDialog.isValidExcel ? "#4CAF50" : "#F44336"
-                    visible: excelFilePath.text !== ""
-                    Layout.fillWidth: true
-                }
-                
-                // 题库名称输入
-                Text {
-                    text: "题库名称:"
-                    font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 16
-                    color: "#333333"
-                }
-                
-                TextField {
-                    id: questionBankName
-                    Layout.fillWidth: true
-                    font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 14
-                    
-                    background: Rectangle {
-                        color: "#ffffff"
-                        radius: 4
-                        border.color: "#cccccc"
-                        border.width: 1
-                    }
-                }
-                
-                Text {
-                    text: "导入说明:"
-                    font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 16
-                    font.bold: true
-                    color: "#333333"
-                }
-                
-                Text {
-                    text: "表头格式要求:\n题干、答案、解析、选项A、选项B、选项C、选项D、选项E、选项F、选项G\n\n说明：\n1. 必填字段：题干、答案\n2. 答案不要有字母外的其他字符\n3. 判断题的答案为：\"A\",\"B\""
-                    font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 14
-                    color: "#666666"
-                    Layout.fillWidth: true
-                    wrapMode: Text.WordWrap
-                }
-                
-                // 底部按钮布局，添加Item填充高度空间
-                Item {
-                    Layout.fillHeight: true
-                }
+            }
+        }
+        
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 15
+            
+            // 添加标题
+            Text {
+                text: "批量导入题目"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 20
+                font.bold: true
+                color: "#333333"
+                Layout.alignment: Qt.AlignHCenter
+            }
+            
+            Text {
+                text: "请选择要导入的Excel文件"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 16
+                color: "#333333"
+            }
+            
+            Rectangle {
+                Layout.fillWidth: true
+                height: 50
+                color: "#ffffff"
+                border.color: "#cccccc"
+                border.width: 1
+                radius: 4
                 
                 RowLayout {
-                    Layout.alignment: Qt.AlignRight
-                    spacing: 15
+                    anchors.fill: parent
+                    anchors.margins: 5
+                    spacing: 10
+                    
+                    TextField {
+                        id: excelFilePath
+                        Layout.fillWidth: true
+                        readOnly: true
+                        placeholderText: "请选择Excel文件"
+                        placeholderTextColor: "#cccccc"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 14
+                        
+                        background: Rectangle {
+                            color: "transparent"
+                        }
+                    }
                     
                     Button {
-                        Layout.preferredWidth: 120
+                        Layout.preferredWidth: 100
                         Layout.preferredHeight: 40
-                        text: "取消"
+                        text: "浏览..."
                         
                         background: Rectangle {
                             color: "#f0f0f0"
@@ -441,128 +399,211 @@ Rectangle {
                             border.width: 1
                         }
                         
-                        contentItem: Text {
-                            text: parent.text
-                            font.family: "阿里妈妈数黑体"
-                            font.pixelSize: 14
-                            color: "#333333"
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        
                         onClicked: {
-                            batchImportDialog.close()
+                            fileDialog.open()
                         }
                     }
+                }
+            }
+            
+            // 状态信息
+            Text {
+                id: excelValidationText
+                text: batchImportDialog.isValidExcel ? 
+                      "✅ Excel文件格式正确，可以导入" : 
+                      (excelFilePath.text === "" ? "" : "❌ Excel文件格式不正确，请检查表头格式")
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 14
+                color: batchImportDialog.isValidExcel ? "#4CAF50" : "#F44336"
+                visible: excelFilePath.text !== ""
+                Layout.fillWidth: true
+            }
+            
+            // 题库名称输入
+            Text {
+                text: "题库名称:"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 16
+                color: "#333333"
+            }
+            
+            TextField {
+                id: questionBankName
+                Layout.fillWidth: true
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 14
+                
+                background: Rectangle {
+                    color: "#ffffff"
+                    radius: 4
+                    border.color: "#cccccc"
+                    border.width: 1
+                }
+            }
+            
+            Text {
+                text: "导入说明:"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 16
+                font.bold: true
+                color: "#333333"
+            }
+            
+            Text {
+                text: "表头格式要求:\n题干、答案、解析、选项A、选项B、选项C、选项D、选项E、选项F、选项G\n\n说明：\n1. 必填字段：题干、答案\n2. 答案不要有字母外的其他字符\n3. 判断题的答案为：\"A\",\"B\""
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 14
+                color: "#666666"
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+            }
+            
+            // 底部按钮布局，添加Item填充高度空间
+            Item {
+                Layout.fillHeight: true
+            }
+            
+            RowLayout {
+                Layout.alignment: Qt.AlignRight
+                spacing: 15
+                
+                Button {
+                    Layout.preferredWidth: 120
+                    Layout.preferredHeight: 40
+                    text: "取消"
                     
-                    Button {
-                        Layout.preferredWidth: 120
-                        Layout.preferredHeight: 40
-                        text: "开始导入"
-                        enabled: batchImportDialog.isValidExcel && questionBankName.text.trim() !== ""
+                    background: Rectangle {
+                        color: "#f0f0f0"
+                        radius: 4
+                        border.color: "#cccccc"
+                        border.width: 1
+                    }
+                    
+                    contentItem: Text {
+                        text: parent.text
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 14
+                        color: "#333333"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    onClicked: {
+                        batchImportDialog.visible = false
+                        batchImportDialogMask.visible = false
+                    }
+                }
+                
+                Button {
+                    Layout.preferredWidth: 120
+                    Layout.preferredHeight: 40
+                    text: "开始导入"
+                    enabled: batchImportDialog.isValidExcel && questionBankName.text.trim() !== ""
+                    
+                    background: Rectangle {
+                        color: parent.enabled ? "#2196F3" : "#cccccc"
+                        radius: 4
+                    }
+                    
+                    contentItem: Text {
+                        text: parent.text
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 14
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    onClicked: {
+                        console.log("开始导入题目...");
                         
-                        background: Rectangle {
-                            color: parent.enabled ? "#2196F3" : "#cccccc"
-                            radius: 4
+                        // 检查Excel文件是否有效
+                        if (!excelFilePath.text || !fileManager.validateExcelStructure(excelFilePath.text)) {
+                            statusText.text = "请选择有效的Excel文件";
+                            statusTimer.restart();
+                            return;
                         }
                         
-                        contentItem: Text {
-                            text: parent.text
-                            font.family: "阿里妈妈数黑体"
-                            font.pixelSize: 14
-                            color: "white"
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
+                        // 检查题库名称是否有效
+                        if (!questionBankName.text.trim()) {
+                            statusText.text = "请输入题库名称";
+                            statusTimer.restart();
+                            return;
                         }
                         
-                        onClicked: {
-                            console.log("开始导入题目...");
-                            
-                            // 检查Excel文件是否有效
-                            if (!excelFilePath.text || !fileManager.validateExcelStructure(excelFilePath.text)) {
-                                statusText.text = "请选择有效的Excel文件";
-                                statusTimer.restart();
-                                return;
-                            }
-                            
-                            // 检查题库名称是否有效
-                            if (!questionBankName.text.trim()) {
-                                statusText.text = "请输入题库名称";
-                                statusTimer.restart();
-                                return;
-                            }
-                            
-                            // 读取Excel数据
-                            console.log("读取Excel文件:", excelFilePath.text);
-                            var excelData = fileManager.readExcelFile(excelFilePath.text);
-                            console.log("读取到", excelData.length, "条记录");
-                            
-                            if (excelData.length === 0) {
-                                statusText.text = "Excel文件中没有有效数据";
-                                statusTimer.restart();
-                                return;
-                            }
-                            
-                            // 创建题库
-                            console.log("创建题库:", questionBankName.text);
-                            if (!dbManager.addQuestionBank(questionBankName.text, excelData.length)) {
-                                // 检查是否是因为同名题库导致的失败
-                                var banks = dbManager.getAllQuestionBanks();
-                                var hasSameName = false;
-                                for (var i = 0; i < banks.length; i++) {
-                                    if (banks[i].name === questionBankName.text) {
-                                        hasSameName = true;
-                                        break;
-                                    }
-                                }
-                                
-                                if (hasSameName) {
-                                    statusText.text = "题库 '" + questionBankName.text + "' 已存在，请使用其他名称";
-                                } else {
-                                    statusText.text = "创建题库失败";
-                                }
-                                statusTimer.restart();
-                                return;
-                            }
-                            
-                            // 获取新创建的题库ID
+                        // 读取Excel数据
+                        console.log("读取Excel文件:", excelFilePath.text);
+                        var excelData = fileManager.readExcelFile(excelFilePath.text);
+                        console.log("读取到", excelData.length, "条记录");
+                        
+                        if (excelData.length === 0) {
+                            statusText.text = "Excel文件中没有有效数据";
+                            statusTimer.restart();
+                            return;
+                        }
+                        
+                        // 创建题库
+                        console.log("创建题库:", questionBankName.text);
+                        if (!dbManager.addQuestionBank(questionBankName.text, excelData.length)) {
+                            // 检查是否是因为同名题库导致的失败
                             var banks = dbManager.getAllQuestionBanks();
-                            var newBank = null;
+                            var hasSameName = false;
                             for (var i = 0; i < banks.length; i++) {
                                 if (banks[i].name === questionBankName.text) {
-                                    newBank = banks[i];
+                                    hasSameName = true;
                                     break;
                                 }
                             }
                             
-                            if (!newBank) {
-                                statusText.text = "无法获取新创建的题库ID";
-                                statusTimer.restart();
-                                return;
-                            }
-                            
-                            // 导入题目
-                            console.log("导入题目到题库:", newBank.id);
-                            if (dbManager.importQuestions(newBank.id, excelData)) {
-                                statusText.text = "成功导入" + excelData.length + "道题目";
-                                loadQuestionBanks(); // 刷新题库列表
+                            if (hasSameName) {
+                                statusText.text = "题库 '" + questionBankName.text + "' 已存在，请使用其他名称";
                             } else {
-                                statusText.text = "导入题目失败";
+                                statusText.text = "创建题库失败";
                             }
-                            
                             statusTimer.restart();
-                            batchImportDialog.close();
+                            return;
                         }
+                        
+                        // 获取新创建的题库ID
+                        var banks = dbManager.getAllQuestionBanks();
+                        var newBank = null;
+                        for (var i = 0; i < banks.length; i++) {
+                            if (banks[i].name === questionBankName.text) {
+                                newBank = banks[i];
+                                break;
+                            }
+                        }
+                        
+                        if (!newBank) {
+                            statusText.text = "无法获取新创建的题库ID";
+                            statusTimer.restart();
+                            return;
+                        }
+                        
+                        // 导入题目
+                        console.log("导入题目到题库:", newBank.id);
+                        if (dbManager.importQuestions(newBank.id, excelData)) {
+                            statusText.text = "成功导入" + excelData.length + "道题目";
+                            loadQuestionBanks(); // 刷新题库列表
+                        } else {
+                            statusText.text = "导入题目失败";
+                        }
+                        
+                        statusTimer.restart();
+                        batchImportDialog.visible = false
+                        batchImportDialogMask.visible = false
                     }
                 }
             }
         }
         
         // 重置对话框
-        onOpened: {
+        function open() {
             excelFilePath.text = ""
             questionBankName.text = ""
             isValidExcel = false
+            batchImportDialog.visible = true
+            batchImportDialogMask.visible = true
         }
     }
     
@@ -576,7 +617,7 @@ Rectangle {
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         
         contentItem: Rectangle {
-            color: "#f5f5f5"
+            color: "#f5f0f5"
             
             ColumnLayout {
                 anchors.fill: parent

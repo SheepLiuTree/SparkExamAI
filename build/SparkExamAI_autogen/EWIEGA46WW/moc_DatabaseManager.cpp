@@ -125,7 +125,12 @@ constexpr auto qt_meta_stringdata_CLASSDatabaseManagerENDCLASS = QtMocHelpers::s
     "updateUserWrongQuestions",
     "wrongQuestionIds",
     "getUserWrongQuestionIds",
-    "deleteUserBankProgress"
+    "deleteUserBankProgress",
+    "addAccount",
+    "username",
+    "password",
+    "getAllAccounts",
+    "deleteAccount"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -138,7 +143,7 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSDatabaseManagerENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-      69,   14, // methods
+      72,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -146,75 +151,78 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSDatabaseManagerENDCLASS[] = {
        0,       // signalCount
 
  // methods: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,  428,    2, 0x02,    1 /* Public */,
-       3,    6,  429,    2, 0x02,    2 /* Public */,
-       3,    5,  442,    2, 0x22,    9 /* Public | MethodCloned */,
-      10,    1,  453,    2, 0x02,   15 /* Public */,
-      11,    0,  456,    2, 0x02,   17 /* Public */,
-      12,    0,  457,    2, 0x02,   18 /* Public */,
-      13,    1,  458,    2, 0x02,   19 /* Public */,
-      14,    2,  461,    2, 0x02,   21 /* Public */,
-      15,    1,  466,    2, 0x02,   24 /* Public */,
-      16,    1,  469,    2, 0x02,   26 /* Public */,
-      17,    6,  472,    2, 0x02,   28 /* Public */,
-      17,    5,  485,    2, 0x22,   35 /* Public | MethodCloned */,
-      18,    2,  496,    2, 0x02,   41 /* Public */,
-      21,    2,  501,    2, 0x02,   44 /* Public */,
-      21,    1,  506,    2, 0x22,   47 /* Public | MethodCloned */,
-      23,    1,  509,    2, 0x02,   49 /* Public */,
-      24,    0,  512,    2, 0x02,   51 /* Public */,
-      25,    2,  513,    2, 0x02,   52 /* Public */,
-      25,    1,  518,    2, 0x22,   55 /* Public | MethodCloned */,
-      25,    0,  521,    2, 0x22,   57 /* Public | MethodCloned */,
-      28,    3,  522,    2, 0x02,   58 /* Public */,
-      28,    2,  529,    2, 0x22,   62 /* Public | MethodCloned */,
-      28,    1,  534,    2, 0x22,   65 /* Public | MethodCloned */,
-      29,    1,  537,    2, 0x02,   67 /* Public */,
-      29,    0,  540,    2, 0x22,   69 /* Public | MethodCloned */,
-      31,    1,  541,    2, 0x02,   70 /* Public */,
-      32,    2,  544,    2, 0x02,   72 /* Public */,
-      34,    1,  549,    2, 0x02,   75 /* Public */,
-      36,    0,  552,    2, 0x02,   77 /* Public */,
-      37,    1,  553,    2, 0x02,   78 /* Public */,
-      38,    2,  556,    2, 0x02,   80 /* Public */,
-      39,    5,  561,    2, 0x02,   83 /* Public */,
-      39,    4,  572,    2, 0x22,   89 /* Public | MethodCloned */,
-      44,    1,  581,    2, 0x02,   94 /* Public */,
-      46,    5,  584,    2, 0x02,   96 /* Public */,
-      46,    4,  595,    2, 0x22,  102 /* Public | MethodCloned */,
-      47,    1,  604,    2, 0x02,  107 /* Public */,
-      48,    1,  607,    2, 0x02,  109 /* Public */,
-      49,    2,  610,    2, 0x02,  111 /* Public */,
-      51,    2,  615,    2, 0x02,  114 /* Public */,
-      53,    0,  620,    2, 0x02,  117 /* Public */,
-      54,    2,  621,    2, 0x02,  118 /* Public */,
-      56,    1,  626,    2, 0x02,  121 /* Public */,
-      58,    1,  629,    2, 0x02,  123 /* Public */,
-      60,    0,  632,    2, 0x02,  125 /* Public */,
-      61,    8,  633,    2, 0x02,  126 /* Public */,
-      61,    7,  650,    2, 0x22,  135 /* Public | MethodCloned */,
-      61,    6,  665,    2, 0x22,  143 /* Public | MethodCloned */,
-      69,    3,  678,    2, 0x02,  150 /* Public */,
-      69,    2,  685,    2, 0x22,  154 /* Public | MethodCloned */,
-      69,    1,  690,    2, 0x22,  157 /* Public | MethodCloned */,
-      70,    2,  693,    2, 0x02,  159 /* Public */,
-      70,    1,  698,    2, 0x22,  162 /* Public | MethodCloned */,
-      70,    0,  701,    2, 0x22,  164 /* Public | MethodCloned */,
-      71,    1,  702,    2, 0x02,  165 /* Public */,
-      72,    1,  705,    2, 0x02,  167 /* Public */,
-      73,    1,  708,    2, 0x02,  169 /* Public */,
-      74,    0,  711,    2, 0x02,  171 /* Public */,
-      75,    1,  712,    2, 0x02,  172 /* Public */,
-      76,    1,  715,    2, 0x02,  174 /* Public */,
-      77,    2,  718,    2, 0x02,  176 /* Public */,
-      77,    1,  723,    2, 0x22,  179 /* Public | MethodCloned */,
-      79,    3,  726,    2, 0x02,  181 /* Public */,
-      82,    1,  733,    2, 0x02,  185 /* Public */,
-      83,    4,  736,    2, 0x02,  187 /* Public */,
-      86,    2,  745,    2, 0x02,  192 /* Public */,
-      87,    3,  750,    2, 0x02,  195 /* Public */,
-      89,    2,  757,    2, 0x02,  199 /* Public */,
-      90,    2,  762,    2, 0x02,  202 /* Public */,
+       1,    0,  446,    2, 0x02,    1 /* Public */,
+       3,    6,  447,    2, 0x02,    2 /* Public */,
+       3,    5,  460,    2, 0x22,    9 /* Public | MethodCloned */,
+      10,    1,  471,    2, 0x02,   15 /* Public */,
+      11,    0,  474,    2, 0x02,   17 /* Public */,
+      12,    0,  475,    2, 0x02,   18 /* Public */,
+      13,    1,  476,    2, 0x02,   19 /* Public */,
+      14,    2,  479,    2, 0x02,   21 /* Public */,
+      15,    1,  484,    2, 0x02,   24 /* Public */,
+      16,    1,  487,    2, 0x02,   26 /* Public */,
+      17,    6,  490,    2, 0x02,   28 /* Public */,
+      17,    5,  503,    2, 0x22,   35 /* Public | MethodCloned */,
+      18,    2,  514,    2, 0x02,   41 /* Public */,
+      21,    2,  519,    2, 0x02,   44 /* Public */,
+      21,    1,  524,    2, 0x22,   47 /* Public | MethodCloned */,
+      23,    1,  527,    2, 0x02,   49 /* Public */,
+      24,    0,  530,    2, 0x02,   51 /* Public */,
+      25,    2,  531,    2, 0x02,   52 /* Public */,
+      25,    1,  536,    2, 0x22,   55 /* Public | MethodCloned */,
+      25,    0,  539,    2, 0x22,   57 /* Public | MethodCloned */,
+      28,    3,  540,    2, 0x02,   58 /* Public */,
+      28,    2,  547,    2, 0x22,   62 /* Public | MethodCloned */,
+      28,    1,  552,    2, 0x22,   65 /* Public | MethodCloned */,
+      29,    1,  555,    2, 0x02,   67 /* Public */,
+      29,    0,  558,    2, 0x22,   69 /* Public | MethodCloned */,
+      31,    1,  559,    2, 0x02,   70 /* Public */,
+      32,    2,  562,    2, 0x02,   72 /* Public */,
+      34,    1,  567,    2, 0x02,   75 /* Public */,
+      36,    0,  570,    2, 0x02,   77 /* Public */,
+      37,    1,  571,    2, 0x02,   78 /* Public */,
+      38,    2,  574,    2, 0x02,   80 /* Public */,
+      39,    5,  579,    2, 0x02,   83 /* Public */,
+      39,    4,  590,    2, 0x22,   89 /* Public | MethodCloned */,
+      44,    1,  599,    2, 0x02,   94 /* Public */,
+      46,    5,  602,    2, 0x02,   96 /* Public */,
+      46,    4,  613,    2, 0x22,  102 /* Public | MethodCloned */,
+      47,    1,  622,    2, 0x02,  107 /* Public */,
+      48,    1,  625,    2, 0x02,  109 /* Public */,
+      49,    2,  628,    2, 0x02,  111 /* Public */,
+      51,    2,  633,    2, 0x02,  114 /* Public */,
+      53,    0,  638,    2, 0x02,  117 /* Public */,
+      54,    2,  639,    2, 0x02,  118 /* Public */,
+      56,    1,  644,    2, 0x02,  121 /* Public */,
+      58,    1,  647,    2, 0x02,  123 /* Public */,
+      60,    0,  650,    2, 0x02,  125 /* Public */,
+      61,    8,  651,    2, 0x02,  126 /* Public */,
+      61,    7,  668,    2, 0x22,  135 /* Public | MethodCloned */,
+      61,    6,  683,    2, 0x22,  143 /* Public | MethodCloned */,
+      69,    3,  696,    2, 0x02,  150 /* Public */,
+      69,    2,  703,    2, 0x22,  154 /* Public | MethodCloned */,
+      69,    1,  708,    2, 0x22,  157 /* Public | MethodCloned */,
+      70,    2,  711,    2, 0x02,  159 /* Public */,
+      70,    1,  716,    2, 0x22,  162 /* Public | MethodCloned */,
+      70,    0,  719,    2, 0x22,  164 /* Public | MethodCloned */,
+      71,    1,  720,    2, 0x02,  165 /* Public */,
+      72,    1,  723,    2, 0x02,  167 /* Public */,
+      73,    1,  726,    2, 0x02,  169 /* Public */,
+      74,    0,  729,    2, 0x02,  171 /* Public */,
+      75,    1,  730,    2, 0x02,  172 /* Public */,
+      76,    1,  733,    2, 0x02,  174 /* Public */,
+      77,    2,  736,    2, 0x02,  176 /* Public */,
+      77,    1,  741,    2, 0x22,  179 /* Public | MethodCloned */,
+      79,    3,  744,    2, 0x02,  181 /* Public */,
+      82,    1,  751,    2, 0x02,  185 /* Public */,
+      83,    4,  754,    2, 0x02,  187 /* Public */,
+      86,    2,  763,    2, 0x02,  192 /* Public */,
+      87,    3,  768,    2, 0x02,  195 /* Public */,
+      89,    2,  775,    2, 0x02,  199 /* Public */,
+      90,    2,  780,    2, 0x02,  202 /* Public */,
+      91,    3,  785,    2, 0x02,  205 /* Public */,
+      94,    0,  792,    2, 0x02,  209 /* Public */,
+      95,    1,  793,    2, 0x02,  210 /* Public */,
 
  // methods: parameters
     QMetaType::Bool,
@@ -286,6 +294,9 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSDatabaseManagerENDCLASS[] = {
     QMetaType::Bool, QMetaType::QString, QMetaType::Int, QMetaType::QVariantList,    6,   35,   88,
     QMetaType::QVariantList, QMetaType::QString, QMetaType::Int,    6,   35,
     QMetaType::Bool, QMetaType::QString, QMetaType::Int,    6,   35,
+    QMetaType::Bool, QMetaType::QString, QMetaType::QString, QMetaType::QString,   92,    6,   93,
+    QMetaType::QVariantList,
+    QMetaType::Bool, QMetaType::QString,    6,
 
        0        // eod
 };
@@ -571,7 +582,17 @@ Q_CONSTINIT const QMetaObject DatabaseManager::staticMetaObject = { {
         // method 'deleteUserBankProgress'
         QtPrivate::TypeAndForceComplete<bool, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
-        QtPrivate::TypeAndForceComplete<int, std::false_type>
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        // method 'addAccount'
+        QtPrivate::TypeAndForceComplete<bool, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        // method 'getAllAccounts'
+        QtPrivate::TypeAndForceComplete<QVariantList, std::false_type>,
+        // method 'deleteAccount'
+        QtPrivate::TypeAndForceComplete<bool, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>
     >,
     nullptr
 } };
@@ -720,6 +741,12 @@ void DatabaseManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
             if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
         case 68: { bool _r = _t->deleteUserBankProgress((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[2])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 69: { bool _r = _t->addAccount((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[3])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+        case 70: { QVariantList _r = _t->getAllAccounts();
+            if (_a[0]) *reinterpret_cast< QVariantList*>(_a[0]) = std::move(_r); }  break;
+        case 71: { bool _r = _t->deleteAccount((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
     }
@@ -744,13 +771,13 @@ int DatabaseManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 69)
+        if (_id < 72)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 69;
+        _id -= 72;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 69)
+        if (_id < 72)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 69;
+        _id -= 72;
     }
     return _id;
 }

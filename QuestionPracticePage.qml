@@ -27,6 +27,78 @@ Rectangle {
     // 当前多选题选中的选项
     property var currentMultiSelections: []
     
+    // 添加键盘事件处理
+    Keys.onPressed: function(event) {
+        console.log("按键事件触发:", event.key, "修饰键:", event.modifiers)
+        if (event.modifiers & Qt.ControlModifier) {
+            // 处理Ctrl+左右箭头切换题目
+            if (event.key === Qt.Key_Left) {
+                console.log("切换到上一题")
+                if (currentQuestionIndex > 0) {
+                    previousQuestion()
+                }
+                return
+            } else if (event.key === Qt.Key_Right) {
+                console.log("切换到下一题")
+                if (currentQuestionIndex < currentQuestions.length - 1) {
+                    nextQuestion()
+                }
+                return
+            }
+
+            // 获取按下的键的ASCII码
+            var keyCode = event.key
+            // 将键码转换为0-25的范围（A-Z）
+            var optionIndex = keyCode - Qt.Key_A
+            console.log("选项索引:", optionIndex)
+            
+            if (optionIndex >= 0 && optionIndex < 26) {
+                // 检查当前题目是否有足够的选项
+                var currentQuestion = currentQuestions[currentQuestionIndex]
+                if (currentQuestion) {
+                    console.log("处理选项:", optionIndex)
+                    
+                    // 如果题目已经有答案，不允许再次作答
+                    var questionId = currentQuestion.id
+                    if (userAnswers[questionId] && !userAnswers[questionId].isTemporary) {
+                        return
+                    }
+                    
+                    // 获取当前题目的选项数量
+                    var options = getDisplayOptions(currentQuestion)
+                    var maxOptionIndex = options.length - 1
+                    
+                    // 检查选项索引是否在有效范围内
+                    if (optionIndex > maxOptionIndex) {
+                        console.log("选项索引超出范围，最大选项索引:", maxOptionIndex)
+                        return
+                    }
+                    
+                    // 根据题目类型处理选项
+                    var questionType = getQuestionType(currentQuestion)
+                    if (questionType === "多选题") {
+                        // 多选题只改变选中状态
+                        toggleOption(optionIndex)
+                    } else {
+                        // 单选题和判断题直接提交答案
+                        submitAnswer(String.fromCharCode(65 + optionIndex))
+                    }
+                }
+            }
+        }
+    }
+
+    // 确保组件可以接收键盘焦点
+    focus: true
+    
+    // 添加焦点变化处理
+    onFocusChanged: {
+        if (focus) {
+            console.log("组件获得焦点")
+            forceActiveFocus()
+        }
+    }
+    
     // 从数据库加载题目
     function loadQuestions() {
         currentQuestions = []
@@ -862,6 +934,7 @@ Rectangle {
     // 页面初始化时加载题目
     Component.onCompleted: {
         loadQuestions()
+        forceActiveFocus() // 确保组件获得焦点
         
         // 在第一次加载时，如果是错题模式但没有找到错题，尝试分析答题记录找出错题
         if (wrongQuestionsMode && currentQuestions.length === 0 && userData && userData.workId) {
@@ -1115,7 +1188,7 @@ Rectangle {
                               getQuestionType(currentQuestions[currentQuestionIndex]) : ""
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 18
-                        color: "#AADDFF"
+                        color: "white"
                     }
                     
                     // 题目内容

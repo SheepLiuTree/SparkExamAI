@@ -2,3 +2,4 @@
 #include "EWIEGA46WW/moc_DatabaseManager.cpp"
 #include "EWIEGA46WW/moc_FaceRecognizer.cpp"
 #include "EWIEGA46WW/moc_FileManager.cpp"
+#include "EWIEGA46WW/moc_LogManager.cpp"

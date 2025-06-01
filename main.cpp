@@ -8,6 +8,7 @@
 #include "FileManager.h"
 #include "DatabaseManager.h"
 #include "FaceRecognizer.h"
+#include "LogManager.h"
 
 #ifdef HAS_WEBENGINE
 #include <QtWebEngineQuick/QtWebEngineQuick>
@@ -46,6 +47,10 @@ void listDirectoryContents(const QString &dirPath) {
 
 int main(int argc, char *argv[])
 {
+    // 初始化日志系统
+    LogManager::getInstance().init();
+    LogManager::getInstance().installMessageHandler();
+
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
@@ -159,6 +164,10 @@ int main(int argc, char *argv[])
     FaceRecognizer faceRecognizer;
     if (!faceRecognizer.initialize()) {
         qDebug() << "人脸识别器初始化失败 - 但仍继续运行";
+        qDebug() << "请检查以下内容：";
+        qDebug() << "1. 模型文件是否存在于正确位置";
+        qDebug() << "2. DLL文件是否存在于应用程序目录";
+        qDebug() << "3. 应用程序是否有足够的权限访问这些文件";
     } else {
         qDebug() << "人脸识别器初始化成功";
     }

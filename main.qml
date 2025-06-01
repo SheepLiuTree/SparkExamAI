@@ -7,13 +7,13 @@ import Qt5Compat.GraphicalEffects
 import QtQuick.Dialogs
 
 Window {
-    //width: Screen.width
-    //height: Screen.height
-    width: 1280
-    height: 1024
+    width: Screen.width
+    height: Screen.height
+    //width: 1280
+    //height: 1024
     visible: true
-    //visibility: Window.FullScreen
-    //flags: Qt.Window | Qt.FramelessWindowHint
+    visibility: Window.FullScreen
+    flags: Qt.Window | Qt.FramelessWindowHint
     title: qsTr("星火智能评测系统")
     
     // 应用Material样式 - 确保全局应用
@@ -2582,30 +2582,15 @@ Window {
                 faceTrackingTimer.stop()
                 
                 Qt.callLater(function() {
-                    // 关闭弹窗
+                    // 关闭人脸识别弹窗
                     faceRecognitionPopup.close()
                     
-                    // 判断目标页面并打开
-                    if (faceRecognitionPopup.targetPage !== "") {
-                        // 打开指定的页面
-                        console.log("打开目标页面：" + faceRecognitionPopup.targetPage + 
-                                   (Object.keys(faceRecognitionPopup.extraParams).length > 0 ? 
-                                    "，附加参数：" + JSON.stringify(faceRecognitionPopup.extraParams) : ""))
-                        
-                        // 使用临时对象组合所有参数
-                        var pageParams = { 
-                            userData: { id: result.id, name: result.name, workId: result.workId }
-                        }
-                        
-                        // 合并extraParams中的参数
-                        if (Object.keys(faceRecognitionPopup.extraParams).length > 0) {
-                            for (var key in faceRecognitionPopup.extraParams) {
-                                pageParams[key] = faceRecognitionPopup.extraParams[key]
-                            }
-                        }
-                        
-                        // 打开页面并传递参数
-                        stackView.push(faceRecognitionPopup.targetPage, pageParams)
+                    // 获取用户完整信息
+                    var userData = dbManager.getFaceDataByWorkId(result.workId)
+                    if (userData) {
+                        // 显示个人信息核对对话框
+                        userVerificationDialog.userData = userData
+                        userVerificationDialog.open()
                     }
                 })
             } else {
@@ -2827,15 +2812,15 @@ Window {
                     // 使用Qt 6兼容的样式定制方式
                     Rectangle {
                         anchors.fill: parent
-                        color: "#446688cc"
-                    radius: 5
+                        color: "#446688"
+                        radius: 5
                     
                     Text {
                         anchors.centerIn: parent
-                            text: "取消"
+                        text: "取消"
                         font.family: "阿里妈妈数黑体"
-                    font.pixelSize: 16
-                            color: "white"
+                        font.pixelSize: 16
+                        color: "white"
                         }
                     }
                     
@@ -2858,14 +2843,14 @@ Window {
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         
         background: Rectangle {
-            color: "#44ffffff"
-            border.color: "#66ffffff"
+            color: "#3a0000"
+            border.color: "#3a0000"
             border.width: 1
             radius: 10
         }
         
         header: Rectangle {
-            color: "#55000000"
+            color: "#550000"
             height: 40
             radius: 10
             
@@ -2907,7 +2892,7 @@ Window {
                 height: 40
                 
                 background: Rectangle {
-                    color: "#446688cc"
+                    color: "#af6688"
                     radius: 5
                 }
                 
@@ -3053,5 +3038,182 @@ Window {
         var savedVirtualKeyboard = dbManager.getSetting("enable_virtual_keyboard", "true")
         enableVirtualKeyboard = savedVirtualKeyboard.toLowerCase() === "true"
         console.log("从数据库读取虚拟键盘设置: " + savedVirtualKeyboard + " -> " + enableVirtualKeyboard)
+    }
+
+    // 个人信息核对对话框
+    Dialog {
+        id: userVerificationDialog
+        anchors.centerIn: parent
+        width: 400
+        height: 400
+        modal: true
+        title: "个人信息核对"
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        
+        property var userData: null
+        
+        // 设置对话框标题区域
+        header: Rectangle {
+            color: "#404040"
+            height: 40
+            radius: 5
+            
+            Text {
+                text: userVerificationDialog.title
+                color: "white"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 18
+                font.bold: true
+                anchors.centerIn: parent
+            }
+        }
+        
+        // 设置对话框背景
+        background: Rectangle {
+            color: "#303030"
+            border.color: "#505050"
+            border.width: 1
+            radius: 5
+        }
+        
+        // 对话框内容
+        Column {
+            anchors.fill: parent
+            spacing: 20
+            anchors.margins: 20
+            
+            // 用户头像
+            Rectangle {
+                width: 120
+                height: 120
+                radius: 60
+                anchors.horizontalCenter: parent.horizontalCenter
+                clip: true
+                
+                Image {
+                    id: userAvatar
+                    anchors.fill: parent
+                    source: {
+                        if (!userVerificationDialog.userData || !userVerificationDialog.userData.avatarPath) {
+                            return ""
+                        }
+                        var path = userVerificationDialog.userData.avatarPath
+                        // 如果路径已经包含file:///前缀，直接返回
+                        if (path.startsWith("file:///")) {
+                            return path
+                        }
+                        // 否则添加file:///前缀
+                        return "file:///" + path
+                    }
+                    fillMode: Image.PreserveAspectCrop
+                }
+            }
+            
+            // 用户信息
+            Column {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 10
+                
+                Text {
+                    text: "姓名：" + (userVerificationDialog.userData ? userVerificationDialog.userData.name : "")
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 18
+                    color: "white"
+                }
+                
+                Text {
+                    text: "工号：" + (userVerificationDialog.userData ? userVerificationDialog.userData.workId : "")
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 18
+                    color: "white"
+                }
+                
+                Text {
+                    text: "权限：" + (userVerificationDialog.userData ? (userVerificationDialog.userData.permission === "1" ? "管理员" : "普通用户") : "")
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 18
+                    color: "white"
+                }
+            }
+            
+            // 按钮行
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 30
+                
+                // 确认按钮
+                Button {
+                    width: 120
+                    height: 40
+                    background: Rectangle {
+                        color: "#0078d7"
+                        radius: 4
+                    }
+                    contentItem: Text {
+                        text: "确认"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("用户确认身份")
+                        userVerificationDialog.close()
+                        
+                        // 判断目标页面并打开
+                        if (faceRecognitionPopup.targetPage !== "") {
+                            // 检查是否是策略引擎页面且用户不是管理员
+                            if (faceRecognitionPopup.targetPage === "QuestionEnginePage.qml" && 
+                                userVerificationDialog.userData.permission !== "1") {
+                                // 显示权限不足提示
+                                errorDialog.title = "权限不足"
+                                errorMessageText.text = "策略引擎仅限管理员访问"
+                                errorDialog.open()
+                                return
+                            }
+                            
+                            // 使用临时对象组合所有参数
+                            var pageParams = { 
+                                userData: userVerificationDialog.userData
+                            }
+                            
+                            // 合并extraParams中的参数
+                            if (Object.keys(faceRecognitionPopup.extraParams).length > 0) {
+                                for (var key in faceRecognitionPopup.extraParams) {
+                                    pageParams[key] = faceRecognitionPopup.extraParams[key]
+                                }
+                            }
+                            
+                            // 打开页面并传递参数
+                            stackView.push(faceRecognitionPopup.targetPage, pageParams)
+                        }
+                    }
+                }
+                
+                // 重新识别按钮
+                Button {
+                    width: 120
+                    height: 40
+                    background: Rectangle {
+                        color: "#505050"
+                        radius: 4
+                    }
+                    contentItem: Text {
+                        text: "重新识别"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 16
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("用户选择重新识别")
+                        userVerificationDialog.close()
+                        faceRecognitionPopup.open()
+                    }
+                }
+            }
+        }
     }
 }

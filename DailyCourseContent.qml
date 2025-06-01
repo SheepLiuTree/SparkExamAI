@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Rectangle {
+    id: root
     color: "transparent"
     
     property var userData
@@ -13,6 +14,107 @@ Rectangle {
     // 从数据库加载今日题目
     Component.onCompleted: {
         loadTodayQuestions()
+        // 确保组件获得焦点
+        forceActiveFocus()
+    }
+    
+    // 添加键盘事件处理
+    Keys.onPressed: function(event) {
+        console.log("按键事件触发:", event.key, "修饰键:", event.modifiers)
+        if (event.modifiers & Qt.ControlModifier) {
+            // 处理Ctrl+左右箭头
+            if (event.key === Qt.Key_Left) {
+                console.log("切换到上一题")
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--
+                }
+                return
+            } else if (event.key === Qt.Key_Right) {
+                console.log("切换到下一题")
+                if (currentQuestionIndex < currentQuestions.length - 1) {
+                    currentQuestionIndex++
+                }
+                return
+            }
+
+            // 获取按下的键的ASCII码
+            var keyCode = event.key
+            // 将键码转换为0-25的范围（A-Z）
+            var optionIndex = keyCode - Qt.Key_A
+            console.log("选项索引:", optionIndex)
+            
+            if (optionIndex >= 0 && optionIndex < 26) {
+                // 检查当前题目是否有足够的选项
+                var question = currentQuestions[currentQuestionIndex]
+                if (question) {
+                    console.log("处理选项:", optionIndex)
+                    // 模拟点击选项
+                    var currentAnswer = userAnswers[currentQuestionIndex]
+                    
+                    // 判断题处理（A=正确，B=错误）
+                    if (!question.options || question.options.length === 0) {
+                        console.log("判断题处理")
+                        if (optionIndex === 0) { // Ctrl+A = 正确
+                            userAnswers[currentQuestionIndex] = 0
+                            console.log("选择：正确")
+                        } else if (optionIndex === 1) { // Ctrl+B = 错误
+                            userAnswers[currentQuestionIndex] = 1
+                            console.log("选择：错误")
+                        }
+                    } else {
+                        // 获取当前题目的选项数量
+                        var maxOptionIndex = question.options.length - 1
+                        
+                        // 检查选项索引是否在有效范围内
+                        if (optionIndex > maxOptionIndex) {
+                            console.log("选项索引超出范围，最大选项索引:", maxOptionIndex)
+                            return
+                        }
+                        
+                        if (question.answer.length > 1) {
+                            // 多选题
+                            if (!Array.isArray(currentAnswer)) {
+                                currentAnswer = []
+                            }
+                            var index = currentAnswer.indexOf(optionIndex)
+                            if (index === -1) {
+                                currentAnswer.push(optionIndex)
+                            } else {
+                                currentAnswer.splice(index, 1)
+                            }
+                            // 如果所有选项都被取消，则设置为undefined
+                            if (currentAnswer.length === 0) {
+                                userAnswers[currentQuestionIndex] = undefined
+                            } else {
+                                userAnswers[currentQuestionIndex] = currentAnswer
+                            }
+                        } else {
+                            // 单选题
+                            userAnswers[currentQuestionIndex] = optionIndex
+                        }
+                    }
+                    
+                    // 强制更新UI
+                    userAnswers = Object.assign({}, userAnswers)
+                    console.log("选项已更新:", userAnswers[currentQuestionIndex])
+                }
+            }
+        }
+    }
+
+    // 确保组件可以接收键盘焦点
+    focus: true
+    // 添加焦点变化处理
+    onFocusChanged: {
+        if (focus) {
+            console.log("组件获得焦点")
+        }
+    }
+    // 添加活动状态变化处理
+    onActiveFocusChanged: {
+        if (activeFocus) {
+            console.log("组件获得活动焦点")
+        }
     }
     
     // 加载今日题目
@@ -189,6 +291,10 @@ Rectangle {
         color: "#44ffffff"
         radius: 10
         
+        // 添加焦点处理
+        focus: true
+        Keys.forwardTo: [root]
+        
         RowLayout {
             anchors.fill: parent
             anchors.margins: 20
@@ -251,7 +357,7 @@ Rectangle {
                                 }
                                 font.family: "阿里妈妈数黑体"
                                 font.pixelSize: 20
-                                color: "#2c70b7"
+                                color: "white"
                                 Layout.alignment: Qt.AlignLeft
                                 font.bold: true
                             }
@@ -259,7 +365,7 @@ Rectangle {
                             ScrollView {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-            clip: true
+                                clip: true
                                 
                                 Text {
                                     text: currentQuestions[currentQuestionIndex] ? currentQuestions[currentQuestionIndex].content : ""

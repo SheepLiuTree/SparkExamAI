@@ -1425,6 +1425,12 @@
 			"MU",
 			"EWIEGA46WW/moc_FileManager.cpp",
 			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/LogManager.h",
+			"MU",
+			"EWIEGA46WW/moc_LogManager.cpp",
+			null
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
@@ -1534,6 +1540,7 @@
 			null
 		],
 		[ "E:/SparkExamAI/SparkExamAI/SparkExamAI/FileManager.cpp", "MU", null ],
+		[ "E:/SparkExamAI/SparkExamAI/SparkExamAI/LogManager.cpp", "MU", null ],
 		[ "E:/SparkExamAI/SparkExamAI/SparkExamAI/main.cpp", "MU", null ]
 	],
 	"UIC_OPTIONS" : [],

@@ -111,7 +111,7 @@ Item {
                 height: 30
                 radius: 15
                 color: languageMouseArea.containsMouse ? "#60D060" : "#40B040"
-                anchors.right: minimizeButton.left
+                anchors.right: closeButton.left
                 anchors.rightMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
                 
@@ -147,17 +147,23 @@ Item {
                 anchors.right: languageButton.left
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
+                z: 1001  // 确保在最上层
+                preventStealing: true  // 防止事件被窃取
+                propagateComposedEvents: false  // 不传播事件
                 
                 property int startX: 0
                 property int startY: 0
+                property bool isDragging: false
                 
                 onPressed: {
                     startX = mouse.x
                     startY = mouse.y
+                    isDragging = true
+                    mouse.accepted = true
                 }
                 
                 onPositionChanged: {
-                    if (pressed) {
+                    if (pressed && isDragging) {
                         var deltaX = mouse.x - startX
                         var deltaY = mouse.y - startY
                         
@@ -172,7 +178,14 @@ Item {
                         if (newY >= 0 && newY + keyboardContainer.height <= Window.height) {
                             keyboardContainer.y = newY
                         }
+                        
+                        mouse.accepted = true
                     }
+                }
+                
+                onReleased: {
+                    isDragging = false
+                    mouse.accepted = true
                 }
             }
         }
