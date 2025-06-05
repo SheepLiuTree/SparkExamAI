@@ -18,7 +18,7 @@ SerialPortManager::SerialPortManager(QObject *parent)
     
     // 设置命令队列定时器
     connect(&m_commandTimer, &QTimer::timeout, this, &SerialPortManager::processNextCommand);
-    m_commandTimer.setInterval(1); // 500微秒间隔
+    m_commandTimer.setInterval(1); // 1微秒间隔
     
     // 初始加载可用端口
     refreshPorts();
@@ -253,11 +253,11 @@ void SerialPortManager::processNextCommand()
     QByteArray command = m_commandQueue.takeFirst();
     
     if (sendCommand(command)) {
-        QTimer::singleShot(100, this, [this]() {
+        QTimer::singleShot(1, this, [this]() {
             m_busy = false;
             // 处理下一个命令
             if (!m_commandQueue.isEmpty()) {
-                QTimer::singleShot(400, this, &SerialPortManager::processNextCommand);
+                QTimer::singleShot(1, this, &SerialPortManager::processNextCommand);
             } else {
                 m_commandTimer.stop();
             }
@@ -266,7 +266,7 @@ void SerialPortManager::processNextCommand()
         m_busy = false;
         // 如果发送失败，直接处理下一个命令
         if (!m_commandQueue.isEmpty()) {
-            QTimer::singleShot(400, this, &SerialPortManager::processNextCommand);
+            QTimer::singleShot(40, this, &SerialPortManager::processNextCommand);
         } else {
             m_commandTimer.stop();
         }
