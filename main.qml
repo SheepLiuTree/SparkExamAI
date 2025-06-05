@@ -497,6 +497,27 @@ Window {
                 }
 
                 Button {
+                    width: 200
+                    height: 70
+                    background: Image {
+                        source: "qrc:/images/button_bg.png"
+                        fillMode: Image.Stretch
+                    }
+                    contentItem: Text {
+                        text: "串口调试"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 24
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("串口调试 clicked")
+                        stackView.push("SerialDebugPage.qml")
+                    }
+                }
+
+                Button {
                     visible: show_menu !== 1
                     width: 200
                     height: 70

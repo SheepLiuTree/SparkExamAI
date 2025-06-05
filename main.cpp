@@ -9,6 +9,7 @@
 #include "DatabaseManager.h"
 #include "FaceRecognizer.h"
 #include "LogManager.h"
+#include "SerialPortManager.h"
 
 #ifdef HAS_WEBENGINE
 #include <QtWebEngineQuick/QtWebEngineQuick>
@@ -172,6 +173,10 @@ int main(int argc, char *argv[])
         qDebug() << "人脸识别器初始化成功";
     }
     engine.rootContext()->setContextProperty("faceRecognizer", &faceRecognizer);
+    
+    // 创建SerialPortManager实例并注册到QML上下文
+    SerialPortManager serialPortManager;
+    engine.rootContext()->setContextProperty("serialPortManager", &serialPortManager);
     
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

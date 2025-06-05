@@ -1248,6 +1248,16 @@
 		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6MultimediaWidgets/Qt6MultimediaWidgetsTargets-relwithdebinfo.cmake",
 		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6MultimediaWidgets/Qt6MultimediaWidgetsAdditionalTargetInfo.cmake",
 		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6MultimediaWidgets/Qt6MultimediaWidgetsVersionlessTargets.cmake",
+		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6SerialPort/Qt6SerialPortConfigVersion.cmake",
+		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6SerialPort/Qt6SerialPortConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6SerialPort/Qt6SerialPortConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.24/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6SerialPort/Qt6SerialPortDependencies.cmake",
+		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6SerialPort/Qt6SerialPortTargets.cmake",
+		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6SerialPort/Qt6SerialPortTargets-debug.cmake",
+		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6SerialPort/Qt6SerialPortTargets-relwithdebinfo.cmake",
+		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6SerialPort/Qt6SerialPortAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6SerialPort/Qt6SerialPortVersionlessTargets.cmake",
 		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6/Qt6ConfigVersion.cmake",
 		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
 		"C:/Qt/6.7.3/msvc2019_64/lib/cmake/Qt6/Qt6Config.cmake",
@@ -1431,6 +1441,12 @@
 			"MU",
 			"EWIEGA46WW/moc_LogManager.cpp",
 			null
+		],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/SerialPortManager.h",
+			"MU",
+			"EWIEGA46WW/moc_SerialPortManager.cpp",
+			null
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
@@ -1452,6 +1468,7 @@
 		"QT_QMLMODELS_LIB",
 		"QT_QML_LIB",
 		"QT_QUICK_LIB",
+		"QT_SERIALPORT_LIB",
 		"QT_SQL_LIB",
 		"QT_VIRTUALKEYBOARD_LIB",
 		"QT_WEBCHANNELQUICK_LIB",
@@ -1493,6 +1510,7 @@
 		"C:/Qt/6.7.3/msvc2019_64/include/QtMultimedia",
 		"C:/Qt/6.7.3/msvc2019_64/include/QtMultimediaWidgets",
 		"C:/Qt/6.7.3/msvc2019_64/include/QtWidgets",
+		"C:/Qt/6.7.3/msvc2019_64/include/QtSerialPort",
 		"C:/Qt/6.7.3/msvc2019_64/include/QtWebEngineQuick",
 		"C:/Qt/6.7.3/msvc2019_64/include/QtWebEngineCore",
 		"C:/Qt/6.7.3/msvc2019_64/include/QtWebChannel",
@@ -1541,6 +1559,11 @@
 		],
 		[ "E:/SparkExamAI/SparkExamAI/SparkExamAI/FileManager.cpp", "MU", null ],
 		[ "E:/SparkExamAI/SparkExamAI/SparkExamAI/LogManager.cpp", "MU", null ],
+		[
+			"E:/SparkExamAI/SparkExamAI/SparkExamAI/SerialPortManager.cpp",
+			"MU",
+			null
+		],
 		[ "E:/SparkExamAI/SparkExamAI/SparkExamAI/main.cpp", "MU", null ]
 	],
 	"UIC_OPTIONS" : [],

@@ -47,8 +47,8 @@ message(STATUS "SeetaFaceTracker: ${SEETA_FACETRACKER}")
 message(STATUS "SeetaNet: ${SEETA_NET}")
 
 # 查找Qt模块
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick Sql Multimedia MultimediaWidgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Sql Multimedia MultimediaWidgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick Sql Multimedia MultimediaWidgets SerialPort)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Sql Multimedia MultimediaWidgets SerialPort)
 
 # 可选的Qt模块
 find_package(Qt6 COMPONENTS WebEngineQuick)
@@ -75,6 +75,8 @@ set(PROJECT_SOURCES
         FaceRecognizer.h
         LogManager.h
         LogManager.cpp
+        SerialPortManager.cpp
+        SerialPortManager.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -101,6 +103,7 @@ target_link_libraries(SparkExamAI
   Qt${QT_VERSION_MAJOR}::Sql
   Qt${QT_VERSION_MAJOR}::Multimedia
   Qt${QT_VERSION_MAJOR}::MultimediaWidgets
+  Qt${QT_VERSION_MAJOR}::SerialPort
   # 显式列出OpenCV库，先列出imgproc库
   C:/OpenCV4.5.2/x64/vc16/lib/opencv_imgproc452.lib
   C:/OpenCV4.5.2/x64/vc16/lib/opencv_core452.lib
