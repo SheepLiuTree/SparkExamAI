@@ -1003,6 +1003,8 @@ Rectangle {
             
             // 更新首页用户列表
             sortOptionUpdated()
+
+        executeLightSequence()
         })
         
         // 默认考虑虚拟键盘设置是成功的
@@ -1028,6 +1030,43 @@ Rectangle {
             statusMessage = "保存失败的设置: 虚拟键盘，请重试"
             isSuccess = false
         }
+    }
+
+    // 灯光控制序列函数
+    function executeLightSequence() {
+        var controls = []
+        for (var i = 1; i <= 6; i++) {
+            controls.push({
+                "lightIndex": i,
+                "state": true,
+                "delay": 10
+            })
+        }
+        for (var j = 1; j <= 6; j++) {
+            controls.push({
+                "lightIndex": j,
+                "state": false,
+                "delay": 200
+            })
+        }
+        for (var i = 1; i <= 6; i++) {
+            controls.push({
+                "lightIndex": i,
+                "state": true,
+                "delay": 10
+            })
+        }
+        for (var j = 1; j <= 6; j++) {
+            controls.push({
+                "lightIndex": j,
+                "state": false,
+                "delay": 20
+            })
+        }
+        // 使用JSON字符串传递数据
+        var jsonStr = JSON.stringify(controls)
+        console.log("执行灯光控制序列: " + jsonStr)
+        serialPortManager.toggleLights(jsonStr)
     }
     
     // 摄像头重试定时器

@@ -28,12 +28,15 @@ SerialPortManager::SerialPortManager(QObject *parent)
     // 初始加载可用端口
     refreshPorts();
     
-    // 从数据库加载串口设置
+    // 从数据库加载串口设置并连接
     DatabaseManager dbManager;
     QString savedPort = dbManager.getSetting("serial_port", "auto");
     if (savedPort != "auto") {
         m_currentPort = savedPort;
         emit currentPortChanged();
+        
+        // 尝试连接串口
+        connectToPort();        
     }
 }
 

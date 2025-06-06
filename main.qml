@@ -3059,6 +3059,7 @@ Window {
         var savedVirtualKeyboard = dbManager.getSetting("enable_virtual_keyboard", "true")
         enableVirtualKeyboard = savedVirtualKeyboard.toLowerCase() === "true"
         console.log("从数据库读取虚拟键盘设置: " + savedVirtualKeyboard + " -> " + enableVirtualKeyboard)
+        executeLightSequence()
     }
 
     // 个人信息核对对话框
@@ -3236,5 +3237,42 @@ Window {
                 }
             }
         }
+    }
+
+    // 灯光控制序列函数
+    function executeLightSequence() {
+        var controls = []
+        for (var i = 1; i <= 6; i++) {
+            controls.push({
+                "lightIndex": i,
+                "state": true,
+                "delay": 10
+            })
+        }
+        for (var j = 1; j <= 6; j++) {
+            controls.push({
+                "lightIndex": j,
+                "state": false,
+                "delay": 200
+            })
+        }
+        for (var i = 1; i <= 6; i++) {
+            controls.push({
+                "lightIndex": i,
+                "state": true,
+                "delay": 10
+            })
+        }
+        for (var j = 1; j <= 6; j++) {
+            controls.push({
+                "lightIndex": j,
+                "state": false,
+                "delay": 20
+            })
+        }
+        // 使用JSON字符串传递数据
+        var jsonStr = JSON.stringify(controls)
+        console.log("执行灯光控制序列: " + jsonStr)
+        serialPortManager.toggleLights(jsonStr)
     }
 }
