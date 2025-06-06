@@ -133,7 +133,7 @@ Rectangle {
                 Button {
                     text: "全部打开"
                     onClicked: {
-                        var states = [true, false, true, false, true, false]
+                        var states = [true, true, true, true, true, true]
                         serialPortManager.toggleLights(states)
                     }
                 }

@@ -946,6 +946,28 @@ Rectangle {
         console.log("保存串口设置:", selectedPort)
         dbManager.setSetting("serial_port", selectedPort)
         
+        // 连接串口
+        if (selectedPort !== "自动检测（推荐）") {
+            console.log("尝试连接到串口:", selectedPort)
+            serialPortManager.currentPort = selectedPort
+            var connected = serialPortManager.connectToPort()
+            if (connected) {
+                console.log("串口连接成功")
+                statusMessage = "串口连接成功"
+                isSuccess = true
+            } else {
+                console.log("串口连接失败")
+                statusMessage = "串口连接失败"
+                isSuccess = false
+            }
+        } else {
+            console.log("使用自动检测模式，不主动连接串口")
+            // 如果之前已连接，则断开连接
+            if (serialPortManager.connected) {
+                serialPortManager.disconnectFromPort()
+            }
+        }
+        
         // 保存管理员密码
         if (adminPassword !== "") {
             console.log("保存管理员密码")
