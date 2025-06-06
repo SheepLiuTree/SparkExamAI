@@ -30,12 +30,20 @@ Rectangle {
     property int cameraRetryCount: 0
     property int maxCameraRetries: 5
     
+    // 串口相关属性
+    property var availablePorts: []
+    property bool portsLoaded: false
+    
     // 定义信号
     signal sortOptionUpdated()
     
     // 添加MediaDevices对象用于访问摄像头列表
     MediaDevices {
         id: mediaDevices
+        onVideoInputsChanged: {
+            console.log("摄像头列表发生变化，重新加载...")
+            loadCameras()
+        }
     }
     
     // 连接到信号以更新首页用户列表
@@ -45,10 +53,13 @@ Rectangle {
     }
     
     Component.onCompleted: {
-        // 首先验证数据库中的摄像头设置
-        console.log("=== 页面加载时验证数据库设置 ===")
-        var initialCameraSetting = dbManager.getSetting("camera_device", "auto")
-        console.log("数据库中当前摄像头设置: [" + initialCameraSetting + "], 类型: " + typeof initialCameraSetting)
+        console.log("=== 通用设置页面加载 ===")
+        
+        // 初始化摄像头列表
+        loadCameras()
+        
+        // 初始化串口列表
+        refreshPorts()
         
         // 载入管理员密码设置
         var savedPassword = dbManager.getSetting("admin_password", "")
@@ -62,42 +73,37 @@ Rectangle {
         
         // 载入首页排序设置
         var savedSortOption = dbManager.getSetting("home_sort_option", "1").toString().trim()
-        console.log("从数据库获取的排序设置原始值: [" + savedSortOption + "]");
+        console.log("从数据库获取的排序设置原始值: [" + savedSortOption + "]")
         
         // 确保有效的排序选项值 - 只有当值明确为"0"时才使用刷题数排序，其他情况使用能力排序
-        var useAbilitySort = (savedSortOption !== "0");
-        homeSortOption = useAbilitySort ? 1 : 0;
+        var useAbilitySort = (savedSortOption !== "0")
+        homeSortOption = useAbilitySort ? 1 : 0
         
-        console.log("最终应用的排序设置: " + (useAbilitySort ? "个人能力排序(1)" : "刷题数排序(0)"));
+        console.log("最终应用的排序设置: " + (useAbilitySort ? "个人能力排序(1)" : "刷题数排序(0)"))
         
         // 设置对应的单选按钮选中状态 - 通过属性绑定，避免触发事件
         if (useAbilitySort) {
-            sortOption1.checked = true;
-            sortOption2.checked = false;
+            sortOption1.checked = true
+            sortOption2.checked = false
         } else {
-            sortOption1.checked = false;
-            sortOption2.checked = true;
+            sortOption1.checked = false
+            sortOption2.checked = true
         }
         
         // 载入AI智能体地址设置
         var savedAgentAddress = dbManager.getSetting("ai_agent_address", "https://www.coze.cn/store/agent/7485277516954271795?bot_id=true")
         aiAgentAddress = savedAgentAddress
         agentAddressField.text = savedAgentAddress
-        console.log("从数据库载入AI智能体地址: " + (savedAgentAddress ? savedAgentAddress : "未设置，使用默认值"))
         
-        // 载入AI智能体用户名和密码设置
-        var savedAgentUsername = dbManager.getSetting("ai_agent_username", "")
+        // 载入AI智能体用户名设置
+        var savedAgentUsername = dbManager.getSetting("ai_agent_username", "变电三工班")
         aiAgentUsername = savedAgentUsername
         agentUsernameField.text = savedAgentUsername
-        console.log("从数据库载入AI智能体用户名: " + (savedAgentUsername ? "已设置" : "未设置"))
         
-        var savedAgentPassword = dbManager.getSetting("ai_agent_password", "")
+        // 载入AI智能体密码设置
+        var savedAgentPassword = dbManager.getSetting("ai_agent_password", "Biandian3")
         aiAgentPassword = savedAgentPassword
         agentPasswordField.text = savedAgentPassword
-        console.log("从数据库载入AI智能体密码: " + (savedAgentPassword ? "已设置" : "未设置"))
-        
-        // 初始化摄像头
-        initializeCameras()
     }
     
     // 虚拟键盘重启对话框
@@ -334,50 +340,183 @@ Rectangle {
                             }
                         }
                         
-                        // 摄像头设备设置
-                        RowLayout {
+                        // 摄像头设置
+                        Rectangle {
                             Layout.fillWidth: true
-                            height: 40
-                            spacing: 10
+                            height: 50
+                            color: "transparent"
                             
-                            Text {
-                                text: "摄像头设备:"
-                                font.family: "阿里妈妈数黑体"
-                                font.pixelSize: 18
-                                color: "white"
-                                Layout.preferredWidth: 120
-                                Layout.preferredHeight: 40
-                                verticalAlignment: Text.AlignVCenter
-                            }
-                            
-                            Rectangle {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 40
-                                color: "#22ffffff"
-                                radius: 5
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: 10
+                                
+                                Text {
+                                    text: "摄像头:"
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    Layout.preferredWidth: 120
+                                }
                                 
                                 ComboBox {
                                     id: cameraComboBox
-                                    anchors.fill: parent
-                                    anchors.margins: 5
-                                    font.family: "阿里妈妈数黑体"
-                                    font.pixelSize: 16
-                                    background: Rectangle {
-                                        color: "transparent"
-                                    }
-                                    contentItem: Text {
-                                        text: parent.displayText
-                                        color: "white"
-                                        font.family: "阿里妈妈数黑体"
-                                        font.pixelSize: 16
-                                        verticalAlignment: Text.AlignVCenter
-                                        horizontalAlignment: Text.AlignLeft
-                                        elide: Text.ElideRight
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 40
+                                    model: availableCameras
+                                    textRole: "description"
+                                    valueRole: "id"
+                                    
+                                    // 在模型更新后设置当前值
+                                    onModelChanged: {
+                                        console.log("摄像头ComboBox模型已更新，当前项目数:", model ? model.length : 0)
+                                        // 从数据库读取保存的摄像头设置
+                                        var savedCameraId = dbManager.getSetting("camera_device", "auto")
+                                        console.log("从数据库读取的摄像头设置:", savedCameraId)
+                                        
+                                        // 设置ComboBox的当前值
+                                        var found = false
+                                        for (var i = 0; i < model.length; i++) {
+                                            if (model[i].id === savedCameraId) {
+                                                currentIndex = i
+                                                found = true
+                                                console.log("找到匹配的摄像头设置，索引:", i)
+                                                break
+                                            }
+                                        }
+                                        
+                                                if (!found) {
+                                                    console.log("未找到匹配的摄像头设置，使用默认值")
+                                                    currentIndex = 0
+                                                }
                                     }
                                     
-                                    // 初始模型
-                                    model: ["自动检测（推荐）", "正在加载..."]
-                                    currentIndex: 0
+                                    onCurrentValueChanged: {
+                                        if (currentValue) {
+                                            console.log("摄像头选择变更: " + currentValue)
+                                        }
+                                    }
+                                    
+                                    delegate: ItemDelegate {
+                                        width: cameraComboBox.width
+                                        contentItem: Text {
+                                            text: modelData.description
+                                            color: "black"
+                                            font.pixelSize: 14
+                                            elide: Text.ElideRight
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        highlighted: cameraComboBox.highlightedIndex === index
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // 串口设置
+                        Rectangle {
+                            Layout.fillWidth: true
+                            height: 50
+                            color: "transparent"
+                            
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: 10
+                                
+                                Text {
+                                    text: "串口:"
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    Layout.preferredWidth: 120
+                                }
+                                
+                                ComboBox {
+                                    id: portComboBox
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 40
+                                    model: availablePorts
+                                    
+                                    // 在模型更新后设置当前值
+                                    onModelChanged: {
+                                        console.log("串口ComboBox模型已更新，当前项目数:", model ? model.length : 0)
+                                        // 从数据库读取保存的串口设置
+                                        var savedPort = dbManager.getSetting("serial_port", "auto")
+                                        console.log("从数据库读取的串口设置:", savedPort)
+                                        
+                                        // 设置ComboBox的当前值
+                                        var found = false
+                                        if (savedPort === "auto") {
+                                            currentIndex = 0
+                                            found = true
+                                        } else {
+                                            for (var i = 0; i < model.length; i++) {
+                                                if (model[i] === savedPort) {
+                                                    currentIndex = i
+                                                    found = true
+                                                    console.log("找到匹配的串口设置，索引:", i)
+                                                    break
+                                                }
+                                            }
+                                        }
+                                        
+                                        if (!found) {
+                                            console.log("未找到匹配的串口设置，使用默认值")
+                                            currentIndex = 0
+                                        }
+                                    }
+                                    
+                                    onCurrentValueChanged: {
+                                        if (currentValue) {
+                                            console.log("串口选择变更: " + currentValue)
+                                        }
+                                    }
+                                    
+                                    delegate: ItemDelegate {
+                                        width: portComboBox.width
+                                        contentItem: Text {
+                                            text: modelData
+                                            color: "black"
+                                            font.pixelSize: 14
+                                            elide: Text.ElideRight
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        highlighted: portComboBox.highlightedIndex === index
+                                    }
+                                }
+                                
+                                // 串口刷新按钮
+                                Button {
+                                    id: refreshPortsButton
+                                    Layout.preferredWidth: 120
+                                    Layout.preferredHeight: 40
+                                    text: "刷新串口列表"
+                                    font.pixelSize: 14
+                                    
+                                    // 自定义按钮样式
+                                    background: Rectangle {
+                                        radius: 8  // 圆角半径
+                                        color: refreshPortsButton.pressed ? "#1976D2" : "#2196F3"  // 按下时深蓝色，正常时浅蓝色
+                                        opacity: refreshPortsButton.enabled ? 1.0 : 0.5  // 禁用时降低透明度
+                                    }
+                                    
+                                    contentItem: Text {
+                                        text: refreshPortsButton.text
+                                        font: refreshPortsButton.font
+                                        color: "white"  // 文字颜色设为白色
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    
+                                    onClicked: {
+                                        console.log("点击刷新串口列表按钮")
+                                        // 禁用按钮，防止重复点击
+                                        refreshPortsButton.enabled = false
+                                        
+                                        // 刷新串口列表
+                                        refreshPorts()
+                                        
+                                        // 延迟1秒后重新启用按钮
+                                        timer.restart()
+                                    }
                                 }
                             }
                         }
@@ -795,59 +934,43 @@ Rectangle {
     
     // 保存所有设置
     function saveAllSettings() {
-        // 保存管理员密码
-        var passwordSuccess = dbManager.setSetting("admin_password", passwordField.text)
+        console.log("=== 保存通用设置 ===")
         
         // 保存摄像头设置
-        var cameraSuccess = false
-        console.log("=== 开始保存摄像头设置 ===")
-        console.log("当前ComboBox索引: " + cameraComboBox.currentIndex)
-        console.log("当前显示文本: " + cameraComboBox.currentText)
+        var selectedCamera = cameraComboBox.currentValue
+        console.log("保存摄像头设置:", selectedCamera)
+        dbManager.setSetting("camera_device", selectedCamera)
         
-        try {
-            var cameraId = getCurrentCameraId()
-            console.log("要保存的摄像头ID: " + cameraId)
-            
-            cameraSuccess = dbManager.setSetting("camera_device", cameraId)
-            console.log("摄像头设置保存结果: " + cameraSuccess)
-            
-            if (cameraSuccess) {
-                if (cameraId === "auto") {
-                    console.log("已保存自动检测模式")
-                } else {
-                    // 查找设备名称用于日志
-                    var deviceName = "未知设备"
-                    var deviceIndex = cameraComboBox.currentIndex - 1
-                    if (deviceIndex >= 0 && deviceIndex < availableCameras.length) {
-                        deviceName = availableCameras[deviceIndex].description
-                    }
-                    console.log("已保存特定摄像头: ID=" + cameraId + ", 名称=" + deviceName)
-                }
-            }
-        } catch (e) {
-            console.log("保存摄像头设置时出错: " + e.toString() + "，使用自动模式")
-            cameraSuccess = dbManager.setSetting("camera_device", "auto")
-            console.log("错误处理后保存结果: " + cameraSuccess)
+        // 保存串口设置
+        var selectedPort = portComboBox.currentValue
+        console.log("保存串口设置:", selectedPort)
+        dbManager.setSetting("serial_port", selectedPort)
+        
+        // 保存管理员密码
+        if (adminPassword !== "") {
+            console.log("保存管理员密码")
+            dbManager.setSetting("admin_password", adminPassword)
         }
         
-        console.log("=== 摄像头设置保存完成 ===")
+        // 保存虚拟键盘设置
+        console.log("保存虚拟键盘设置:", enableVirtualKeyboard)
+        dbManager.setSetting("enable_virtual_keyboard", enableVirtualKeyboard.toString())
         
         // 保存首页排序设置
-        var sortSuccess = dbManager.setSetting("home_sort_option", homeSortOption.toString())
-        console.log("首页排序设置已保存: " + (homeSortOption === 1 ? "本月个人能力排序(1)" : "本月刷题数排序(0)") + 
-                   " (home_sort_option=" + homeSortOption.toString() + ")")
+        console.log("保存首页排序设置:", homeSortOption)
+        dbManager.setSetting("home_sort_option", homeSortOption.toString())
         
         // 保存AI智能体地址
-        var agentAddressSuccess = dbManager.setSetting("ai_agent_address", agentAddressField.text)
-        console.log("AI智能体地址已保存: " + agentAddressField.text)
+        console.log("保存AI智能体地址:", aiAgentAddress)
+        dbManager.setSetting("ai_agent_address", aiAgentAddress)
         
         // 保存AI智能体用户名
-        var agentUsernameSuccess = dbManager.setSetting("ai_agent_username", agentUsernameField.text)
-        console.log("AI智能体用户名已保存: " + (agentUsernameField.text ? "已设置" : "未设置"))
+        console.log("保存AI智能体用户名:", aiAgentUsername)
+        dbManager.setSetting("ai_agent_username", aiAgentUsername)
         
         // 保存AI智能体密码
-        var agentPasswordSuccess = dbManager.setSetting("ai_agent_password", agentPasswordField.text)
-        console.log("AI智能体密码已保存: " + (agentPasswordField.text ? "已设置" : "未设置"))
+        console.log("保存AI智能体密码:", aiAgentPassword)
+        dbManager.setSetting("ai_agent_password", aiAgentPassword)
         
         // 使用延迟调用确保数据库操作完成后再更新UI
         Qt.callLater(function() {
@@ -876,27 +999,11 @@ Rectangle {
         }
         
         // 显示结果消息，但不包括虚拟键盘设置（如果它已更改）
-        if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess && agentUsernameSuccess && agentPasswordSuccess && 
-            (virtualKeyboardSuccess || virtualKeyboardChanged)) {
-            
-            // 如果虚拟键盘设置已更改，则只显示其他设置已保存
-            if (virtualKeyboardChanged) {
-                statusMessage = "其他设置已保存成功，等待确认虚拟键盘设置变更"
-            } else {
-                statusMessage = "所有设置已保存成功"
-            }
+        if (virtualKeyboardSuccess) {
+            statusMessage = "所有设置已保存成功"
             isSuccess = true
         } else {
-            let failedSettings = [];
-            if (!passwordSuccess) failedSettings.push("密码");
-            if (!cameraSuccess) failedSettings.push("摄像头");
-            if (!sortSuccess) failedSettings.push("首页排序");
-            if (!agentAddressSuccess) failedSettings.push("智能体地址");
-            if (!agentUsernameSuccess) failedSettings.push("智能体用户名");
-            if (!agentPasswordSuccess) failedSettings.push("智能体密码");
-            if (!virtualKeyboardSuccess && !virtualKeyboardChanged) failedSettings.push("虚拟键盘");
-            
-            statusMessage = "保存失败的设置: " + failedSettings.join(", ") + "，请重试"
+            statusMessage = "保存失败的设置: 虚拟键盘，请重试"
             isSuccess = false
         }
     }
@@ -978,11 +1085,40 @@ Rectangle {
             
             camerasLoaded = true
             console.log("摄像头数据加载完成，有效摄像头: " + availableCameras.length + " 个")
-            setupCameraComboBox()
+            console.log("摄像头列表内容:", JSON.stringify(availableCameras))
+            
+            // 从数据库读取保存的摄像头设置
+            var savedCameraId = dbManager.getSetting("camera_device", "auto")
+            console.log("从数据库读取的摄像头设置:", savedCameraId)
+            
+            // 设置ComboBox的当前值
+            var found = false
+            for (var i = 0; i < availableCameras.length; i++) {
+                if (availableCameras[i].id === savedCameraId) {
+                    cameraComboBox.currentIndex = i
+                    found = true
+                    console.log("找到匹配的摄像头设置，索引:", i)
+                    break
+                }
+            }
+            
+            if (!found) {
+                console.log("未找到匹配的摄像头设置，使用默认值")
+                cameraComboBox.currentIndex = 0
+            }
+            
+            // 强制更新ComboBox
+            cameraComboBox.model = null
+            cameraComboBox.model = availableCameras
             
         } catch (e) {
             console.log("加载摄像头时发生异常: " + e.toString())
-            handleCameraLoadFailure()
+            availableCameras = [{
+                id: "auto",
+                description: "自动检测（推荐）"
+            }]
+            cameraComboBox.currentIndex = 0
+            cameraComboBox.model = availableCameras
         }
     }
     
@@ -1115,6 +1251,163 @@ Rectangle {
             return availableCameras[index - 1].id
         } else {
             return "auto"
+        }
+    }
+    
+    // 刷新串口列表
+    function refreshPorts() {
+        console.log("=== 开始刷新串口列表 ===")
+        try {
+            // 清空现有列表
+            availablePorts = []
+            
+            // 添加自动检测选项
+            availablePorts.push("自动检测（推荐）")
+            
+            // 强制刷新串口列表
+            serialPortManager.refreshPorts()
+            
+            // 获取最新的串口列表
+            var ports = serialPortManager.availablePorts
+            console.log("获取到串口列表，数量:", ports.length)
+            
+            // 添加实际串口
+            for (var i = 0; i < ports.length; i++) {
+                availablePorts.push(ports[i])
+                console.log("串口 " + i + ": " + ports[i])
+            }
+            
+            portsLoaded = true
+            console.log("串口数据加载完成，有效串口: " + (availablePorts.length - 1) + " 个")
+            console.log("串口列表内容:", JSON.stringify(availablePorts))
+            
+            // 从数据库读取保存的串口设置
+            var savedPort = dbManager.getSetting("serial_port", "auto")
+            console.log("从数据库读取的串口设置:", savedPort)
+            
+            // 设置ComboBox的当前值
+            var found = false
+            if (savedPort === "auto") {
+                portComboBox.currentIndex = 0
+                found = true
+            } else {
+                for (var i = 0; i < availablePorts.length; i++) {
+                    if (availablePorts[i] === savedPort) {
+                        portComboBox.currentIndex = i
+                        found = true
+                        console.log("找到匹配的串口设置，索引:", i)
+                        break
+                    }
+                }
+            }
+            
+            if (!found) {
+                console.log("未找到匹配的串口设置，使用默认值")
+                portComboBox.currentIndex = 0
+                // 如果找不到保存的串口，自动保存为自动检测
+                dbManager.setSetting("serial_port", "auto")
+            }
+            
+            // 强制更新ComboBox
+            portComboBox.model = null
+            portComboBox.model = availablePorts
+            
+            // 显示成功消息
+            statusMessage = "串口列表已更新"
+            isSuccess = true
+            
+        } catch (e) {
+            console.log("刷新串口列表时发生异常: " + e.toString())
+            availablePorts = ["自动检测（推荐）"]
+            portComboBox.currentIndex = 0
+            portComboBox.model = availablePorts
+            
+            // 显示错误消息
+            statusMessage = "刷新串口列表失败: " + e.toString()
+            isSuccess = false
+        }
+    }
+    
+    // 添加定时器用于延迟重新启用按钮
+    Timer {
+        id: timer
+        interval: 1000  // 1秒
+        onTriggered: {
+            refreshPortsButton.enabled = true
+        }
+    }
+    
+    // 加载摄像头列表
+    function loadCameras() {
+        console.log("开始加载摄像头列表...")
+        try {
+            // 清空现有列表
+            availableCameras = []
+            
+            // 添加自动检测选项
+            availableCameras.push({
+                id: "auto",
+                description: "自动检测（推荐）"
+            })
+            
+            // 获取摄像头列表
+            var cameras = mediaDevices.videoInputs
+            console.log("获取到摄像头列表，数量:", cameras.length)
+            
+            // 添加实际摄像头
+            for (var i = 0; i < cameras.length; i++) {
+                var camera = cameras[i]
+                if (camera && camera.id && camera.description) {
+                    // 确保ID和描述都是字符串
+                    var cameraId = String(camera.id)
+                    var cameraDesc = String(camera.description)
+                    
+                    availableCameras.push({
+                        id: cameraId,
+                        description: cameraDesc
+                    })
+                    console.log("摄像头 " + i + ": ID=[" + cameraId + "], 名称=[" + cameraDesc + "]")
+                } else {
+                    console.log("摄像头 " + i + " 数据不完整，跳过")
+                }
+            }
+            
+            camerasLoaded = true
+            console.log("摄像头数据加载完成，有效摄像头: " + (availableCameras.length - 1) + " 个")
+            console.log("摄像头列表内容:", JSON.stringify(availableCameras))
+            
+            // 从数据库读取保存的摄像头设置
+            var savedCameraId = dbManager.getSetting("camera_device", "auto")
+            console.log("从数据库读取的摄像头设置:", savedCameraId)
+            
+            // 设置ComboBox的当前值
+            var found = false
+            for (var i = 0; i < availableCameras.length; i++) {
+                if (availableCameras[i].id === savedCameraId) {
+                    cameraComboBox.currentIndex = i
+                    found = true
+                    console.log("找到匹配的摄像头设置，索引:", i)
+                    break
+                }
+            }
+            
+            if (!found) {
+                console.log("未找到匹配的摄像头设置，使用默认值")
+                cameraComboBox.currentIndex = 0
+            }
+            
+            // 强制更新ComboBox
+            cameraComboBox.model = null
+            cameraComboBox.model = availableCameras
+            
+        } catch (e) {
+            console.log("加载摄像头时发生异常: " + e.toString())
+            availableCameras = [{
+                id: "auto",
+                description: "自动检测（推荐）"
+            }]
+            cameraComboBox.currentIndex = 0
+            cameraComboBox.model = availableCameras
         }
     }
 } 

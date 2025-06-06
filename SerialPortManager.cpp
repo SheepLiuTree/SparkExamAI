@@ -1,5 +1,6 @@
 #include "SerialPortManager.h"
 #include <QDebug>
+#include "DatabaseManager.h"
 
 SerialPortManager::SerialPortManager(QObject *parent)
     : QObject(parent)
@@ -22,6 +23,14 @@ SerialPortManager::SerialPortManager(QObject *parent)
     
     // 初始加载可用端口
     refreshPorts();
+    
+    // 从数据库加载串口设置
+    DatabaseManager dbManager;
+    QString savedPort = dbManager.getSetting("serial_port", "auto");
+    if (savedPort != "auto") {
+        m_currentPort = savedPort;
+        emit currentPortChanged();
+    }
 }
 
 SerialPortManager::~SerialPortManager()
@@ -83,8 +92,16 @@ bool SerialPortManager::refreshPorts()
 bool SerialPortManager::connectToPort()
 {
     if (m_currentPort.isEmpty()) {
-        emit serialError("未选择串口");
-        return false;
+        // 如果当前没有选择端口，尝试从数据库读取
+        DatabaseManager dbManager;
+        QString savedPort = dbManager.getSetting("serial_port", "auto");
+        if (savedPort != "auto") {
+            m_currentPort = savedPort;
+            emit currentPortChanged();
+        } else {
+            emit serialError("未选择串口");
+            return false;
+        }
     }
     
     if (m_serialPort->isOpen()) {

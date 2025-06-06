@@ -10,6 +10,8 @@
 #include "FaceRecognizer.h"
 #include "LogManager.h"
 #include "SerialPortManager.h"
+#include <QMediaDevices>
+#include <QAudioDevice>
 
 #ifdef HAS_WEBENGINE
 #include <QtWebEngineQuick/QtWebEngineQuick>
@@ -177,6 +179,13 @@ int main(int argc, char *argv[])
     // 创建SerialPortManager实例并注册到QML上下文
     SerialPortManager serialPortManager;
     engine.rootContext()->setContextProperty("serialPortManager", &serialPortManager);
+    
+    // 注册SerialPortManager类型
+    qmlRegisterType<SerialPortManager>("SerialPortManager", 1, 0, "SerialPortManager");
+    
+    // 注册MediaDevices类型
+    qmlRegisterType<QMediaDevices>("QtMultimedia", 6, 0, "MediaDevices");
+    qmlRegisterType<QAudioDevice>("QtMultimedia", 6, 0, "AudioDevice");
     
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

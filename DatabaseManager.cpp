@@ -1081,6 +1081,9 @@ void DatabaseManager::initDefaultSettings()
         // 虚拟键盘设置 - 默认启用
         setSetting("enable_virtual_keyboard", "true");
         
+        // 串口设置 - 默认自动检测
+        setSetting("serial_port", "auto");
+        
         qDebug() << "初始化默认设置完成";
     }
 }
