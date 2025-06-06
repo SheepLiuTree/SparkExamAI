@@ -1,6 +1,10 @@
 #include "SerialPortManager.h"
 #include <QDebug>
 #include "DatabaseManager.h"
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QTimer>
 
 SerialPortManager::SerialPortManager(QObject *parent)
     : QObject(parent)
@@ -146,15 +150,15 @@ bool SerialPortManager::toggleLight(int lightIndex, bool state)
         return false;
     }
     
-    // 检查灯光索引是否有效（1-8）
-    if (lightIndex < 1 || lightIndex > 8) {
+    // 检查灯光索引是否有效（1-6）
+    if (lightIndex < 1 || lightIndex > 6) {
         emit serialError("无效的灯光索引: " + QString::number(lightIndex));
         return false;
     }
     
     // 创建并发送命令
     QByteArray command = createLightCommand(lightIndex, state);
-    enqueueCommand(command);
+    enqueueCommand(command, 0);  // 单灯控制不需要延时
     
     // 更新本地状态（实际状态在接收到响应后更新）
     m_lightStatus[lightIndex - 1] = state;
@@ -163,31 +167,72 @@ bool SerialPortManager::toggleLight(int lightIndex, bool state)
     return true;
 }
 
-bool SerialPortManager::toggleLights(const QVector<bool> &states)
+bool SerialPortManager::toggleLights(const QString &jsonControls)
 {
     if (!m_serialPort->isOpen()) {
         emit serialError("串口未连接");
         return false;
     }
     
-    // 检查状态数组大小
-    if (states.size() > 8) {
-        emit serialError("灯光状态数组超出范围");
+    // 解析JSON字符串
+    QJsonDocument doc = QJsonDocument::fromJson(jsonControls.toUtf8());
+    if (doc.isNull() || !doc.isArray()) {
+        emit serialError("无效的JSON格式");
         return false;
     }
     
-    // 为每个灯发送命令
-    for (int i = 0; i < states.size(); ++i) {
-        if (i < 6) { // 只处理前6个灯
-            QByteArray command = createLightCommand(i + 1, states[i]);
-            enqueueCommand(command);
-            
-            // 更新本地状态
-            m_lightStatus[i] = states[i];
+    QJsonArray controls = doc.array();
+    if (controls.isEmpty()) {
+        emit serialError("灯光控制序列为空");
+        return false;
+    }
+    
+    // 验证每个控制命令的有效性
+    for (const QJsonValue &value : controls) {
+        if (!value.isObject()) {
+            emit serialError("无效的控制命令格式");
+            return false;
+        }
+        
+        QJsonObject control = value.toObject();
+        int lightIndex = control["lightIndex"].toInt();
+        bool state = control["state"].toBool();
+        int delay = control["delay"].toInt();
+        
+        if (lightIndex < 1 || lightIndex > 6) {
+            emit serialError(QString("无效的灯光索引: %1").arg(lightIndex));
+            return false;
+        }
+        if (delay < 0) {
+            emit serialError(QString("无效的延时时间: %1").arg(delay));
+            return false;
         }
     }
     
-    emit lightStatusChanged();
+    // 清空现有命令队列
+    m_commandQueue.clear();
+    
+    // 创建命令序列
+    for (int i = 0; i < controls.size(); ++i) {
+        QJsonObject control = controls[i].toObject();
+        int lightIndex = control["lightIndex"].toInt();
+        bool state = control["state"].toBool();
+        int delay = control["delay"].toInt();
+        
+        QByteArray command = createLightCommand(lightIndex, state);
+        
+        // 将命令和延时时间添加到队列
+        enqueueCommand(command, delay);
+        
+        // 输出调试信息
+        QString statusStr = QString("添加命令: 灯%1 %2 (延时: %3ms, 序号: %4)")
+            .arg(lightIndex)
+            .arg(state ? "开" : "关")
+            .arg(delay)
+            .arg(i + 1);
+        emit serialMessage(statusStr);
+    }
+    
     return true;
 }
 
@@ -267,14 +312,15 @@ void SerialPortManager::processNextCommand()
     }
     
     m_busy = true;
-    QByteArray command = m_commandQueue.takeFirst();
+    Command cmd = m_commandQueue.takeFirst();
     
-    if (sendCommand(command)) {
-        QTimer::singleShot(1, this, [this]() {
+    if (sendCommand(cmd.data)) {
+        // 命令发送成功后，使用命令中指定的延时时间
+        QTimer::singleShot(cmd.delay, this, [this]() {
             m_busy = false;
             // 处理下一个命令
             if (!m_commandQueue.isEmpty()) {
-                QTimer::singleShot(1, this, &SerialPortManager::processNextCommand);
+                processNextCommand();
             } else {
                 m_commandTimer.stop();
             }
@@ -283,7 +329,7 @@ void SerialPortManager::processNextCommand()
         m_busy = false;
         // 如果发送失败，直接处理下一个命令
         if (!m_commandQueue.isEmpty()) {
-            QTimer::singleShot(40, this, &SerialPortManager::processNextCommand);
+            QTimer::singleShot(50, this, &SerialPortManager::processNextCommand);
         } else {
             m_commandTimer.stop();
         }
@@ -316,9 +362,12 @@ bool SerialPortManager::sendCommand(const QByteArray &command)
     return m_serialPort->waitForBytesWritten(100);
 }
 
-void SerialPortManager::enqueueCommand(const QByteArray &command)
+void SerialPortManager::enqueueCommand(const QByteArray &command, int delay)
 {
-    m_commandQueue.append(command);
+    Command cmd;
+    cmd.data = command;
+    cmd.delay = delay;
+    m_commandQueue.append(cmd);
     
     if (!m_commandTimer.isActive()) {
         m_commandTimer.start();

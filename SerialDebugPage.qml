@@ -133,16 +133,42 @@ Rectangle {
                 Button {
                     text: "全部打开"
                     onClicked: {
-                        var states = [true, true, true, true, true, true]
-                        serialPortManager.toggleLights(states)
+                        var controls = []
+                        for (var i = 1; i <= 6; i++) {
+                            controls.push({
+                                "lightIndex": i,
+                                "state": true,
+                                "delay": 1
+                            })
+                        }
+                        for (var j = 1; j <= 6; j++) {
+                            controls.push({
+                                "lightIndex": j,
+                                "state": false,
+                                "delay": 1
+                            })
+                        }
+                        // 使用JSON字符串传递数据
+                        var jsonStr = JSON.stringify(controls)
+                        console.log("全部打开"+jsonStr)
+                        serialPortManager.toggleLights(jsonStr)
                     }
                 }
                 
                 Button {
                     text: "全部关闭"
                     onClicked: {
-                        var states = [false, false, false, false, false, false]
-                        serialPortManager.toggleLights(states)
+                        var controls = []
+                        for (var i = 1; i <= 6; i++) {
+                            controls.push({
+                                "lightIndex": i,
+                                "state": false,
+                                "delay": 2
+                            })
+                        }
+                        // 使用JSON字符串传递数据
+                        var jsonStr = JSON.stringify(controls)
+                        serialPortManager.toggleLights(jsonStr)
                     }
                 }
                 
