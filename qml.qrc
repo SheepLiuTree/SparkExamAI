@@ -43,5 +43,6 @@
         <file>images/bronzeMedal.png</file>
         <file>images/FaceTracking.png</file>
         <file>images/collection.png</file>
+        <file>audio/winner.mp3</file>
     </qresource>
 </RCC>

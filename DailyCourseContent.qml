@@ -940,11 +940,59 @@ Rectangle {
             resultDialog.questionBankInfo = questionBankInfoStr
             resultDialog.pentagonTypeInfo = pentagonTypeInfoStr
             resultDialog.open()
+            executeLightSequence(Math.round(score / total * 100))
         } else {
             console.error("保存答题记录失败")
             messageDialog.messageText = "保存答题记录失败，请重试"
             messageDialog.open()
         }
+    }
+
+    function executeLightSequence(percent) {
+        var controls = []
+            for (var i = 1; i <= 6; i++) {
+                controls.push({
+                    "lightIndex": i,
+                    "state": true,
+                    "delay": 200
+                })
+            }
+            // 使用JSON字符串传递数据
+            var jsonStr = JSON.stringify(controls)
+            serialPortManager.toggleLights(jsonStr)
+            if (percent >= 90) {}
+            else if (percent >= 80) {
+                for (var i = 6; i >= 5; i--) {
+                    controls.push({
+                        "lightIndex": i,
+                        "state": false,
+                        "delay": 400
+                    })
+                }
+            // 播放胜利音效
+
+            }
+            else if (percent >= 60) {
+                for (var i = 6; i >= 3; i--) {
+                    controls.push({
+                        "lightIndex": i,
+                        "state": false,
+                        "delay": 400
+                    })
+                }
+            }
+            else {
+                for (var i = 6; i >= 2; i--) {
+                    controls.push({
+                        "lightIndex": i,
+                        "state": false,
+                        "delay": 400
+                    })
+                }
+            }
+             // 使用JSON字符串传递数据
+            var jsonStr = JSON.stringify(controls)
+            serialPortManager.toggleLights(jsonStr)
     }
     
     // 获取错题列表
@@ -1042,7 +1090,7 @@ Rectangle {
         property int percentage: 0
         property string questionBankInfo: ""
         property string pentagonTypeInfo: ""
-        
+
         background: Rectangle {
             color: "#1e293b"
             radius: 12
@@ -1215,6 +1263,19 @@ Rectangle {
                                 confirmDialog.dialogTitle = "退出确认"
                                 confirmDialog.dialogMessage = "确定要退出星火日课吗？"
                                 confirmDialog.confirmAction = function() {
+
+                                    var controls = []
+                                    for (var i = 1; i <= 6; i++) {
+                                        controls.push({
+                                            "lightIndex": i,
+                                            "state": false,
+                                            "delay": 2
+                                        })
+                                    }
+                                    // 使用JSON字符串传递数据
+                                    var jsonStr = JSON.stringify(controls)
+                                    serialPortManager.toggleLights(jsonStr)
+                                    
                                     // 关闭结果对话框
                                     resultDialog.close()
                                     

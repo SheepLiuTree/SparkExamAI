@@ -48,7 +48,8 @@
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/images/title_bg2.png",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/images/sparklogo.png",
 		"E:/SparkExamAI/SparkExamAI/SparkExamAI/images/avatar_bg.png",
-		"E:/SparkExamAI/SparkExamAI/SparkExamAI/images/setting.png"
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/images/setting.png",
+		"E:/SparkExamAI/SparkExamAI/SparkExamAI/audio/winner.mp3"
 	],
 	"LOCK_FILE" : "E:/SparkExamAI/SparkExamAI/SparkExamAI/build/CMakeFiles/SparkExamAI_autogen.dir/AutoRcc_qml_EWIEGA46WW_Lock.lock",
 	"MULTI_CONFIG" : false,
