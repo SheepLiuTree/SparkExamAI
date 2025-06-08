@@ -518,6 +518,36 @@ Rectangle {
                                         timer.restart()
                                     }
                                 }
+
+                                //重置按钮
+                                Button {
+                                    id: resetButton
+                                    Layout.preferredWidth: 120
+                                    Layout.preferredHeight: 40
+                                    text: "重置灯光"
+                                    font.pixelSize: 14
+                                    background: Rectangle {
+                                        radius: 8  // 圆角半径
+                                        color: resetButton.pressed ? "#1976D2" : "#2196F3"  // 按下时深蓝色，正常时浅蓝色
+                                        opacity: resetButton.enabled ? 1.0 : 0.5  // 禁用时降低透明度
+                                    }
+                                    
+                                    contentItem: Text {
+                                        text: resetButton.text
+                                        font: resetButton.font
+                                        color: "white"  // 文字颜色设为白色
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    onClicked: {
+                                        console.log("点击重置按钮")
+                                        // 重置按钮
+                                        resetButton.enabled = false
+                                        resetLight()
+                                        // 重置按钮
+                                        resetButton.enabled = true
+                                    }
+                                }
                             }
                         }
                         
@@ -1030,6 +1060,22 @@ Rectangle {
             statusMessage = "保存失败的设置: 虚拟键盘，请重试"
             isSuccess = false
         }
+    }
+
+    //重置灯光
+    function resetLight() {
+        var controls = []
+        for (var j = 1; j <= 6; j++) {
+            controls.push({
+                "lightIndex": j,
+                "state": false,
+                "delay": 20
+            })
+        }        
+        // 使用JSON字符串传递数据
+        var jsonStr = JSON.stringify(controls)
+        console.log("执行重置灯光控制序列: " + jsonStr)
+        serialPortManager.toggleLights(jsonStr)
     }
 
     // 灯光控制序列函数

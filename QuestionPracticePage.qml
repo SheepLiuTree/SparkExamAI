@@ -564,9 +564,37 @@ Rectangle {
                    "正确答案:", correctAnswer, 
                    "是否正确:", isCorrect,
                    "是否首次作答:", isFirstTimeAnswered)
+
+        executeLightSequence(isCorrect)
         
         // 保存用户题库进度
         saveUserProgress()
+    }
+
+    // 灯光控制序列函数
+    function executeLightSequence(isCorrect) {
+        var controls = []
+        if(isCorrect){
+           for (var i = 4; i <= 6; i++) {
+            controls.push({
+                "lightIndex": i,
+                "state": true,
+                "delay": 5
+                })
+            } 
+        }else{
+            for (var i = 1; i <= 3; i++) {
+            controls.push({
+                "lightIndex": i,
+                "state": true,
+                "delay": 5
+                })
+            } 
+        }        
+        // 使用JSON字符串传递数据
+        var jsonStr = JSON.stringify(controls)
+        console.log("执行灯光控制序列: " + jsonStr)
+        serialPortManager.toggleLights(jsonStr)
     }
     
     // 从错题集中移除指定题目
@@ -660,6 +688,22 @@ Rectangle {
             }
         }
     }
+
+    //重置灯光
+    function resultLight(){
+        var controls = []
+        for (var i = 1; i <= 6; i++) {
+            controls.push({
+                "lightIndex": i,
+                "state": false,
+                "delay": 5
+                })
+            }    
+        // 使用JSON字符串传递数据
+        var jsonStr = JSON.stringify(controls)
+        console.log("执行灯光控制序列: " + jsonStr)
+        serialPortManager.toggleLights(jsonStr)
+    }
     
     // 前往下一题
     function nextQuestion() {
@@ -683,6 +727,9 @@ Rectangle {
             
             // 强制刷新UI
             refresh();
+
+            resultLight();
+
         } else {
             // 已经是最后一题，保存记录
             saveTemporarySelections();
@@ -756,6 +803,7 @@ Rectangle {
             
             // 强制刷新UI
             refresh();
+            resultLight();
         }
     }
     
@@ -1052,6 +1100,7 @@ Rectangle {
                     confirmDialog.dialogTitle = "返回确认"
                     confirmDialog.dialogMessage = "确定要返回题库列表吗？\n当前练习进度将会保存。"
                     confirmDialog.confirmAction = function() {
+                        resultLight();
                         // 保存临时选择
                         saveTemporarySelections()
                         

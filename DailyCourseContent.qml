@@ -1269,7 +1269,7 @@ Rectangle {
                                         controls.push({
                                             "lightIndex": i,
                                             "state": false,
-                                            "delay": 2
+                                            "delay": 5
                                         })
                                     }
                                     // 使用JSON字符串传递数据

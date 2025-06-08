@@ -286,7 +286,7 @@ build .qt\qml_imports\SparkExamAI_build.cmake | ${cmake_ninja_workdir}.qt\qml_im
 #############################################
 # Phony custom command for CMakeFiles\SparkExamAI_autogen_timestamp_deps
 
-build CMakeFiles\SparkExamAI_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles\SparkExamAI_autogen_timestamp_deps: phony C$:\Qt\6.7.3\msvc2019_64\bin\moc.exe C$:\Qt\6.7.3\msvc2019_64\lib\Qt6Multimediad.lib C$:\Qt\6.7.3\msvc2019_64\bin\uic.exe C$:\Qt\6.7.3\msvc2019_64\lib\Qt6Quickd.lib C$:\Qt\6.7.3\msvc2019_64\lib\Qt6Sqld.lib C$:\Qt\6.7.3\msvc2019_64\lib\Qt6MultimediaWidgetsd.lib C$:\Qt\6.7.3\msvc2019_64\lib\Qt6SerialPortd.lib C$:\Qt\6.7.3\msvc2019_64\lib\Qt6WebEngineQuickd.lib C$:\Qt\6.7.3\msvc2019_64\lib\Qt6VirtualKeyboardd.lib QXlsx\QXlsxQt6.lib || QXlsx\QXlsxQt6.lib QXlsx\QXlsx_autogen QXlsx\QXlsx_autogen_timestamp_deps
+build CMakeFiles\SparkExamAI_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles\SparkExamAI_autogen_timestamp_deps: phony C$:\Qt\6.7.3\msvc2019_64\bin\moc.exe C$:\Qt\6.7.3\msvc2019_64\bin\uic.exe C$:\Qt\6.7.3\msvc2019_64\lib\Qt6Quickd.lib C$:\Qt\6.7.3\msvc2019_64\lib\Qt6Multimediad.lib C$:\Qt\6.7.3\msvc2019_64\lib\Qt6Sqld.lib C$:\Qt\6.7.3\msvc2019_64\lib\Qt6MultimediaWidgetsd.lib C$:\Qt\6.7.3\msvc2019_64\lib\Qt6VirtualKeyboardd.lib C$:\Qt\6.7.3\msvc2019_64\lib\Qt6SerialPortd.lib C$:\Qt\6.7.3\msvc2019_64\lib\Qt6WebEngineQuickd.lib QXlsx\QXlsxQt6.lib || QXlsx\QXlsxQt6.lib QXlsx\QXlsx_autogen QXlsx\QXlsx_autogen_timestamp_deps
 
 
 #############################################
