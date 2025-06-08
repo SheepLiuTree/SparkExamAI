@@ -499,6 +499,7 @@ Window {
                 Button {
                     width: 200
                     height: 70
+                    visible: false
                     background: Image {
                         source: "qrc:/images/button_bg.png"
                         fillMode: Image.Stretch
@@ -2075,13 +2076,16 @@ Window {
 
                     // 组件加载完成后，从数据库加载数据
                     Component.onCompleted: {
+                         // 从数据库读取虚拟键盘设置
+        
                         loadUserListFromDatabase()
                     }
 
                     // 从数据库加载用户列表的函数
                     function loadUserListFromDatabase() {
                         console.log("开始加载用户列表...");
-                        
+                        var savedVirtualKeyboard = dbManager.getSetting("enable_virtual_keyboard", "true")
+                        enableVirtualKeyboard = savedVirtualKeyboard === "true"
                         // 获取当前排序选项
                         var sortOption = dbManager.getSetting("home_sort_option", "1");
                         console.log("当前排序选项: " + sortOption + 
@@ -3057,7 +3061,7 @@ Window {
     Component.onCompleted: {
         // 从数据库读取虚拟键盘设置
         var savedVirtualKeyboard = dbManager.getSetting("enable_virtual_keyboard", "true")
-        enableVirtualKeyboard = savedVirtualKeyboard.toLowerCase() === "true"
+        enableVirtualKeyboard = savedVirtualKeyboard === "true"
         console.log("从数据库读取虚拟键盘设置: " + savedVirtualKeyboard + " -> " + enableVirtualKeyboard)
         executeLightSequence()
     }

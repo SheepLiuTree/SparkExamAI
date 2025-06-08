@@ -249,7 +249,7 @@ Rectangle {
                 
                 Rectangle {
                     Layout.fillWidth: true
-                    height: 560  // 增加高度以容纳新增的智能体用户名和密码设置项
+                    height: 610  // 增加高度以容纳新增的智能体用户名和密码设置项
                     color: "#44ffffff"
                     radius: 10
                     
