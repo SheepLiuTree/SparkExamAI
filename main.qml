@@ -9,12 +9,33 @@ import QtQuick.Dialogs
 Window {
     width: Screen.width
     height: Screen.height
-    //width: 1280
-    //height: 1024
     visible: true
     visibility: Window.FullScreen
     flags: Qt.Window | Qt.FramelessWindowHint
     title: qsTr("星火智能评测系统")
+    
+    // 添加隐藏的SparkAIAgentPage实例
+    SparkAIAgentPage {
+        id: hiddenSparkAIAgentPage
+        visible: false
+        anchors.fill: parent
+        z: -1  // 确保它在最底层
+        isBackgroundMode: false  // 修改为false以显示遮罩和信息窗口
+    }
+    
+    // 在应用程序启动时初始化
+    Component.onCompleted: {
+        // 初始化隐藏的SparkAIAgentPage
+        hiddenSparkAIAgentPage.loadAgentSettings()
+        
+        // 从数据库读取虚拟键盘设置
+        var savedVirtualKeyboard = dbManager.getSetting("enable_virtual_keyboard", "true")
+        enableVirtualKeyboard = savedVirtualKeyboard === "true"
+        console.log("从数据库读取虚拟键盘设置: " + savedVirtualKeyboard + " -> " + enableVirtualKeyboard)
+        
+        // 执行灯光控制序列
+        executeLightSequence()
+    }
     
     // 应用Material样式 - 确保全局应用
     Material.theme: Material.Dark
@@ -483,12 +504,12 @@ Window {
                     onClicked: {
                         console.log("星火智能体 clicked")
                         try {
-                            // 直接打开星火智能体页面，不需要人脸识别
-                            stackView.push("SparkAIAgentPage.qml")
+                            // 直接显示已经准备好的页面
+                            hiddenSparkAIAgentPage.visible = true
+                            hiddenSparkAIAgentPage.z = 1000  // 确保显示在最上层
+                            stackView.push(hiddenSparkAIAgentPage)
                         } catch (e) {
-                            // 显示错误信息
                             console.error("打开星火智能体页面失败: " + e.message)
-                            // 显示提示对话框
                             errorDialog.title = "功能不可用"
                             errorDialog.text = "星火智能体需要QtWebEngine支持。请确保已安装Qt WebEngine模块。"
                             errorDialog.open()
@@ -3057,14 +3078,7 @@ Window {
         }
     }
     
-    // 初始化组件时读取虚拟键盘设置
-    Component.onCompleted: {
-        // 从数据库读取虚拟键盘设置
-        var savedVirtualKeyboard = dbManager.getSetting("enable_virtual_keyboard", "true")
-        enableVirtualKeyboard = savedVirtualKeyboard === "true"
-        console.log("从数据库读取虚拟键盘设置: " + savedVirtualKeyboard + " -> " + enableVirtualKeyboard)
-        executeLightSequence()
-    }
+
 
     // 个人信息核对对话框
     Dialog {
@@ -3279,4 +3293,4 @@ Window {
         console.log("执行灯光控制序列: " + jsonStr)
         serialPortManager.toggleLights(jsonStr)
     }
-}
+} // 结束 Window

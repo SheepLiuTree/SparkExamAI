@@ -19,6 +19,7 @@ Rectangle {
     property bool isLoadingComplete: false
     property bool isMonitoring: false
     property bool isAutoLoginInProgress: false
+    property bool isBackgroundMode: false  // 新增：后台模式标志
     
     // 新增：调试信息控制和显示
     property bool showDebugInfo: false  // 控制是否显示调试信息
@@ -81,7 +82,9 @@ Rectangle {
                 updateDebugInfo("监测完成", "检测到'继续对话...'，用户已登录，停止监测")
                 sourceMonitorTimer.stop()
                 isMonitoring = false
-                loadingOverlay.visible = false
+                if (!isBackgroundMode) {
+                    loadingOverlay.visible = false
+                }
                 return
             }
             
@@ -108,7 +111,9 @@ Rectangle {
         if (!aiAgentUsername || !aiAgentPassword) {
             console.warn("智能体用户名或密码未设置，无法自动登录")
             updateDebugInfo("自动登录错误", "用户名或密码未设置，无法执行自动登录")
-            loadingOverlay.visible = false
+            if (!isBackgroundMode) {
+                loadingOverlay.visible = false
+            }
             showLoginErrorDialog("智能体用户名或密码未设置", "请先在设置中配置智能体用户名和密码")
             return
         }
@@ -116,7 +121,9 @@ Rectangle {
         if (aiAgentUsername.trim() === "" || aiAgentPassword.trim() === "") {
             console.warn("智能体用户名或密码为空，无法自动登录")
             updateDebugInfo("自动登录错误", "用户名或密码为空字符串，无法执行自动登录")
-            loadingOverlay.visible = false
+            if (!isBackgroundMode) {
+                loadingOverlay.visible = false
+            }
             showLoginErrorDialog("智能体用户名或密码为空", "请先在设置中配置有效的智能体用户名和密码")
             return
         }
@@ -126,7 +133,9 @@ Rectangle {
         
         // 步骤1：点击"开始使用"按钮 - 增加重试机制
         console.log("步骤1：查找并点击'开始使用'按钮")
-        loadingText.text = "正在查找'开始使用'按钮..."
+        if (!isBackgroundMode) {
+            loadingText.text = "正在查找'开始使用'按钮..."
+        }
         updateDebugInfo("登录步骤1", "查找并点击'开始使用'按钮")
         tryClickStartButton()
     }
@@ -167,7 +176,9 @@ Rectangle {
                     console.error("多次重试后仍未找到'开始使用'按钮")
                     updateDebugInfo("登录步骤1", "重试10次后仍未找到'开始使用'按钮，登录失败")
                     isAutoLoginInProgress = false
-                    loadingOverlay.visible = false
+                    if (!isBackgroundMode) {
+                        loadingOverlay.visible = false
+                    }
                     showLoginErrorDialog("自动登录失败", "页面可能已更新，未找到'开始使用'按钮")
                 }
             }
@@ -235,7 +246,9 @@ Rectangle {
                     console.error("多次重试后仍未找到'账号登录'标签")
                     updateDebugInfo("登录步骤2", "重试10次后仍未找到'账号登录'标签，登录失败")
                     isAutoLoginInProgress = false
-                    loadingOverlay.visible = false
+                    if (!isBackgroundMode) {
+                        loadingOverlay.visible = false
+                    }
                     showLoginErrorDialog("自动登录失败", "页面可能已更新，未找到'账号登录'标签")
                 }
             }
@@ -288,7 +301,9 @@ Rectangle {
                     console.error("多次重试后仍未找到用户名输入框")
                     updateDebugInfo("登录步骤3", "重试10次后仍未找到用户名输入框，登录失败")
                     isAutoLoginInProgress = false
-                    loadingOverlay.visible = false
+                    if (!isBackgroundMode) {
+                        loadingOverlay.visible = false
+                    }
                     showLoginErrorDialog("自动登录失败", "无法找到用户名输入框，请检查页面是否正常")
                 }
             }
@@ -378,7 +393,9 @@ Rectangle {
                 console.error("字符输入失败，输入框可能丢失")
                 updateDebugInfo("登录步骤3", "字符输入失败，输入框可能丢失")
                 isAutoLoginInProgress = false
-                loadingOverlay.visible = false
+                if (!isBackgroundMode) {
+                    loadingOverlay.visible = false
+                }
                 showLoginErrorDialog("自动登录失败", "用户名输入过程中输入框丢失")
             }
         })
@@ -416,7 +433,9 @@ Rectangle {
                     autoLoginTimer.start()
                 } else {
                     isAutoLoginInProgress = false
-                    loadingOverlay.visible = false
+                    if (!isBackgroundMode) {
+                        loadingOverlay.visible = false
+                    }
                     showLoginErrorDialog("自动登录失败", "用户名输入多次验证失败")
                 }
             }
@@ -469,7 +488,9 @@ Rectangle {
                     console.error("多次重试后仍未找到密码输入框")
                     updateDebugInfo("登录步骤4", "重试10次后仍未找到密码输入框，登录失败")
                     isAutoLoginInProgress = false
-                    loadingOverlay.visible = false
+                    if (!isBackgroundMode) {
+                        loadingOverlay.visible = false
+                    }
                     showLoginErrorDialog("自动登录失败", "无法找到密码输入框，请检查页面是否正常")
                 }
             }
@@ -559,7 +580,9 @@ Rectangle {
                 console.error("密码字符输入失败，输入框可能丢失")
                 updateDebugInfo("登录步骤4", "密码字符输入失败，输入框可能丢失")
                 isAutoLoginInProgress = false
-                loadingOverlay.visible = false
+                if (!isBackgroundMode) {
+                    loadingOverlay.visible = false
+                }
                 showLoginErrorDialog("自动登录失败", "密码输入过程中输入框丢失")
             }
         })
@@ -597,7 +620,9 @@ Rectangle {
                     autoLoginTimer.start()
                 } else {
                     isAutoLoginInProgress = false
-                    loadingOverlay.visible = false
+                    if (!isBackgroundMode) {
+                        loadingOverlay.visible = false
+                    }
                     showLoginErrorDialog("自动登录失败", "密码输入多次验证失败")
                 }
             }
@@ -669,7 +694,9 @@ Rectangle {
                     console.error("多次重试后仍未找到登录按钮")
                     updateDebugInfo("登录步骤5", "重试10次后仍未找到登录按钮或输入框异常，登录失败")
                     isAutoLoginInProgress = false
-                    loadingOverlay.visible = false
+                    if (!isBackgroundMode) {
+                        loadingOverlay.visible = false
+                    }
                     showLoginErrorDialog("自动登录失败", "页面可能已更新，未找到登录按钮或输入框数据异常")
                 }
             }
@@ -689,7 +716,9 @@ Rectangle {
                 console.log("自动登录成功！检测到'继续对话...'")
                 updateDebugInfo("登录成功", "检测到'继续对话...'，自动登录成功完成！")
                 isAutoLoginInProgress = false
-                loadingOverlay.visible = false
+                if (!isBackgroundMode) {
+                    loadingOverlay.visible = false
+                }
                 // 登录成功，直接关闭加载遮罩，不显示成功对话框
             } else if (currentSourceCode.indexOf("用户名或密码错误") !== -1 || 
                       currentSourceCode.indexOf("登录失败") !== -1 ||
@@ -697,7 +726,9 @@ Rectangle {
                 console.error("登录失败：用户名或密码错误")
                 updateDebugInfo("登录失败", "检测到用户名或密码错误提示")
                 isAutoLoginInProgress = false
-                loadingOverlay.visible = false
+                if (!isBackgroundMode) {
+                    loadingOverlay.visible = false
+                }
                 showLoginErrorDialog("登录失败", "用户名或密码错误，请检查设置")
             } else {
                 // 没有检测到明确的成功或失败状态，继续等待
@@ -726,12 +757,16 @@ Rectangle {
                             console.log("未检测到登录元素，可能已经成功登录")
                             updateDebugInfo("登录结果", "未检测到登录元素，可能已成功登录")
                             isAutoLoginInProgress = false
-                            loadingOverlay.visible = false
+                            if (!isBackgroundMode) {
+                                loadingOverlay.visible = false
+                            }
                         } else {
                             console.log("登录流程完成，但无法确定最终状态")
                             updateDebugInfo("登录结果", "登录流程完成，但状态不明确")
                             isAutoLoginInProgress = false
-                            loadingOverlay.visible = false
+                            if (!isBackgroundMode) {
+                                loadingOverlay.visible = false
+                            }
                             showLoginErrorDialog("登录状态不明", "登录流程已完成，请手动检查登录状态")
                         }
                     })
@@ -846,27 +881,31 @@ Rectangle {
         radius: 10
         
         WebView {
-    id: webView
-    anchors.fill: parent
+            id: webView
+            anchors.fill: parent
             anchors.topMargin: 10
             url: ""
-
-    // 显式声明参数并判断加载状态
-    onLoadingChanged: function(loadRequest) {
-        switch (loadRequest.status) {
-            case WebView.LoadStartedStatus:
+            
+            // 显式声明参数并判断加载状态
+            onLoadingChanged: function(loadRequest) {
+                switch (loadRequest.status) {
+                    case WebView.LoadStartedStatus:
                         console.log("网页开始加载...")
                         updateDebugInfo("网页加载", "开始加载智能体页面")
                         isLoadingComplete = false
-                        loadingOverlay.visible = true
-                        loadingText.text = "正在加载智能体..."
+                        if (!isBackgroundMode) {
+                            loadingOverlay.visible = true
+                            loadingText.text = "正在加载智能体..."
+                        }
                         break
                         
-            case WebView.LoadSucceededStatus:
+                    case WebView.LoadSucceededStatus:
                         console.log("网页加载成功!")
                         updateDebugInfo("网页加载", "页面加载成功，准备开始源码监测")
                         isLoadingComplete = true
-                        loadingText.text = "正在检测页面状态..."
+                        if (!isBackgroundMode) {
+                            loadingText.text = "正在检测页面状态..."
+                        }
                         
                         // 延迟一秒后开始监测源码
                         Qt.callLater(function() {
@@ -877,11 +916,13 @@ Rectangle {
                         })
                         break
                         
-            case WebView.LoadFailedStatus:
+                    case WebView.LoadFailedStatus:
                         console.error("网页加载失败: " + loadRequest.errorString)
                         updateDebugInfo("网页加载", "页面加载失败: " + loadRequest.errorString)
                         isLoadingComplete = false
-                        loadingOverlay.visible = false
+                        if (!isBackgroundMode) {
+                            loadingOverlay.visible = false
+                        }
                         showLoginErrorDialog("加载失败", "网页加载失败: " + loadRequest.errorString)
                         break
                 }
@@ -1021,7 +1062,9 @@ Rectangle {
                 default:
                     console.log("未知的自动登录步骤: " + currentStep)
                     isAutoLoginInProgress = false
-                    loadingOverlay.visible = false
+                    if (!isBackgroundMode) {
+                        loadingOverlay.visible = false
+                    }
                     break
             }
         }
@@ -1144,7 +1187,7 @@ Rectangle {
                 simulateTypingUsername(nextCharIndex)
             } else if (inputType === "password") {
                 simulateTypingPassword(nextCharIndex)
+            }
         }
-    }
     }
 } 
