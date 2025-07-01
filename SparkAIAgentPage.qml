@@ -839,6 +839,56 @@ Rectangle {
         }
     }
     
+    // 新增：刷新按钮
+    Rectangle {
+        id: refreshButton
+        anchors.top: parent.top
+        anchors.topMargin: 20
+        anchors.left: backButton.right
+        anchors.leftMargin: 20
+        width: 100
+        height: 40
+        color: "transparent"
+        radius: 5
+        z: 10
+        
+        Image {
+            anchors.fill: parent
+            source: "qrc:/images/button_bg.png"
+            fillMode: Image.Stretch
+        }
+        
+        Text {
+            anchors.centerIn: parent
+            text: "刷新"
+            font.family: "阿里妈妈数黑体"
+            font.pixelSize: 18
+            color: "white"
+        }
+        
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                updateDebugInfo("页面刷新", "用户点击刷新按钮，重新加载网页")
+                // 停止定时器和自动登录流程
+                sourceMonitorTimer.stop()
+                autoLoginTimer.stop()
+                isAutoLoginInProgress = false
+                isMonitoring = false
+                isLoadingComplete = false
+                if (!isBackgroundMode) {
+                    loadingOverlay.visible = true
+                    loadingText.text = "正在刷新页面..."
+                }
+                // 重新加载网页
+                webView.url = "" // 先清空，确保强制刷新
+                Qt.callLater(function() {
+                    webView.url = aiAgentUrl
+                })
+            }
+        }
+    }
+    
     // 页面标题
     Text {
         id: pageTitle

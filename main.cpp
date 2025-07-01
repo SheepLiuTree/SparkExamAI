@@ -50,6 +50,11 @@ void listDirectoryContents(const QString &dirPath) {
 
 int main(int argc, char *argv[])
 {
+    // main.cpp 最开始
+    qputenv("QT_QUICK_BACKEND", "software");
+    qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-gpu");
+
+
     // 初始化日志系统
     LogManager::getInstance().init();
     LogManager::getInstance().installMessageHandler();
