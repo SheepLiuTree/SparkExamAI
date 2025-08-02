@@ -115,6 +115,50 @@ bool DatabaseManager::initDatabase()
         // 继续执行，不因此中断程序
     }
     
+    // 强制检查并更新users表结构
+    QSqlQuery updateQuery;
+    updateQuery.exec("PRAGMA foreign_keys=off");
+    
+    // 检查face_image_path列是否存在
+    QSqlQuery checkCol;
+    checkCol.exec("PRAGMA table_info(users)");
+    bool hasFaceImagePath = false;
+    bool hasPassword = false;
+    
+    while (checkCol.next()) {
+        QString colName = checkCol.value(1).toString();
+        if (colName == "face_image_path") hasFaceImagePath = true;
+        if (colName == "password") hasPassword = true;
+    }
+    
+    if (!hasFaceImagePath) {
+        qDebug() << "添加face_image_path列";
+        updateQuery.exec("ALTER TABLE users ADD COLUMN face_image_path TEXT");
+    }
+    
+    if (!hasPassword) {
+        qDebug() << "添加password列";
+        updateQuery.exec("ALTER TABLE users ADD COLUMN password TEXT DEFAULT '123456'");
+    }
+    
+    updateQuery.exec("PRAGMA foreign_keys=on");
+    
+    // 检查users表结构
+    QSqlQuery checkQuery;
+    checkQuery.exec("PRAGMA table_info(users)");
+    qDebug() << "Users表结构:";
+    while (checkQuery.next()) {
+        qDebug() << "  " << checkQuery.value(1).toString() << ":" << checkQuery.value(2).toString();
+    }
+    
+    // 检查表是否存在
+    checkQuery.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='users'");
+    if (checkQuery.next()) {
+        qDebug() << "users表存在";
+    } else {
+        qDebug() << "users表不存在";
+    }
+    
     // 初始化默认设置
     initDefaultSettings();
     
@@ -133,8 +177,9 @@ bool DatabaseManager::createTables()
         "name TEXT NOT NULL, "
         "gender TEXT NOT NULL, "
         "work_id TEXT UNIQUE NOT NULL, "
-        "face_image_path TEXT NOT NULL, "
+        "face_image_path TEXT, "
         "avatar_path TEXT NOT NULL, "
+        "password TEXT DEFAULT '123456', "
         "is_admin BOOLEAN DEFAULT 0, "
         "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
         ")"
@@ -308,9 +353,9 @@ bool DatabaseManager::createTables()
     return true;
 }
 
-bool DatabaseManager::addFaceData(const QString &name, const QString &gender, 
-                                 const QString &workId, const QString &faceImagePath, 
-                                 const QString &avatarPath, bool isAdmin)
+bool DatabaseManager::addFaceData(const QString &name, const QString &gender,
+                                 const QString &workId, const QString &faceImagePath,
+                                 const QString &avatarPath, bool isAdmin, const QString &password)
 {
     QSqlQuery query;
     
@@ -336,9 +381,12 @@ bool DatabaseManager::addFaceData(const QString &name, const QString &gender,
         }
     }
     
+    // 使用默认密码如果没有提供
+    QString userPassword = password.isEmpty() ? "123456" : password;
+    
     query.prepare(
-        "INSERT INTO users (name, gender, work_id, face_image_path, avatar_path, is_admin) "
-        "VALUES (:name, :gender, :work_id, :face_image_path, :avatar_path, :is_admin)"
+        "INSERT INTO users (name, gender, work_id, face_image_path, avatar_path, password, is_admin) "
+        "VALUES (:name, :gender, :work_id, :face_image_path, :avatar_path, :password, :is_admin)"
     );
     
     query.bindValue(":name", name);
@@ -346,6 +394,7 @@ bool DatabaseManager::addFaceData(const QString &name, const QString &gender,
     query.bindValue(":work_id", workId);
     query.bindValue(":face_image_path", relativeFaceImagePath);
     query.bindValue(":avatar_path", relativeAvatarPath);
+    query.bindValue(":password", userPassword);
     query.bindValue(":is_admin", isAdmin ? 1 : 0);
     
     if (!query.exec()) {
@@ -353,6 +402,77 @@ bool DatabaseManager::addFaceData(const QString &name, const QString &gender,
         return false;
     }
     
+    return true;
+}
+
+bool DatabaseManager::addUserData(const QString &name, const QString &gender,
+                                 const QString &workId, const QString &avatarPath,
+                                 bool isAdmin, const QString &password)
+{
+    QSqlQuery query;
+    
+    qDebug() << "开始添加用户数据:";
+    qDebug() << "  name:" << name;
+    qDebug() << "  gender:" << gender;
+    qDebug() << "  workId:" << workId;
+    qDebug() << "  avatarPath:" << avatarPath;
+    qDebug() << "  isAdmin:" << isAdmin;
+    qDebug() << "  password:" << (password.isEmpty() ? "使用默认密码" : "已提供密码");
+    
+    // 将绝对路径转换为相对路径
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString relativeAvatarPath = avatarPath;
+    
+    qDebug() << "  appDir:" << appDir;
+    
+    // 移除应用程序目录前缀，转换为相对路径
+    if (relativeAvatarPath.startsWith(appDir)) {
+        relativeAvatarPath = relativeAvatarPath.mid(appDir.length());
+        // 确保路径以/开头
+        if (!relativeAvatarPath.startsWith("/")) {
+            relativeAvatarPath = "/" + relativeAvatarPath;
+        }
+    }
+    
+    qDebug() << "  relativeAvatarPath:" << relativeAvatarPath;
+    
+    // 使用默认密码如果没有提供
+    QString userPassword = password.isEmpty() ? "123456" : password;
+    
+    // 使用NULL作为人脸图像路径，因为我们不再需要面容采集
+    QVariant faceImagePath = QVariant(QVariant::String); // 明确设置为NULL
+    
+    query.prepare(
+        "INSERT INTO users (name, gender, work_id, face_image_path, avatar_path, password, is_admin) "
+        "VALUES (:name, :gender, :work_id, :face_image_path, :avatar_path, :password, :is_admin)"
+    );
+    
+    query.bindValue(":name", name);
+    query.bindValue(":gender", gender);
+    query.bindValue(":work_id", workId);
+    query.bindValue(":face_image_path", QVariant()); // 使用空QVariant表示NULL
+    query.bindValue(":avatar_path", relativeAvatarPath);
+    query.bindValue(":password", userPassword);
+    query.bindValue(":is_admin", isAdmin ? 1 : 0);
+    
+    if (!query.exec()) {
+        qDebug() << "Failed to add user data:" << query.lastError().text();
+        qDebug() << "  Error type:" << query.lastError().type();
+        qDebug() << "  Error database text:" << query.lastError().databaseText();
+        qDebug() << "  Error driver text:" << query.lastError().driverText();
+        qDebug() << "  SQL Query:" << query.lastQuery();
+        qDebug() << "  Bound values:";
+        qDebug() << "    name:" << name;
+        qDebug() << "    gender:" << gender;
+        qDebug() << "    work_id:" << workId;
+        qDebug() << "    face_image_path: NULL";
+        qDebug() << "    avatar_path:" << relativeAvatarPath;
+        qDebug() << "    password:" << userPassword;
+        qDebug() << "    is_admin:" << (isAdmin ? 1 : 0);
+        return false;
+    }
+    
+    qDebug() << "用户数据添加成功";
     return true;
 }
 
@@ -732,9 +852,9 @@ bool DatabaseManager::userExists(const QString &workId)
     return false;
 }
 
-bool DatabaseManager::updateFaceData(const QString &workId, const QString &name, 
-                                    const QString &gender, const QString &faceImagePath, 
-                                    const QString &avatarPath, bool isAdmin)
+bool DatabaseManager::updateFaceData(const QString &workId, const QString &name,
+                                    const QString &gender, const QString &faceImagePath,
+                                    const QString &avatarPath, bool isAdmin, const QString &password)
 {
     QSqlQuery query;
     
@@ -766,6 +886,7 @@ bool DatabaseManager::updateFaceData(const QString &workId, const QString &name,
         "gender = :gender, "
         "face_image_path = :face_image_path, "
         "avatar_path = :avatar_path, "
+        "password = :password, "
         "is_admin = :is_admin "
         "WHERE work_id = :work_id"
     );
@@ -774,6 +895,7 @@ bool DatabaseManager::updateFaceData(const QString &workId, const QString &name,
     query.bindValue(":gender", gender);
     query.bindValue(":face_image_path", relativeFaceImagePath);
     query.bindValue(":avatar_path", relativeAvatarPath);
+    query.bindValue(":password", password);
     query.bindValue(":is_admin", isAdmin ? 1 : 0);
     query.bindValue(":work_id", workId);
     
@@ -906,7 +1028,7 @@ void DatabaseManager::initDefaultSettings()
         setSetting("home_sort_option", "1");
         
         // AI智能体地址设置
-        setSetting("ai_agent_address", "https://www.coze.cn/store/agent/7485277516954271795?bot_id=true");
+        setSetting("ai_agent_address", "https://www.coze.cn/s/hn97Tsa7-fw/");
         
         // 五芒图默认标题设置
         setSetting("pentagon_title_1", "基础认知");
@@ -1704,6 +1826,53 @@ bool DatabaseManager::addKnowledgePoint(const QString &title, const QString &con
     
     if (!query.exec()) {
         qDebug() << "添加智点失败:" << query.lastError().text();
+        return false;
+    }
+    
+    return true;
+}
+
+// 验证用户密码
+bool DatabaseManager::verifyPassword(const QString &workId, const QString &password)
+{
+    QSqlQuery query;
+    query.prepare("SELECT password FROM users WHERE work_id = :work_id");
+    query.bindValue(":work_id", workId);
+    
+    if (query.exec() && query.next()) {
+        QString storedPassword = query.value("password").toString();
+        return storedPassword == password;
+    }
+    
+    return false;
+}
+
+// 验证用户姓名、工号和密码
+bool DatabaseManager::verifyUserCredentials(const QString &name, const QString &workId, const QString &password)
+{
+    QSqlQuery query;
+    query.prepare("SELECT password FROM users WHERE work_id = :work_id AND name = :name");
+    query.bindValue(":work_id", workId);
+    query.bindValue(":name", name);
+    
+    if (query.exec() && query.next()) {
+        QString storedPassword = query.value("password").toString();
+        return storedPassword == password;
+    }
+    
+    return false;
+}
+
+// 更新用户密码
+bool DatabaseManager::updateUserPassword(const QString &workId, const QString &newPassword)
+{
+    QSqlQuery query;
+    query.prepare("UPDATE users SET password = :password WHERE work_id = :work_id");
+    query.bindValue(":password", newPassword);
+    query.bindValue(":work_id", workId);
+    
+    if (!query.exec()) {
+        qDebug() << "Failed to update password:" << query.lastError().text();
         return false;
     }
     

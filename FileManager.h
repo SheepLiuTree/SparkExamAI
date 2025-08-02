@@ -28,6 +28,9 @@ public:
     // 检查目录是否存在
     Q_INVOKABLE bool directoryExists(const QString &dirPath);
     
+    // 检查文件是否存在
+    Q_INVOKABLE bool fileExists(const QString &filePath);
+    
     // 打开文件夹选择对话框
     Q_INVOKABLE QString getFolderPath(const QString &title = "选择文件夹");
     

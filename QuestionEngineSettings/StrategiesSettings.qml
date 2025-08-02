@@ -29,7 +29,7 @@ Rectangle {
         anchors.margins: 20
         spacing: 15
         
-        // 星火日课配置区
+        // 团委日课配置区
         Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: 120
@@ -42,7 +42,7 @@ Rectangle {
                 spacing: 15
                 
                 Text {
-                    text: "星火日课配置"
+                    text: "团委日课配置"
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 20
                     font.bold: true
@@ -143,7 +143,7 @@ Rectangle {
                 }
                 
                 Text {
-                    text: "设置每个题库的题目分配数量，总和应等于星火日课题目数量"
+                    text: "设置每个题库的题目分配数量，总和应等于团委日课题目数量"
                     font.family: "阿里妈妈数黑体"
                     font.pixelSize: 14
                     color: "white"
@@ -855,7 +855,7 @@ Rectangle {
         var distributionsStr = JSON.stringify(bankDistributions)
         var distributionsSuccess = dbManager.setSetting("question_bank_distributions", distributionsStr)
         
-        // 保存星火日课启用状态
+        // 保存团委日课启用状态
         var enableSuccess = dbManager.setSetting("spark_daily_enabled", "true")
         
         // 保存设置时间

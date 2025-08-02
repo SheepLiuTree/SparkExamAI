@@ -35,15 +35,23 @@ bool FileManager::copyFile(const QString &sourcePath, const QString &destination
     }
 
     // 复制文件
-    return sourceFile.copy(destinationPath);
+    bool success = sourceFile.copy(destinationPath);
+    if (!success) {
+        qDebug() << "文件复制失败，源文件:" << sourcePath;
+        qDebug() << "目标文件:" << destinationPath;
+        qDebug() << "错误信息:" << sourceFile.errorString();
+        qDebug() << "源文件权限:" << sourceFile.permissions();
+        qDebug() << "目标目录权限:" << QFileInfo(destinationPath).dir().absolutePath();
+    }
+    return success;
 }
 
 bool FileManager::moveFile(const QString &sourcePath, const QString &destinationPath)
 {
     QFile sourceFile(sourcePath);
-    if (!sourceFile.exists())
+    if (!sourceFile.exists() || sourcePath.isEmpty())
     {
-        qDebug() << "源文件不存在:" << sourcePath;
+        qDebug() << "源文件不存在或路径为空:" << sourcePath;
         return false;
     }
 
@@ -80,6 +88,12 @@ bool FileManager::directoryExists(const QString &dirPath)
 {
     QDir dir(dirPath);
     return dir.exists();
+}
+
+bool FileManager::fileExists(const QString &filePath)
+{
+    QFile file(filePath);
+    return file.exists();
 }
 
 QString FileManager::getFolderPath(const QString &title)

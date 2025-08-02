@@ -8,7 +8,7 @@ Rectangle {
     color: "transparent"
     
     // 智能体地址属性
-    property string aiAgentUrl: "https://www.coze.cn/store/agent/7485277516954271795?bot_id=true" // 默认值
+    property string aiAgentUrl: "https://www.coze.cn/s/hn97Tsa7-fw/" // 默认值
     
     // 返回按钮
     Button {
@@ -57,7 +57,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.topMargin: 30
         anchors.horizontalCenter: parent.horizontalCenter
-        text: "星火智能体"
+        text: "团委智能体"
         font.family: "阿里妈妈数黑体"
         font.pixelSize: 36
         color: "white"
@@ -70,7 +70,7 @@ Rectangle {
         anchors.top: pageTitle.bottom
         anchors.topMargin: 10
         anchors.horizontalCenter: parent.horizontalCenter
-        text: "欢迎使用星火智能体!"
+        text: "欢迎使用团委智能体!"
         font.family: "阿里妈妈数黑体"
         font.pixelSize: 20
         color: "white"
@@ -377,10 +377,10 @@ Rectangle {
     
     // 组件初始化时，确保WebEngine模块可用
     Component.onCompleted: {
-        console.log("星火智能体页面加载")
+        console.log("团委智能体页面加载")
         
         // 从数据库加载智能体地址设置
-        var savedAgentAddress = dbManager.getSetting("ai_agent_address", "https://www.coze.cn/store/agent/7485277516954271795?bot_id=true")
+        var savedAgentAddress = dbManager.getSetting("ai_agent_address", "https://www.coze.cn/s/hn97Tsa7-fw/")
         if (savedAgentAddress && savedAgentAddress.trim() !== "") {
             aiAgentUrl = savedAgentAddress
             console.log("从数据库加载智能体地址: " + aiAgentUrl)

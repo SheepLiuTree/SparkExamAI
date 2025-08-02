@@ -12,7 +12,7 @@ Window {
     visible: true
     visibility: Window.FullScreen
     flags: Qt.Window | Qt.FramelessWindowHint
-    title: qsTr("星火智能评测系统")
+    title: qsTr("团委智能体平台")
 
     // 提供一个全局函数用于更新用户数据
     function updateUserData(workId) {
@@ -78,7 +78,7 @@ Window {
             id: headline_text
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "星火智能评测系统"
+            text: "团委智能体平台"
             font.family: "阿里妈妈数黑体"
             font.pixelSize: 48
             color: "white"
@@ -235,7 +235,7 @@ Window {
                         fillMode: Image.Stretch
                     }
                     contentItem: Text {
-                        text: "星火日课"
+                        text: "团委日课"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 24
                         color: "white"
@@ -243,10 +243,11 @@ Window {
                         verticalAlignment: Text.AlignVCenter
                     }
                     onClicked: {
-                        console.log("星火日课 clicked")
-                        faceRecognitionPopup.targetPage = "DailyCourseContent.qml"
-                        faceRecognitionPopup.titleText = "星火日课"
-                        faceRecognitionPopup.open()
+                        console.log("团委日课 clicked")
+                        passwordDialog.targetPage = "DailyCourseContent.qml"
+                        passwordDialog.titleText = "团委日课"
+                        passwordDialog.mode = "name_workid_password"  // 姓名+工号+密码验证
+                        passwordDialog.open()
                     }
                 }
 
@@ -258,7 +259,7 @@ Window {
                         fillMode: Image.Stretch
                     }
                     contentItem: Text {
-                        text: "星火特训"
+                        text: "团委特训"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 24
                         color: "white"
@@ -266,10 +267,11 @@ Window {
                         verticalAlignment: Text.AlignVCenter
                     }
                     onClicked: {
-                        console.log("星火特训 clicked")
-                        faceRecognitionPopup.targetPage = "SpecialTrainingPage.qml"
-                        faceRecognitionPopup.titleText = "星火特训"
-                        faceRecognitionPopup.open()
+                        console.log("团委特训 clicked")
+                        passwordDialog.targetPage = "SpecialTrainingPage.qml"
+                        passwordDialog.titleText = "团委特训"
+                        passwordDialog.mode = "name_workid_password"  // 姓名+工号+密码验证
+                        passwordDialog.open()
                     }
                 }
 
@@ -281,7 +283,7 @@ Window {
                         fillMode: Image.Stretch
                     }
                     contentItem: Text {
-                        text: "面容采集"
+                        text: "人员采集"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 24
                         color: "white"
@@ -348,9 +350,10 @@ Window {
                     }
                     onClicked: {
                         console.log("题集速录 clicked")
-                        faceRecognitionPopup.targetPage = "QuestionCollectionPage.qml"
-                        faceRecognitionPopup.titleText = "题集速录"
-                        faceRecognitionPopup.open()
+                        passwordDialog.targetPage = "QuestionCollectionPage.qml"
+                        passwordDialog.titleText = "题集速录"
+                        passwordDialog.mode = "password"  // 仅密码验证
+                        passwordDialog.open()
                     }
                 }
 
@@ -371,9 +374,10 @@ Window {
                     }
                     onClicked: {
                         console.log("题策引擎 clicked")
-                        faceRecognitionPopup.targetPage = "QuestionEnginePage.qml"
-                        faceRecognitionPopup.titleText = "题策引擎"
-                        faceRecognitionPopup.open()
+                        passwordDialog.targetPage = "QuestionEnginePage.qml"
+                        passwordDialog.titleText = "题策引擎"
+                        passwordDialog.mode = "admin"  // 管理员密码验证
+                        passwordDialog.open()
                     }
                 }
 
@@ -385,7 +389,7 @@ Window {
                         fillMode: Image.Stretch
                     }
                     contentItem: Text {
-                        text: "星火智能体"
+                        text: "团委智能体"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 24
                         color: "white"
@@ -393,16 +397,16 @@ Window {
                         verticalAlignment: Text.AlignVCenter
                     }
                     onClicked: {
-                        console.log("星火智能体 clicked")
+                        console.log("团委智能体 clicked")
                         try {
-                            // 直接打开星火智能体页面，不需要人脸识别
+                            // 直接打开团委智能体页面，不需要人脸识别
                             stackView.push("SparkAIAgentPage.qml")
                         } catch (e) {
                             // 显示错误信息
-                            console.error("打开星火智能体页面失败: " + e.message)
+                            console.error("打开团委智能体页面失败: " + e.message)
                             // 显示提示对话框
                             errorDialog.title = "功能不可用"
-                            errorDialog.text = "星火智能体需要QtWebEngine支持。请确保已安装Qt WebEngine模块。"
+                            errorDialog.text = "团委智能体需要QtWebEngine支持。请确保已安装Qt WebEngine模块。"
                             errorDialog.open()
                         }
                     }
@@ -3041,6 +3045,8 @@ Window {
         }
     }
 
+    // 密码验证对话框已在前面定义，这里不需要重复定义
+
     // 错误提示对话框
     Dialog {
         id: errorDialog
@@ -3118,6 +3124,78 @@ Window {
                     errorDialog.close()
                 }
             }
+        }
+    }
+// 密码验证对话框
+    PasswordDialog {
+        id: passwordDialog
+        property string targetPage: ""
+        
+        onAccepted: {
+            console.log("密码验证成功，姓名:", enteredName, "工号:", enteredWorkId, "密码:", enteredPassword)
+            
+            // 根据验证模式进行验证
+            var isValid = false
+            var userData = null
+            
+            if (mode === "password" || mode === "admin") {
+                // 仅密码验证或管理员密码验证
+                if (enteredPassword === defaultPassword) {
+                    isValid = true
+                    // 创建临时用户数据
+                    userData = {
+                        name: "管理员",
+                        workId: "admin",
+                        isAdmin: mode === "admin"
+                    }
+                }
+            } else if (mode === "name_workid_password") {
+                // 姓名+工号+密码验证
+                userData = dbManager.verifyUserCredentials(enteredName, enteredWorkId, enteredPassword)
+                if (userData) {
+                    isValid = true
+                }
+            }
+            
+            if (isValid && userData) {
+                console.log("验证成功，跳转到页面:", targetPage)
+                
+                // 检查是否需要管理员权限
+                var needsAdmin = false
+                if (titleText === "题策引擎") {
+                    needsAdmin = true
+                }
+                
+                // 如果需要管理员权限但用户不是管理员
+                if (needsAdmin && !userData.isAdmin) {
+                    console.log("非管理员用户尝试访问需要管理员权限的" + titleText)
+                    adminRequiredPopup.titleText = titleText
+                    adminRequiredPopup.open()
+                    return
+                }
+                
+                // 跳转到对应页面
+                if (targetPage !== "") {
+                    var component = Qt.createComponent(targetPage)
+                    if (component.status === Component.Ready) {
+                        var pageObject = component.createObject(stackView, {"userData": userData})
+                        stackView.push(pageObject)
+                    } else {
+                        console.error("组件加载失败:", component.errorString())
+                        stackView.push(targetPage)
+                    }
+                }
+            } else {
+                console.log("验证失败")
+                // 显示错误信息
+                errorDialog.title = "验证失败"
+                errorDialog.text = "密码错误或用户信息不匹配"
+                errorDialog.open()
+            }
+        }
+        
+        onRejected: {
+            console.log("密码验证已取消")
         }
     }
 }

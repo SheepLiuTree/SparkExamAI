@@ -30,12 +30,21 @@ public:
     // 用户管理相关方法
     
     // 添加人脸数据
-    Q_INVOKABLE bool addFaceData(const QString &name, 
-                                const QString &gender, 
-                                const QString &workId, 
-                                const QString &faceImagePath, 
-                                const QString &avatarPath, 
-                                bool isAdmin = false);
+    Q_INVOKABLE bool addFaceData(const QString &name,
+                                const QString &gender,
+                                const QString &workId,
+                                const QString &faceImagePath,
+                                const QString &avatarPath,
+                                bool isAdmin = false,
+                                const QString &password = "123456");
+    
+    // 添加用户数据（无面容采集）
+    Q_INVOKABLE bool addUserData(const QString &name,
+                                const QString &gender,
+                                const QString &workId,
+                                const QString &avatarPath,
+                                bool isAdmin = false,
+                                const QString &password = "123456");
 
     // 删除人脸数据
     Q_INVOKABLE bool deleteFaceData(const QString &workId);
@@ -56,12 +65,22 @@ public:
     Q_INVOKABLE bool userExists(const QString &workId);
 
     // 更新人脸数据
-    Q_INVOKABLE bool updateFaceData(const QString &workId, 
-                                   const QString &name, 
-                                   const QString &gender, 
-                                   const QString &faceImagePath, 
-                                   const QString &avatarPath, 
-                                   bool isAdmin = false);
+    Q_INVOKABLE bool updateFaceData(const QString &workId,
+                                   const QString &name,
+                                   const QString &gender,
+                                   const QString &faceImagePath,
+                                   const QString &avatarPath,
+                                   bool isAdmin = false,
+                                   const QString &password = "");
+    
+    // 验证用户密码
+    Q_INVOKABLE bool verifyPassword(const QString &workId, const QString &password);
+    
+    // 验证用户姓名、工号和密码
+    Q_INVOKABLE bool verifyUserCredentials(const QString &name, const QString &workId, const QString &password);
+    
+    // 更新用户密码
+    Q_INVOKABLE bool updateUserPassword(const QString &workId, const QString &newPassword);
                                    
     // 设置相关方法
     

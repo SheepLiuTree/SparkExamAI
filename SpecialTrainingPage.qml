@@ -247,7 +247,7 @@ Rectangle {
         
         // 标题文本，放在中央
         Text {
-            text: "星火特训 - " + (userData ? userData.name : "用户")
+            text: "团委特训 - " + (userData ? userData.name : "用户")
             font.family: "阿里妈妈数黑体"
             font.pixelSize: 24
             color: "white"

@@ -38,5 +38,7 @@
         <file>images/silverMedal.png</file>
         <file>images/bronzeMedal.png</file>
         <file>images/FaceTracking.png</file>
+        <file>PasswordDialog.qml</file>
+        <file>QuestionCollectionContent.qml</file>
     </qresource>
 </RCC>

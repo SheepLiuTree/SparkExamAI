@@ -11,7 +11,8 @@ Rectangle {
         { id: "general", name: "通用设置", icon: "qrc:/images/setting.png", component: "QuestionEngineSettings/GeneralSettings.qml" },
         { id: "strategies", name: "出题策略", icon: "qrc:/images/strategy.png", component: "QuestionEngineSettings/StrategiesSettings.qml" },
         { id: "pentagon", name: "五芒图设置", icon: "qrc:/images/chart.png", component: "QuestionEngineSettings/PentagonalChartSettings.qml" },
-        { id: "knowledge", name: "智点速览", icon: "qrc:/images/list.png", component: "QuestionEngineSettings/KnowledgePointSettings.qml" }
+        { id: "knowledge", name: "智点速览", icon: "qrc:/images/list.png", component: "QuestionEngineSettings/KnowledgePointSettings.qml" },
+        { id: "collection", name: "题集速录", icon: "qrc:/images/list.png", component: "QuestionCollectionContent.qml" }
     ]
     
     property int selectedCategoryIndex: 0
