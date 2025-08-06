@@ -35,6 +35,8 @@ Dialog {
     }
     padding: 20
     
+    anchors.centerIn: parent
+    
     ColumnLayout {
         anchors.fill: parent
         spacing: 15
@@ -77,9 +79,10 @@ Dialog {
             onTextChanged: passwordDialog.enteredPassword = text
             onAccepted: {
                 if (validateInput()) {
-                    passwordDialog.accept(passwordDialog.enteredName, 
-                                        passwordDialog.enteredWorkId, 
-                                        passwordDialog.enteredPassword)
+                    passwordDialog.accepted(passwordDialog.enteredName,
+                                          passwordDialog.enteredWorkId,
+                                          passwordDialog.enteredPassword)
+                    passwordDialog.close()
                 }
             }
         }
@@ -101,9 +104,10 @@ Dialog {
                 highlighted: true
                 onClicked: {
                     if (validateInput()) {
-                        passwordDialog.accept(passwordDialog.enteredName, 
-                                            passwordDialog.enteredWorkId, 
-                                            passwordDialog.enteredPassword)
+                        passwordDialog.accepted(passwordDialog.enteredName,
+                                              passwordDialog.enteredWorkId,
+                                              passwordDialog.enteredPassword)
+                        passwordDialog.close()
                     }
                 }
             }

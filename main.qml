@@ -376,7 +376,7 @@ Window {
                         console.log("题策引擎 clicked")
                         passwordDialog.targetPage = "QuestionEnginePage.qml"
                         passwordDialog.titleText = "题策引擎"
-                        passwordDialog.mode = "admin"  // 管理员密码验证
+                        passwordDialog.mode = "password"  // 使用密码验证，管理员权限在验证后检查
                         passwordDialog.open()
                     }
                 }
@@ -3127,35 +3127,35 @@ Window {
         }
     }
 // 密码验证对话框
-    PasswordDialog {
-        id: passwordDialog
-        property string targetPage: ""
+PasswordDialog {
+    id: passwordDialog
+    property string targetPage: ""
+    
+    onAccepted: (enteredName, enteredWorkId, enteredPassword) => {
+        console.log("密码验证成功，姓名:", enteredName, "工号:", enteredWorkId, "密码:", enteredPassword)
         
-        onAccepted: {
-            console.log("密码验证成功，姓名:", enteredName, "工号:", enteredWorkId, "密码:", enteredPassword)
-            
-            // 根据验证模式进行验证
-            var isValid = false
-            var userData = null
-            
-            if (mode === "password" || mode === "admin") {
-                // 仅密码验证或管理员密码验证
-                if (enteredPassword === defaultPassword) {
-                    isValid = true
-                    // 创建临时用户数据
-                    userData = {
-                        name: "管理员",
-                        workId: "admin",
-                        isAdmin: mode === "admin"
-                    }
-                }
-            } else if (mode === "name_workid_password") {
-                // 姓名+工号+密码验证
-                userData = dbManager.verifyUserCredentials(enteredName, enteredWorkId, enteredPassword)
-                if (userData) {
-                    isValid = true
+        // 根据验证模式进行验证
+        var isValid = false
+        var userData = null
+        
+        if (mode === "password") {
+            // 仅密码验证 - 使用正确的密码
+            if (enteredPassword === "123456") {
+                isValid = true
+                // 创建临时用户数据，管理员权限在验证后检查
+                userData = {
+                    name: "管理员",
+                    workId: "admin",
+                    isAdmin: true  // 密码验证通过的用户默认为管理员
                 }
             }
+        } else if (mode === "name_workid_password") {
+            // 姓名+工号+密码验证
+            userData = dbManager.verifyUserCredentials(enteredName, enteredWorkId, enteredPassword)
+            if (userData) {
+                isValid = true
+            }
+        }
             
             if (isValid && userData) {
                 console.log("验证成功，跳转到页面:", targetPage)

@@ -185,7 +185,7 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
         }
-        onClicked: confirmDialog.open()
+        onClicked: stackView.pop()
     }
 
     Button {
@@ -430,20 +430,6 @@ Rectangle {
         }
     }
 
-    // 确认返回对话框
-    MessageDialog {
-        id: confirmDialog
-        title: "确认返回"
-        text: "确定要返回主界面吗？"
-        standardButtons: StandardButton.Yes | StandardButton.No
-        onYes: {
-            confirmDialog.close()
-            stackView.pop()
-        }
-        onNo: {
-            confirmDialog.close()
-        }
-    }
 
     // 用户列表视图
     ListView {
