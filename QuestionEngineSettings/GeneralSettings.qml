@@ -15,6 +15,10 @@ Rectangle {
     property bool showPassword: false
     property int homeSortOption: 1
     property string aiAgentAddress: ""
+    property string platformTitle: ""
+    property string dailyCourseText: ""
+    property string specialTrainingText: ""
+    property string tuanweiButtonText: ""
     
     // 定义信号
     signal sortOptionUpdated()
@@ -78,6 +82,28 @@ Rectangle {
         aiAgentAddress = savedAgentAddress
         agentAddressField.text = savedAgentAddress
         console.log("从数据库载入AI智能体地址: " + (savedAgentAddress ? savedAgentAddress : "未设置，使用默认值"))
+
+        // 载入平台标题设置
+        var savedPlatformTitle = dbManager.getSetting("platform_title", "智能体平台")
+        platformTitle = savedPlatformTitle
+        platformTitleField.text = savedPlatformTitle
+        console.log("从数据库载入平台标题: " + (savedPlatformTitle ? savedPlatformTitle : "未设置，使用默认值"))
+
+        // 载入按钮文本设置
+        var savedDailyCourseText = dbManager.getSetting("daily_course_text", "日课")
+        dailyCourseText = savedDailyCourseText
+        dailyCourseField.text = savedDailyCourseText
+        console.log("从数据库载入日课按钮文本: " + (savedDailyCourseText ? savedDailyCourseText : "未设置，使用默认值"))
+
+        var savedSpecialTrainingText = dbManager.getSetting("special_training_text", "特训")
+        specialTrainingText = savedSpecialTrainingText
+        specialTrainingField.text = savedSpecialTrainingText
+        console.log("从数据库载入特训按钮文本: " + (savedSpecialTrainingText ? savedSpecialTrainingText : "未设置，使用默认值"))
+
+        var savedTuanweiButtonText = dbManager.getSetting("tuanwei_button_text", "智能体")
+        tuanweiButtonText = savedTuanweiButtonText
+        tuanweiButtonField.text = savedTuanweiButtonText
+        console.log("从数据库载入团委按钮文本: " + (savedTuanweiButtonText ? savedTuanweiButtonText : "未设置，使用默认值"))
     }
     
     ColumnLayout {
@@ -98,7 +124,7 @@ Rectangle {
                 
                 Rectangle {
                     Layout.fillWidth: true
-                    height: 380  // 增加高度以容纳新增的设置项
+                    height: 650  // 增加高度以容纳新增的设置项
                     color: "#44ffffff"
                     radius: 10
                     
@@ -416,6 +442,192 @@ Rectangle {
                             }
                         }
                         
+                        Text {
+                                text: "注意：以下内容设置后需重启软件生效！！！"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 15
+                                color: "red"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                        // 平台标题设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "平台标题:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                TextField {
+                                    id: platformTitleField
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    text: platformTitle
+                                    placeholderText: "请输入平台标题"
+                                    placeholderTextColor: "#cccccc"
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
+                                    
+                                    onTextChanged: {
+                                        platformTitle = text
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // 日课按钮文本设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "日课按钮:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                TextField {
+                                    id: dailyCourseField
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    text: dailyCourseText
+                                    placeholderText: "请输入日课按钮文本"
+                                    placeholderTextColor: "#cccccc"
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
+                                    
+                                    onTextChanged: {
+                                        dailyCourseText = text
+                                    }
+                                }
+                            }
+                        }
+
+                        // 特训按钮文本设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "特训按钮:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                TextField {
+                                    id: specialTrainingField
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    text: specialTrainingText
+                                    placeholderText: "请输入特训按钮文本"
+                                    placeholderTextColor: "#cccccc"
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
+                                    
+                                    onTextChanged: {
+                                        specialTrainingText = text
+                                    }
+                                }
+                            }
+                        }
+
+                        // 团委按钮文本设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "团委按钮:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                TextField {
+                                    id: tuanweiButtonField
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    text: tuanweiButtonText
+                                    placeholderText: "请输入团委按钮文本"
+                                    placeholderTextColor: "#cccccc"
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
+                                    
+                                    onTextChanged: {
+                                        tuanweiButtonText = text
+                                    }
+                                }
+                            }
+                        }
+
                         // 保存按钮
                         Item {
                             Layout.fillWidth: true
@@ -511,11 +723,25 @@ Rectangle {
         var agentAddressSuccess = dbManager.setSetting("ai_agent_address", agentAddressField.text)
         console.log("AI智能体地址已保存: " + agentAddressField.text)
         
+        // 保存平台标题
+        var platformTitleSuccess = dbManager.setSetting("platform_title", platformTitleField.text)
+        console.log("平台标题已保存: " + platformTitleField.text)
+        
+        // 保存按钮文本设置
+        var dailyCourseSuccess = dbManager.setSetting("daily_course_text", dailyCourseField.text)
+        console.log("日课按钮文本已保存: " + dailyCourseField.text)
+        
+        var specialTrainingSuccess = dbManager.setSetting("special_training_text", specialTrainingField.text)
+        console.log("特训按钮文本已保存: " + specialTrainingField.text)
+        
+        var tuanweiButtonSuccess = dbManager.setSetting("tuanwei_button_text", tuanweiButtonField.text)
+        console.log("团委按钮文本已保存: " + tuanweiButtonField.text)
+        
         // 使用延迟调用确保数据库操作完成后再更新UI
         Qt.callLater(function() {
             // 再次从数据库读取设置确保保存成功
             var savedOption = dbManager.getSetting("home_sort_option", "1")
-            console.log("验证首页排序设置: [" + savedOption + "] " + 
+            console.log("验证首页排序设置: [" + savedOption + "] " +
                       " (" + (savedOption.trim() === "1" ? "本月个人能力排序" : "本月刷题数排序") + ")")
             
             // 更新首页用户列表
@@ -523,7 +749,8 @@ Rectangle {
         })
         
         // 显示结果消息
-        if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess) {
+        if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess && platformTitleSuccess &&
+            dailyCourseSuccess && specialTrainingSuccess && tuanweiButtonSuccess) {
             statusMessage = "所有设置已保存成功"
             isSuccess = true
         } else {
@@ -532,6 +759,10 @@ Rectangle {
             if (!cameraSuccess) failedSettings.push("摄像头");
             if (!sortSuccess) failedSettings.push("首页排序");
             if (!agentAddressSuccess) failedSettings.push("智能体地址");
+            if (!platformTitleSuccess) failedSettings.push("平台标题");
+            if (!dailyCourseSuccess) failedSettings.push("日课按钮");
+            if (!specialTrainingSuccess) failedSettings.push("特训按钮");
+            if (!tuanweiButtonSuccess) failedSettings.push("团委按钮");
             
             statusMessage = "保存失败的设置: " + failedSettings.join(", ") + "，请重试"
             isSuccess = false
