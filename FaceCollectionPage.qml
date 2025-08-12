@@ -40,6 +40,45 @@ Rectangle {
         }
     }
 
+    // 删除用户数据的函数
+    function deleteUserData(workId, name) {
+        console.log("删除用户函数被调用，工号:", workId, "姓名:", name)
+        // 确认删除
+        confirmDeleteText.text = "确定要删除用户 " + name + " (" + workId + ") 吗？"
+        confirmDeleteDialog.workIdToDelete = workId
+        console.log("准备打开确认删除对话框")
+        confirmDeleteDialog.open()
+        console.log("确认删除对话框应该已打开")
+    }
+
+    // 执行删除操作
+    function performDelete(workId) {
+        console.log("开始执行删除操作，工号:", workId)
+        
+        // 从数据库删除用户
+        var result = dbManager.deleteFaceData(workId)
+        console.log("数据库删除操作结果:", result)
+        
+        if (!result) {
+            console.log("删除用户失败，显示错误消息")
+            messageText.text = "删除用户失败！"
+            messagePopup.open()
+            return
+        }
+        
+        console.log("删除用户成功")
+        
+        // 重新从数据库加载数据到模型
+        loadFaceDataFromDatabase()
+        
+        // 显示成功消息
+        messageText.text = "用户删除成功！"
+        messagePopup.open()
+        
+        // 通知用户列表已更新
+        userListUpdated()
+    }
+
     // 保存用户数据的函数（去掉面容采集）
     function saveUserData() {
         // 验证信息是否完整
@@ -430,6 +469,107 @@ Rectangle {
         }
     }
 
+    // 确认删除对话框
+    Popup {
+        id: confirmDeleteDialog
+        width: 300
+        height: 150
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape
+        z: 1000
+        anchors.centerIn: parent
+        
+        // 自定义属性，存储要删除的工号
+        property string workIdToDelete: ""
+
+        background: Rectangle {
+            color: "white"
+            border.color: "#e0e0e0"
+            border.width: 1
+            radius: 10
+        }
+        
+        // 弹窗打开时的调试信息
+        onOpened: {
+            console.log("确认删除对话框已打开，要删除的工号:", workIdToDelete)
+        }
+        
+        // 弹窗关闭时的调试信息
+        onClosed: {
+            console.log("确认删除对话框已关闭")
+        }
+
+        Column {
+            anchors.centerIn: parent
+            spacing: 20
+
+            Text {
+                id: confirmDeleteText
+                text: ""
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 16
+                color: "#333"
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WordWrap
+                width: parent.width - 40
+            }
+
+            Row {
+                spacing: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                Button {
+                    text: "是"
+                    width: 80
+                    height: 30
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 14
+                    background: Rectangle {
+                        color: "#ff6b6b"
+                        radius: 5
+                    }
+                    contentItem: Text {
+                        text: "是"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 14
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("点击了'是'按钮，准备删除用户")
+                        performDelete(confirmDeleteDialog.workIdToDelete)
+                        confirmDeleteDialog.close()
+                    }
+                }
+
+                Button {
+                    text: "否"
+                    width: 80
+                    height: 30
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 14
+                    background: Rectangle {
+                        color: "#e0e0e0"
+                        radius: 5
+                    }
+                    contentItem: Text {
+                        text: "否"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 14
+                        color: "#333"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("点击了'否'按钮，取消删除操作")
+                        confirmDeleteDialog.close()
+                    }
+                }
+            }
+        }
+    }
 
     // 用户列表视图
     ListView {
@@ -467,7 +607,7 @@ Rectangle {
 
                 Column {
                     spacing: 5
-                    width: parent.width - 80
+                    width: parent.width - 140
 
                     Text {
                         text: name + " (" + workId + ")"
@@ -489,6 +629,25 @@ Rectangle {
                         font.pixelSize: 14
                         color: isAdmin ? "#ff6b6b" : "#4ecdc4"
                     }
+                }
+
+                Button {
+                    width: 60
+                    height: 30
+                    anchors.verticalCenter: parent.verticalCenter
+                    background: Rectangle {
+                        color: "#ff6b6b"
+                        radius: 5
+                    }
+                    contentItem: Text {
+                        text: "删除"
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 14
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: deleteUserData(workId, name)
                 }
             }
         }
