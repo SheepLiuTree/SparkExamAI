@@ -82,6 +82,13 @@ Window {
             font.family: "阿里妈妈数黑体"
             font.pixelSize: 48
             color: "white"
+
+            MouseArea {
+                anchors.fill: parent
+                onDoubleClicked: {
+                    exitConfirmationDialog.open();
+                }
+            }
         }
         Text {
             id: date_text
@@ -3126,6 +3133,96 @@ Window {
             }
         }
     }
+// 退出确认对话框
+Dialog {
+    id: exitConfirmationDialog
+    title: "确认退出"
+    modal: true
+    anchors.centerIn: parent
+    width: 300
+    height: 150
+    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+    background: Rectangle {
+        color: "#FFFFFF"
+        radius: 10
+        border.color: "#E0E0E0"
+        border.width: 1
+    }
+
+    contentItem: Rectangle {
+        anchors.fill: parent
+        color: "transparent"
+
+        Text {
+            id: confirmationText
+            text: "确定要退出软件吗？"
+            font.family: "阿里妈妈数黑体"
+            font.pixelSize: 18
+            color: "#333333"
+            anchors.centerIn: parent
+        }
+    }
+
+    footer: Rectangle {
+        color: "transparent"
+        height: 50
+
+        Row {
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 20
+
+            Button {
+                text: "确定"
+                width: 80
+                height: 30
+
+                background: Rectangle {
+                    color: "#F44336"
+                    radius: 5
+                }
+
+                contentItem: Text {
+                    text: "确定"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 14
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: {
+                    Qt.quit();
+                }
+            }
+
+            Button {
+                text: "取消"
+                width: 80
+                height: 30
+
+                background: Rectangle {
+                    color: "#4CAF50"
+                    radius: 5
+                }
+
+                contentItem: Text {
+                    text: "取消"
+                    font.family: "阿里妈妈数黑体"
+                    font.pixelSize: 14
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                onClicked: {
+                    exitConfirmationDialog.close();
+                }
+            }
+        }
+    }
+}
+
 // 密码验证对话框
 PasswordDialog {
     id: passwordDialog
