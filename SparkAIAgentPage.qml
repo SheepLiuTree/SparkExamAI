@@ -204,7 +204,6 @@ Rectangle {
                         settings.accelerated2dCanvasEnabled = true
                         settings.hyperlinkAuditingEnabled = false
                         settings.localStorageEnabled = true
-                        settings.sessionStorageEnabled = true
                         settings.dnsPrefetchEnabled = true
                     }
                     
@@ -255,6 +254,62 @@ Rectangle {
                     
                     // 设置缩放因子
                     zoomFactor: 1.0
+                    
+                    // 添加视口大小调整处理
+                    onWidthChanged: {
+                        console.log("WebView宽度变化: " + width);
+                        // 当宽度变化时，重新运行JavaScript以确保页面适应新尺寸
+                        if (url.toString() !== "about:blank") {
+                            runJavaScript(`
+                                // 调整视口大小
+                                if (window.innerWidth !== ${width}) {
+                                    window.innerWidth = ${width};
+                                }
+                                
+                                // 触发resize事件
+                                window.dispatchEvent(new Event('resize'));
+                                
+                                // 重新应用布局修复
+                                document.body.style.width = '100%';
+                                document.body.style.maxWidth = '100%';
+                                document.body.style.overflowX = 'hidden';
+                                
+                                // 确保所有容器都适应新宽度
+                                var containers = document.querySelectorAll('.container, .main, .content, .wrapper, .app-container, .app-main, .app-content');
+                                containers.forEach(function(el) {
+                                    el.style.width = '100%';
+                                    el.style.maxWidth = '100%';
+                                });
+                            `);
+                        }
+                    }
+                    
+                    onHeightChanged: {
+                        console.log("WebView高度变化: " + height);
+                        // 当高度变化时，重新运行JavaScript以确保页面适应新尺寸
+                        if (url.toString() !== "about:blank") {
+                            runJavaScript(`
+                                // 调整视口大小
+                                if (window.innerHeight !== ${height}) {
+                                    window.innerHeight = ${height};
+                                }
+                                
+                                // 触发resize事件
+                                window.dispatchEvent(new Event('resize'));
+                                
+                                // 重新应用布局修复
+                                document.body.style.height = 'auto';
+                                document.body.style.minHeight = '100%';
+                                
+                                // 确保所有容器都适应新高度
+                                var containers = document.querySelectorAll('.container, .main, .content, .wrapper, .app-container, .app-main, .app-content');
+                                containers.forEach(function(el) {
+                                    el.style.height = 'auto';
+                                    el.style.minHeight = '100%';
+                                });
+                            `);
+                        }
+                    }
                     
                     // 页面加载完成后执行
                     onLoadingChanged: function(loadRequest) {
@@ -361,8 +416,33 @@ Rectangle {
                                         overflow-x: auto;
                                         overflow-y: auto;
                                         width: 100%;
-                                        height: auto;
+                                        height: 100%;
                                         min-height: 100vh;
+                                        position: relative;
+                                    }
+                                    
+                                    /* 设置视口元数据 */
+                                    @viewport {
+                                        width: device-width;
+                                        initial-scale: 1.0;
+                                        maximum-scale: 1.0;
+                                        user-scalable: no;
+                                    }
+                                    
+                                    /* 确保网页内容适应控件大小 */
+                                    html {
+                                        transform-origin: top left;
+                                        transform: scale(1.0);
+                                        width: 100%;
+                                        height: 100%;
+                                    }
+                                    
+                                    body {
+                                        width: 100%;
+                                        max-width: 100%;
+                                        overflow-x: hidden;
+                                        margin: 0;
+                                        padding: 0;
                                     }
                                     
                                     /* 修复主要容器布局 - 只针对可能的问题容器 */
@@ -405,18 +485,38 @@ Rectangle {
                                         width: 100% !important;
                                         max-width: 100% !important;
                                         overflow: visible !important;
+                                        box-sizing: border-box !important;
+                                        display: flex !important;
+                                        flex-direction: column !important;
                                     }
                                     
                                     .coze-message {
                                         width: auto !important;
                                         max-width: 80% !important;
                                         margin: 5px 0 !important;
+                                        box-sizing: border-box !important;
+                                        word-wrap: break-word !important;
+                                        overflow: visible !important;
                                     }
                                     
                                     .coze-input-area {
                                         width: 100% !important;
                                         min-height: 50px !important;
                                         padding: 10px !important;
+                                        box-sizing: border-box !important;
+                                        display: flex !important;
+                                        flex-direction: row !important;
+                                        align-items: center !important;
+                                    }
+                                    
+                                    /* 确保所有容器都正确适应父容器 */
+                                    .app-container, .app-main, .app-content {
+                                        width: 100% !important;
+                                        max-width: 100% !important;
+                                        height: auto !important;
+                                        min-height: 100% !important;
+                                        overflow: visible !important;
+                                        box-sizing: border-box !important;
                                     }
                                 \`;
                                 document.head.appendChild(fixStyle);
