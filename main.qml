@@ -3237,7 +3237,8 @@ PasswordDialog {
         
         if (mode === "password") {
             // 仅密码验证 - 使用正确的密码
-            if (enteredPassword === "123456") {
+            var rootPassword = dbManager.getSetting("admin_password","123456")
+            if (enteredPassword === rootPassword) {
                 isValid = true
                 // 创建临时用户数据，管理员权限在验证后检查
                 userData = {
