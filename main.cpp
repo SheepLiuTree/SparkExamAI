@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QProcess>
+#include <QtWebEngine>
 #include "FileManager.h"
 #include "DatabaseManager.h"
 #include "FaceRecognizer.h"
@@ -46,6 +47,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     QGuiApplication app(argc, argv);
+    
+    // 初始化QtWebEngine
+    QtWebEngine::initialize();
     
     // 详细的启动日志
     qDebug() << "\n\n====================== 应用程序启动 ======================";

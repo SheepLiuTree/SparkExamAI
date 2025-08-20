@@ -89,17 +89,6 @@ Rectangle {
         color: "#44ffffff"
         radius: 10
         
-        // 刷新定时器
-        Timer {
-            id: refreshTimer
-            interval: 3000 // 3秒后刷新
-            repeat: false
-            onTriggered: {
-                console.log("刷新页面");
-                webView.reload();
-            }
-        }
-        
         // 内容组件加载器
         Loader {
             id: contentLoader
@@ -124,6 +113,28 @@ Rectangle {
             
             Item {
                 anchors.fill: parent
+                
+                // 刷新定时器
+                Timer {
+                    id: refreshTimer
+                    interval: 3000 // 3秒后刷新
+                    repeat: false
+                    onTriggered: {
+                        console.log("刷新页面");
+                        webView.reload();
+                    }
+                }
+                
+                // 页面加载超时定时器
+                Timer {
+                    id: loadingTimeoutTimer
+                    interval: 15000 // 15秒超时
+                    repeat: false
+                    onTriggered: {
+                        console.log("页面加载超时，尝试重新加载");
+                        webView.reload();
+                    }
+                }
                 
                 // 加载进度条
                 Rectangle {
@@ -163,16 +174,37 @@ Rectangle {
                     
                     // 页面加载完成后执行
                     onLoadingChanged: function(loadRequest) {
+                        console.log("页面加载状态变化: " + loadRequest.status)
                         if (loadRequest.status === WebEngineLoadRequest.LoadSucceededStatus) {
                             console.log("网页加载成功")
-                            // 在页面加载成功后注入JavaScript来处理浏览器兼容性问题
+                            console.log("当前URL: " + webView.url)
+                            // 停止超时定时器
+                            loadingTimeoutTimer.stop()
+                            
+                            // 延迟一点再注入JavaScript，确保页面完全加载
                             webView.runJavaScript(`
+                                console.log('页面已加载，当前URL: ' + window.location.href);
+                                console.log('页面标题: ' + document.title);
+                                console.log('页面内容长度: ' + document.body.innerHTML.length);
+                                
+                                // 检查页面是否有内容
+                                if (document.body.innerHTML.trim() === '') {
+                                    console.log('警告: 页面内容为空');
+                                    // 尝试重新加载页面
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 1000);
+                                    return;
+                                }
+                                
                                 // 设置用户代理为最新版Chrome
                                 Object.defineProperty(navigator, 'userAgent', {
-                                    get: function () { 
-                                        return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'; 
+                                    get: function () {
+                                        return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36';
                                     }
                                 });
+                                
+                                console.log('用户代理已设置为Chrome');
                                 
                                 // 通用函数：处理兼容性警告
                                 function handleCompatibilityWarnings() {
@@ -233,23 +265,46 @@ Rectangle {
                                 handleCompatibilityWarnings();
                                 
                                 // 设置定时检查，确保动态加载的内容也能被处理
-                                setInterval(handleCompatibilityWarnings, 2000);
+                                // 但限制检查次数和频率
+                                let checkCount = 0;
+                                const maxChecks = 10; // 最多检查10次
+                                const checkInterval = setInterval(() => {
+                                    checkCount++;
+                                    handleCompatibilityWarnings();
+                                    
+                                    // 达到最大检查次数后停止
+                                    if (checkCount >= maxChecks) {
+                                        clearInterval(checkInterval);
+                                        console.log('兼容性检查已完成，停止定时检查');
+                                    }
+                                }, 3000); // 每3秒检查一次，而不是2秒
                             `);
                             
                             // 启动检查定时器
                             compatibilityCheckTimer.start();
                         } else if (loadRequest.status === WebEngineLoadRequest.LoadFailedStatus) {
                             console.error("网页加载失败: " + loadRequest.errorString)
+                            // 停止超时定时器
+                            loadingTimeoutTimer.stop()
                             contentLoader.sourceComponent = fallbackComponent
+                        } else if (loadRequest.status === WebEngineLoadRequest.LoadStartedStatus) {
+                            console.log("网页开始加载: " + webView.url)
+                            // 启动超时定时器
+                            loadingTimeoutTimer.start()
                         }
                     }
                     
                     // 添加检测并处理兼容性问题的JavaScript
                     onJavaScriptConsoleMessage: function(level, message, lineNumber, sourceID) {
-                        // 检测与兼容性相关的错误消息
-                        if (message.indexOf("兼容性") >= 0 || message.indexOf("compatibility") >= 0) {
-                            console.log("检测到兼容性问题，尝试解决...");
-                            refreshTimer.start(); // 设置延迟刷新页面
+                        // 只检测特定的兼容性错误消息，避免过于敏感
+                        if ((message.indexOf("兼容性") >= 0 || message.indexOf("compatibility") >= 0) &&
+                            (message.indexOf("错误") >= 0 || message.indexOf("error") >= 0 ||
+                             message.indexOf("不支持") >= 0 || message.indexOf("not supported") >= 0)) {
+                            console.log("检测到兼容性错误，尝试解决...");
+                            // 只在真正需要时刷新，减少不必要的刷新
+                            if (!refreshTimer.running) {
+                                refreshTimer.start();
+                            }
                         }
                     }
                 }
@@ -257,25 +312,42 @@ Rectangle {
                 // 添加定时器组件用于定期检查兼容性问题
                 Timer {
                     id: compatibilityCheckTimer
-                    interval: 5000 // 5秒检查一次
+                    interval: 10000 // 增加到10秒检查一次，减少频率
                     repeat: true
+                    property int checkCount: 0
+                    property int maxChecks: 5 // 最多检查5次
+                    
                     onTriggered: {
+                        checkCount++;
+                        // 限制检查次数，避免无限检查
+                        if (checkCount > maxChecks) {
+                            console.log("兼容性检查次数已达上限，停止检查");
+                            this.stop();
+                            return;
+                        }
+                        
                         webView.runJavaScript(`
                             // 检查页面中是否存在兼容性问题提示
                             const pageText = document.body.innerText;
-                            if (pageText.includes('兼容性问题') || 
-                                pageText.includes('请切换') || 
-                                pageText.includes('Chrome') ||
-                                pageText.includes('Safari') ||
-                                pageText.includes('Edge') ||
-                                pageText.includes('Firefox')) {
+                            if (pageText.includes('兼容性问题') ||
+                                pageText.includes('请切换浏览器') ||
+                                pageText.includes('浏览器版本过低') ||
+                                pageText.includes('升级浏览器')) {
                                 
                                 // 执行移除兼容性警告的函数
                                 if (typeof handleCompatibilityWarnings === 'function') {
                                     handleCompatibilityWarnings();
+                                    return true; // 表示发现了兼容性问题
                                 }
                             }
-                        `);
+                            return false; // 表示未发现兼容性问题
+                        `, function(result) {
+                            // 如果没有发现兼容性问题，减少后续检查频率
+                            if (result === false && checkCount >= 3) {
+                                console.log("连续检查未发现兼容性问题，停止检查");
+                                compatibilityCheckTimer.stop();
+                            }
+                        });
                     }
                 }
             }
