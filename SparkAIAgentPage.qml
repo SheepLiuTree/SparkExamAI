@@ -509,6 +509,59 @@ Rectangle {
                                         align-items: center !important;
                                     }
                                     
+                                    /* 隐藏触发器元素 */
+                                    [data-testid="coze.assistant.pop.ui.trigger"] {
+                                        display: none !important;
+                                        visibility: hidden !important;
+                                        opacity: 0 !important;
+                                        width: 0 !important;
+                                        height: 0 !important;
+                                        overflow: hidden !important;
+                                    }
+                                    
+                                    [data-testid="coze.assistant.pop.ui.trigger"] > div {
+                                        display: none !important;
+                                        visibility: hidden !important;
+                                        opacity: 0 !important;
+                                        width: 0 !important;
+                                        height: 0 !important;
+                                        overflow: hidden !important;
+                                    }
+                                    
+                                    /* 修复textarea容器宽度问题 */
+                                    .textarea-with-actions-container--vZmOWDDoAgGmFoiU {
+                                        width: 100% !important;
+                                        max-width: 100% !important;
+                                        box-sizing: border-box !important;
+                                        padding: 8px 8px 8px 20px !important;
+                                        display: flex !important;
+                                        flex-direction: row !important;
+                                        align-items: center !important;
+                                        overflow: visible !important;
+                                    }
+                                    
+                                    .textarea-with-actions-container__row--LQiovzz36EjPClsO {
+                                        width: 100% !important;
+                                        max-width: 100% !important;
+                                        box-sizing: border-box !important;
+                                        display: flex !important;
+                                        flex-direction: row !important;
+                                        align-items: center !important;
+                                        overflow: visible !important;
+                                    }
+                                    
+                                    [data-testid="bot.ide.chat_area.chat_input.textarea"] {
+                                        width: 100% !important;
+                                        max-width: 100% !important;
+                                        min-height: 24px !important;
+                                        max-height: 104px !important;
+                                        height: 24px !important;
+                                        box-sizing: border-box !important;
+                                        resize: none !important;
+                                        overflow-y: hidden !important;
+                                        font-size: 14px !important;
+                                    }
+                                    
                                     /* 确保所有容器都正确适应父容器 */
                                     .app-container, .app-main, .app-content {
                                         width: 100% !important;
@@ -523,6 +576,45 @@ Rectangle {
                                 
                                 // 添加修复显示问题的JavaScript - 更加精准的修复策略
                                 setTimeout(function() {
+                                    // 移除特定的Coze触发器元素
+                                    var cozeTrigger = document.querySelector('[data-testid="coze.assistant.pop.ui.trigger"]');
+                                    if (cozeTrigger) {
+                                        cozeTrigger.style.display = 'none';
+                                        cozeTrigger.style.visibility = 'hidden';
+                                        cozeTrigger.style.opacity = '0';
+                                        cozeTrigger.style.width = '0';
+                                        cozeTrigger.style.height = '0';
+                                        cozeTrigger.style.overflow = 'hidden';
+                                        console.log('已隐藏Coze触发器元素');
+                                    }
+                                    
+                                    var textareaContainer = document.querySelector('.textarea-with-actions-container--vZmOWDDoAgGmFoiU');
+                                    if (textareaContainer) {
+                                        textareaContainer.style.width = '100%';
+                                        textareaContainer.style.maxWidth = '100%';
+                                        textareaContainer.style.boxSizing = 'border-box';
+                                        textareaContainer.style.padding = '8px 8px 8px 20px';
+                                        textareaContainer.style.display = 'flex';
+                                        textareaContainer.style.flexDirection = 'row';
+                                        textareaContainer.style.alignItems = 'center';
+                                        textareaContainer.style.overflow = 'visible';
+                                        console.log('修复了textarea容器宽度');
+                                    }
+                                    
+                                    var chatInputTextarea = document.querySelector('[data-testid="bot.ide.chat_area.chat_input.textarea"]');
+                                    if (chatInputTextarea) {
+                                        chatInputTextarea.style.width = '100%';
+                                        chatInputTextarea.style.maxWidth = '100%';
+                                        chatInputTextarea.style.minHeight = '24px';
+                                        chatInputTextarea.style.maxHeight = '104px';
+                                        chatInputTextarea.style.height = '24px';
+                                        chatInputTextarea.style.boxSizing = 'border-box';
+                                        chatInputTextarea.style.resize = 'none';
+                                        chatInputTextarea.style.overflowY = 'hidden';
+                                        chatInputTextarea.style.fontSize = '14px';
+                                        console.log('修复了chat input textarea');
+                                    }
+                                    
                                     // 只修复重要的交互元素，而不是所有元素
                                     var importantSelectors = [
                                         'button', 'input', 'select', 'textarea', 'a',
