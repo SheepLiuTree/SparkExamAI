@@ -17,8 +17,8 @@ Rectangle {
         anchors.topMargin: 20
         anchors.left: parent.left
         anchors.leftMargin: 20
-        width: 100
-        height: 40
+        width: 120
+        height: 45
         background: Image {
             source: "qrc:/images/button_bg.png"
             fillMode: Image.Stretch
@@ -26,7 +26,7 @@ Rectangle {
         contentItem: Text {
             text: "返回"
             font.family: "阿里妈妈数黑体"
-            font.pixelSize: 18
+            font.pixelSize: 16
             color: "white"
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -51,11 +51,39 @@ Rectangle {
         }
     }
     
+    // 浏览器打开按钮
+    Button {
+        id: browserButton
+        anchors.top: parent.top
+        anchors.topMargin: 20
+        anchors.left: backButton.right
+        anchors.leftMargin: 10
+        width: 150
+        height: 45
+        background: Image {
+            source: "qrc:/images/button_bg.png"
+            fillMode: Image.Stretch
+        }
+        contentItem: Text {
+            text: "浏览器打开"
+            font.family: "阿里妈妈数黑体"
+            font.pixelSize: 16
+            color: "white"
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+        
+        onClicked: {
+            console.log("在浏览器中打开网址: " + aiAgentUrl)
+            Qt.openUrlExternally(aiAgentUrl)
+        }
+    }
+    
     // 页面标题
     Text {
         id: pageTitle
         anchors.top: parent.top
-        anchors.topMargin: 30
+        anchors.topMargin: 25
         anchors.horizontalCenter: parent.horizontalCenter
         text: "团委智能体"
         font.family: "阿里妈妈数黑体"
@@ -68,7 +96,7 @@ Rectangle {
     Text {
         id: welcomeText
         anchors.top: pageTitle.bottom
-        anchors.topMargin: 10
+        anchors.topMargin: 15
         anchors.horizontalCenter: parent.horizontalCenter
         text: "欢迎使用团委智能体!"
         font.family: "阿里妈妈数黑体"
@@ -79,13 +107,13 @@ Rectangle {
     // 内容区域
     Rectangle {
         anchors.top: welcomeText.bottom
-        anchors.topMargin: 30
+        anchors.topMargin: 25
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 50
+        anchors.bottomMargin: 30
         anchors.left: parent.left
-        anchors.leftMargin: parent.width * 0.1
+        anchors.leftMargin: Math.max(20, parent.width * 0.08)
         anchors.right: parent.right
-        anchors.rightMargin: parent.width * 0.1
+        anchors.rightMargin: Math.max(20, parent.width * 0.08)
         color: "#44ffffff"
         radius: 10
         
@@ -93,7 +121,7 @@ Rectangle {
         Loader {
             id: contentLoader
             anchors.fill: parent
-            anchors.margins: 10
+            anchors.margins: 15
             
             Component.onCompleted: {
                 // 尝试加载WebEngine组件
@@ -114,25 +142,39 @@ Rectangle {
             Item {
                 anchors.fill: parent
                 
-                // 刷新定时器
-                Timer {
-                    id: refreshTimer
-                    interval: 3000 // 3秒后刷新
-                    repeat: false
-                    onTriggered: {
-                        console.log("刷新页面");
-                        webView.reload();
-                    }
-                }
-                
                 // 页面加载超时定时器
                 Timer {
                     id: loadingTimeoutTimer
-                    interval: 15000 // 15秒超时
+                    interval: 45000 // 增加到45秒超时，给Coze页面更多加载时间
                     repeat: false
                     onTriggered: {
-                        console.log("页面加载超时，尝试重新加载");
-                        webView.reload();
+                        console.log("页面加载超时，尝试重新加载页面");
+                        if (webView.loading) {
+                            webView.reload();
+                            loadingTimeoutTimer.start(); // 重新启动定时器
+                        }
+                    }
+                }
+                
+                // 页面重试计数器
+                property int retryCount: 0
+                property int maxRetries: 3
+                
+                // 延迟重试定时器
+                Timer {
+                    id: retryTimer
+                    interval: 2000 // 2秒后重试
+                    repeat: false
+                    onTriggered: {
+                        if (webView.retryCount < webView.maxRetries) {
+                            console.log("尝试重新加载页面，重试次数: " + (webView.retryCount + 1));
+                            webView.retryCount++;
+                            webView.reload();
+                            loadingTimeoutTimer.start();
+                        } else {
+                            console.log("达到最大重试次数，停止重试");
+                            webView.retryCount = 0;
+                        }
                     }
                 }
                 
@@ -154,11 +196,28 @@ Rectangle {
                     anchors.fill: parent
                     url: sparkAIAgentPage.aiAgentUrl
                     
+                    // 添加加载完成后的额外处理
+                    Component.onCompleted: {
+                        // 设置视口元数据
+                        settings.localStorageEnabled = true
+                        settings.webGLEnabled = true
+                        settings.accelerated2dCanvasEnabled = true
+                        settings.hyperlinkAuditingEnabled = false
+                        settings.localStorageEnabled = true
+                        settings.sessionStorageEnabled = true
+                        settings.dnsPrefetchEnabled = true
+                    }
+                    
                     // 设置自定义用户代理
                     profile: WebEngineProfile {
-                        httpUserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+                        httpUserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
                         httpCacheType: WebEngineProfile.DiskHttpCache
                         persistentCookiesPolicy: WebEngineProfile.AllowPersistentCookies
+                        httpAcceptLanguage: "zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7"
+                        httpCacheMaximumSize: 104857600 // 100MB 缓存
+                        offTheRecord: false
+                        storageName: "CozeProfile"
+                        persistentStoragePath: ""
                     }
                     
                     // 设置WebEngineView属性
@@ -170,7 +229,32 @@ Rectangle {
                         errorPageEnabled: false // 不显示错误页面
                         pluginsEnabled: true // 启用插件支持
                         fullScreenSupportEnabled: true
+                        localContentCanAccessRemoteUrls: true
+                        allowRunningInsecureContent: true
+                        spatialNavigationEnabled: true
+                        touchIconsEnabled: true
+                        webGLEnabled: true
+                        accelerated2dCanvasEnabled: true
+                        hyperlinkAuditingEnabled: false
+                        focusOnNavigationEnabled: true
+                        printElementBackgrounds: true
+                        
+                        // 添加对现代Web应用的支持
+                        localStorageEnabled: true
+                        dnsPrefetchEnabled: true
+                        screenCaptureEnabled: true
+                        localContentCanAccessFileUrls: true
+                        allowGeolocationOnInsecureOrigins: true
+                        
+                        // 性能优化
+                        autoLoadIconsForPage: true
+                        
+                        // 安全设置
+                        allowWindowActivationFromJavaScript: true
                     }
+                    
+                    // 设置缩放因子
+                    zoomFactor: 1.0
                     
                     // 页面加载完成后执行
                     onLoadingChanged: function(loadRequest) {
@@ -181,112 +265,253 @@ Rectangle {
                             // 停止超时定时器
                             loadingTimeoutTimer.stop()
                             
-                            // 延迟一点再注入JavaScript，确保页面完全加载
+                            // 增强的JavaScript注入，修复显示问题
                             webView.runJavaScript(`
                                 console.log('页面已加载，当前URL: ' + window.location.href);
                                 console.log('页面标题: ' + document.title);
-                                console.log('页面内容长度: ' + document.body.innerHTML.length);
-                                
-                                // 检查页面是否有内容
-                                if (document.body.innerHTML.trim() === '') {
-                                    console.log('警告: 页面内容为空');
-                                    // 尝试重新加载页面
-                                    setTimeout(() => {
-                                        window.location.reload();
-                                    }, 1000);
-                                    return;
-                                }
                                 
                                 // 设置用户代理为最新版Chrome
                                 Object.defineProperty(navigator, 'userAgent', {
                                     get: function () {
-                                        return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36';
+                                        return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
                                     }
                                 });
                                 
-                                console.log('用户代理已设置为Chrome');
+                                // 模拟更多浏览器特性
+                                Object.defineProperty(navigator, 'platform', {
+                                    get: function () {
+                                        return 'Win32';
+                                    }
+                                });
                                 
-                                // 通用函数：处理兼容性警告
-                                function handleCompatibilityWarnings() {
-                                    // 检查是否存在兼容性警告
-                                    const warningTexts = ['兼容性问题', '请切换', 'Chrome', 'Safari', 'Edge', 'Firefox', '浏览器', '升级'];
-                                    const allElements = document.querySelectorAll('*');
-                                    
-                                    // 查找和处理警告元素
-                                    allElements.forEach(el => {
-                                        if (el.innerText) {
-                                            for (const warningText of warningTexts) {
-                                                if (el.innerText.includes(warningText)) {
-                                                    // 找到包含警告的父容器并隐藏
-                                                    let parent = el;
-                                                    for (let i = 0; i < 5; i++) {
-                                                        parent = parent.parentElement;
-                                                        if (!parent) break;
-                                                        if (parent.tagName === 'DIV' || parent.tagName === 'SECTION') {
-                                                            parent.style.display = 'none';
-                                                            console.log('已隐藏兼容性警告');
-                                                            break;
-                                                        }
-                                                    }
-                                                    break;
-                                                }
-                                            }
+                                Object.defineProperty(navigator, 'vendor', {
+                                    get: function () {
+                                        return 'Google Inc.';
+                                    }
+                                });
+                                
+                                Object.defineProperty(window, 'chrome', {
+                                    get: function () {
+                                        return {
+                                            runtime: {},
+                                            app: {},
+                                            webstore: {}
+                                        };
+                                    }
+                                });
+                                
+                                // 添加常用Web API
+                                if (typeof Notification === 'undefined') {
+                                    window.Notification = {
+                                        permission: 'granted',
+                                        requestPermission: function(callback) {
+                                            callback('granted');
                                         }
-                                    });
-                                    
-                                    // 查找并点击所有可能的升级/确认按钮
-                                    const buttons = document.querySelectorAll('button, a');
-                                    buttons.forEach(btn => {
-                                        if (btn.innerText && (
-                                            btn.innerText.includes('升级') || 
-                                            btn.innerText.includes('继续') ||
-                                            btn.innerText.includes('确定') ||
-                                            btn.innerText.includes('我知道了')
-                                        )) {
-                                            try {
-                                                btn.click();
-                                                console.log('点击了按钮：' + btn.innerText);
-                                            } catch (e) {}
-                                        }
-                                    });
-                                    
-                                    // 移除遮罩层
-                                    const overlays = document.querySelectorAll('.overlay, [class*="modal"], [class*="mask"], [class*="popup"]');
-                                    overlays.forEach(overlay => {
-                                        overlay.style.display = 'none';
-                                    });
-                                    
-                                    // 确保主要内容可见
-                                    document.body.style.overflow = 'auto';
-                                    document.body.style.pointerEvents = 'auto';
+                                    };
                                 }
                                 
-                                // 立即执行一次
-                                handleCompatibilityWarnings();
+                                // 模拟触摸设备支持
+                                if (!('ontouchstart' in window)) {
+                                    window.ontouchstart = null;
+                                    window.ontouchend = null;
+                                    window.ontouchmove = null;
+                                }
                                 
-                                // 设置定时检查，确保动态加载的内容也能被处理
-                                // 但限制检查次数和频率
-                                let checkCount = 0;
-                                const maxChecks = 10; // 最多检查10次
-                                const checkInterval = setInterval(() => {
-                                    checkCount++;
-                                    handleCompatibilityWarnings();
-                                    
-                                    // 达到最大检查次数后停止
-                                    if (checkCount >= maxChecks) {
-                                        clearInterval(checkInterval);
-                                        console.log('兼容性检查已完成，停止定时检查');
+                                // 添加设备内存信息
+                                if (typeof navigator.deviceMemory === 'undefined') {
+                                    Object.defineProperty(navigator, 'deviceMemory', {
+                                        get: function () {
+                                            return 8;
+                                        }
+                                    });
+                                }
+                                
+                                // 添加硬件并发信息
+                                if (typeof navigator.hardwareConcurrency === 'undefined') {
+                                    Object.defineProperty(navigator, 'hardwareConcurrency', {
+                                        get: function () {
+                                            return 8;
+                                        }
+                                    });
+                                }
+                                
+                                // 添加连接信息
+                                if (typeof navigator.connection === 'undefined') {
+                                    Object.defineProperty(navigator, 'connection', {
+                                        get: function () {
+                                            return {
+                                                effectiveType: '4g',
+                                                downlink: 10,
+                                                rtt: 100
+                                            };
+                                        }
+                                    });
+                                }
+                                
+                                // 添加修复显示问题的CSS - 更加温和的修复策略
+                                var fixStyle = document.createElement('style');
+                                fixStyle.innerHTML = \`
+                                    /* 基础布局修复 */
+                                    * {
+                                        box-sizing: border-box;
                                     }
-                                }, 3000); // 每3秒检查一次，而不是2秒
+                                    
+                                    /* 确保页面基础容器正常显示 */
+                                    body, html {
+                                        overflow-x: auto;
+                                        overflow-y: auto;
+                                        width: 100%;
+                                        height: auto;
+                                        min-height: 100vh;
+                                    }
+                                    
+                                    /* 修复主要容器布局 - 只针对可能的问题容器 */
+                                    .container, .main, .content, .wrapper {
+                                        width: 100%;
+                                        max-width: 100%;
+                                        margin: 0 auto;
+                                        box-sizing: border-box;
+                                    }
+                                    
+                                    /* 确保交互元素可见 - 只修复真正需要修复的元素 */
+                                    button, input, select, textarea, .btn, .button, .submit, .action {
+                                        display: inline-block;
+                                        visibility: visible;
+                                        opacity: 1;
+                                        position: relative;
+                                        z-index: 1;
+                                    }
+                                    
+                                    /* 修复文本显示问题 */
+                                    body, p, span, div, h1, h2, h3, h4, h5, h6 {
+                                        text-overflow: ellipsis;
+                                        white-space: normal;
+                                        word-wrap: break-word;
+                                        overflow: visible;
+                                    }
+                                    
+                                    /* 修复可能的z-index问题 - 只针对负值 */
+                                    [style*="z-index: -"] {
+                                        z-index: 1;
+                                    }
+                                    
+                                    /* 修复可能的transform问题 - 只针对导致不可见的transform */
+                                    [style*="transform: translate"] {
+                                        transform: none;
+                                    }
+                                    
+                                    /* 针对Coze网站的特定修复 */
+                                    .coze-chat-container, .coze-chat-input, .coze-chat-messages {
+                                        width: 100% !important;
+                                        max-width: 100% !important;
+                                        overflow: visible !important;
+                                    }
+                                    
+                                    .coze-message {
+                                        width: auto !important;
+                                        max-width: 80% !important;
+                                        margin: 5px 0 !important;
+                                    }
+                                    
+                                    .coze-input-area {
+                                        width: 100% !important;
+                                        min-height: 50px !important;
+                                        padding: 10px !important;
+                                    }
+                                \`;
+                                document.head.appendChild(fixStyle);
+                                
+                                // 添加修复显示问题的JavaScript - 更加精准的修复策略
+                                setTimeout(function() {
+                                    // 只修复重要的交互元素，而不是所有元素
+                                    var importantSelectors = [
+                                        'button', 'input', 'select', 'textarea', 'a',
+                                        '.btn', '.button', '.submit', '.action',
+                                        '.coze-chat-input', '.coze-send-button',
+                                        '.message-input', '.send-button'
+                                    ];
+                                    
+                                    importantSelectors.forEach(function(selector) {
+                                        var elements = document.querySelectorAll(selector);
+                                        elements.forEach(function(el) {
+                                            var computedStyle = window.getComputedStyle(el);
+                                            if (computedStyle.display === 'none' ||
+                                                computedStyle.visibility === 'hidden' ||
+                                                computedStyle.opacity === '0' ||
+                                                el.offsetWidth === 0 ||
+                                                el.offsetHeight === 0) {
+                                                
+                                                // 检查元素是否在可视区域内
+                                                var rect = el.getBoundingClientRect();
+                                                if (rect.width === 0 || rect.height === 0) {
+                                                    el.style.display = 'inline-block';
+                                                    el.style.visibility = 'visible';
+                                                    el.style.opacity = '1';
+                                                    el.style.width = 'auto';
+                                                    el.style.height = 'auto';
+                                                    console.log('修复了隐藏元素:', selector, el.className);
+                                                }
+                                            }
+                                        });
+                                    });
+                                    
+                                    // 只修复可能导致内容被截断的溢出问题
+                                    var containerSelectors = [
+                                        '.container', '.main', '.content', '.wrapper',
+                                        '.coze-chat-container', '.coze-chat-messages',
+                                        '.message-container', '.chat-container'
+                                    ];
+                                    
+                                    containerSelectors.forEach(function(selector) {
+                                        var elements = document.querySelectorAll(selector);
+                                        elements.forEach(function(el) {
+                                            var computedStyle = window.getComputedStyle(el);
+                                            if (computedStyle.overflow === 'hidden' ||
+                                                computedStyle.overflowX === 'hidden' ||
+                                                computedStyle.overflowY === 'hidden') {
+                                                
+                                                // 检查是否有子元素被截断
+                                                var children = el.children;
+                                                var hasOverflow = false;
+                                                for (var i = 0; i < children.length; i++) {
+                                                    var childRect = children[i].getBoundingClientRect();
+                                                    var parentRect = el.getBoundingClientRect();
+                                                    if (childRect.right > parentRect.right ||
+                                                        childRect.bottom > parentRect.bottom) {
+                                                        hasOverflow = true;
+                                                        break;
+                                                    }
+                                                }
+                                                
+                                                if (hasOverflow) {
+                                                    el.style.overflow = 'auto';
+                                                    el.style.overflowX = 'auto';
+                                                    el.style.overflowY = 'auto';
+                                                    console.log('修复了溢出容器:', selector);
+                                                }
+                                            }
+                                        });
+                                    });
+                                    
+                                    console.log('显示问题修复完成 - 使用精准修复策略');
+                                }, 1500);
+                                
+                                console.log('用户代理已设置为Chrome，显示问题修复脚本已注入');
                             `);
-                            
-                            // 启动检查定时器
-                            compatibilityCheckTimer.start();
                         } else if (loadRequest.status === WebEngineLoadRequest.LoadFailedStatus) {
                             console.error("网页加载失败: " + loadRequest.errorString)
                             // 停止超时定时器
                             loadingTimeoutTimer.stop()
-                            contentLoader.sourceComponent = fallbackComponent
+                            
+                            // 尝试重试加载
+                            if (webView.retryCount < webView.maxRetries) {
+                                console.log("页面加载失败，准备重试");
+                                retryTimer.start();
+                            } else {
+                                console.log("页面加载失败且已达到最大重试次数，显示后备组件");
+                                webView.retryCount = 0; // 重置重试计数器
+                                contentLoader.sourceComponent = fallbackComponent
+                            }
                         } else if (loadRequest.status === WebEngineLoadRequest.LoadStartedStatus) {
                             console.log("网页开始加载: " + webView.url)
                             // 启动超时定时器
@@ -296,60 +521,15 @@ Rectangle {
                     
                     // 添加检测并处理兼容性问题的JavaScript
                     onJavaScriptConsoleMessage: function(level, message, lineNumber, sourceID) {
-                        // 只检测特定的兼容性错误消息，避免过于敏感
+                        // 只记录兼容性错误，不再自动刷新页面
                         if ((message.indexOf("兼容性") >= 0 || message.indexOf("compatibility") >= 0) &&
                             (message.indexOf("错误") >= 0 || message.indexOf("error") >= 0 ||
                              message.indexOf("不支持") >= 0 || message.indexOf("not supported") >= 0)) {
-                            console.log("检测到兼容性错误，尝试解决...");
-                            // 只在真正需要时刷新，减少不必要的刷新
-                            if (!refreshTimer.running) {
-                                refreshTimer.start();
-                            }
+                            console.log("检测到兼容性错误: " + message);
                         }
                     }
                 }
                 
-                // 添加定时器组件用于定期检查兼容性问题
-                Timer {
-                    id: compatibilityCheckTimer
-                    interval: 10000 // 增加到10秒检查一次，减少频率
-                    repeat: true
-                    property int checkCount: 0
-                    property int maxChecks: 5 // 最多检查5次
-                    
-                    onTriggered: {
-                        checkCount++;
-                        // 限制检查次数，避免无限检查
-                        if (checkCount > maxChecks) {
-                            console.log("兼容性检查次数已达上限，停止检查");
-                            this.stop();
-                            return;
-                        }
-                        
-                        webView.runJavaScript(`
-                            // 检查页面中是否存在兼容性问题提示
-                            const pageText = document.body.innerText;
-                            if (pageText.includes('兼容性问题') ||
-                                pageText.includes('请切换浏览器') ||
-                                pageText.includes('浏览器版本过低') ||
-                                pageText.includes('升级浏览器')) {
-                                
-                                // 执行移除兼容性警告的函数
-                                if (typeof handleCompatibilityWarnings === 'function') {
-                                    handleCompatibilityWarnings();
-                                    return true; // 表示发现了兼容性问题
-                                }
-                            }
-                            return false; // 表示未发现兼容性问题
-                        `, function(result) {
-                            // 如果没有发现兼容性问题，减少后续检查频率
-                            if (result === false && checkCount >= 3) {
-                                console.log("连续检查未发现兼容性问题，停止检查");
-                                compatibilityCheckTimer.stop();
-                            }
-                        });
-                    }
-                }
             }
         }
         
