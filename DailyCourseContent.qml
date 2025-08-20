@@ -162,7 +162,7 @@ Rectangle {
         
         // 标题文本，放在中央
         Text {
-            text: "团委日课 - " + (userData ? userData.name : "用户")
+            text: dbManager.getSetting("daily_course_text", "日课") + " - " + (userData ? userData.name : "用户")
             font.family: "阿里妈妈数黑体"
             font.pixelSize: 24
             color: "white"
@@ -785,7 +785,7 @@ Rectangle {
         var success = dbManager.saveUserAnswerRecord(
             userData.workId,
             userData.name,
-            "团委日课",
+            dbManager.getSetting("daily_course_text", "日课"),
             total,
             score,
             answerData,
@@ -930,7 +930,7 @@ Rectangle {
                     color: "#2c70b7"
                     
                     Text {
-                        text: "✨ 团委日课结果 ✨"
+                        text: "✨ " + dbManager.getSetting("daily_course_text", "日课") + "结果 ✨"
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 22
                         font.bold: true
@@ -1073,7 +1073,7 @@ Rectangle {
                         }
                         onClicked: {
                             confirmDialog.dialogTitle = "退出确认"
-                            confirmDialog.dialogMessage = "确定要退出团委日课吗？"
+                            confirmDialog.dialogMessage = "确定要退出" + dbManager.getSetting("daily_course_text", "日课") + "吗？"
                             confirmDialog.confirmAction = function() {
                                 // 关闭结果对话框
                                 resultDialog.close()
@@ -1770,4 +1770,4 @@ Rectangle {
             }
         }
     }
-} 
+}

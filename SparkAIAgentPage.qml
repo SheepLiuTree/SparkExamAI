@@ -85,7 +85,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.topMargin: 25
         anchors.horizontalCenter: parent.horizontalCenter
-        text: "团委智能体"
+        text: dbManager.getSetting("ai_agent_text", "智能体")
         font.family: "阿里妈妈数黑体"
         font.pixelSize: 36
         color: "white"
@@ -98,7 +98,7 @@ Rectangle {
         anchors.top: pageTitle.bottom
         anchors.topMargin: 15
         anchors.horizontalCenter: parent.horizontalCenter
-        text: "欢迎使用团委智能体!"
+        text: "欢迎使用" + dbManager.getSetting("ai_agent_text", "智能体") + "!"
         font.family: "阿里妈妈数黑体"
         font.pixelSize: 20
         color: "white"
@@ -821,7 +821,7 @@ Rectangle {
     
     // 组件初始化时，确保WebEngine模块可用
     Component.onCompleted: {
-        console.log("团委智能体页面加载")
+        console.log(dbManager.getSetting("ai_agent_text", "智能体") + "页面加载")
         
         // 从数据库加载智能体地址设置
         var savedAgentAddress = dbManager.getSetting("ai_agent_address", "https://www.coze.cn/s/hn97Tsa7-fw/")
@@ -832,4 +832,4 @@ Rectangle {
             console.log("使用默认智能体地址: " + aiAgentUrl)
         }
     }
-} 
+}

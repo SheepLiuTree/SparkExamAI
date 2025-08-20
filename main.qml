@@ -74,22 +74,22 @@ Window {
         anchors.right: parent.right
         anchors.horizontalCenter: parent.horizontalCenter
         source: "qrc:/images/headline.png"
-        Text {
-            id: headline_text
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: "团委智能体平台"
-            font.family: "阿里妈妈数黑体"
-            font.pixelSize: 48
-            color: "white"
+            Text {
+                id: headline_text
+                anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: dbManager.getSetting("platform_title", "团委智能体平台")
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 48
+                color: "white"
 
-            MouseArea {
-                anchors.fill: parent
-                onDoubleClicked: {
-                    exitConfirmationDialog.open();
+                MouseArea {
+                    anchors.fill: parent
+                    onDoubleClicked: {
+                        exitConfirmationDialog.open();
+                    }
                 }
             }
-        }
         Text {
             id: date_text
             anchors.bottom: headline_background.bottom
@@ -242,7 +242,8 @@ Window {
                         fillMode: Image.Stretch
                     }
                     contentItem: Text {
-                        text: "团委日课"
+                        id: daily_course_button
+                        text: dbManager.getSetting("daily_course_text", "团委日课")
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 24
                         color: "white"
@@ -266,7 +267,8 @@ Window {
                         fillMode: Image.Stretch
                     }
                     contentItem: Text {
-                        text: "团委特训"
+                        id: special_training_button
+                        text: dbManager.getSetting("special_training_text", "团委特训")
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 24
                         color: "white"
@@ -396,7 +398,8 @@ Window {
                         fillMode: Image.Stretch
                     }
                     contentItem: Text {
-                        text: "团委智能体"
+                        id: personal_page_button
+                        text: dbManager.getSetting("tuanwei_button_text", "团委智能体")
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 24
                         color: "white"

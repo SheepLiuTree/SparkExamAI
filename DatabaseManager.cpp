@@ -1037,6 +1037,12 @@ void DatabaseManager::initDefaultSettings()
         setSetting("pentagon_title_4", "诊断分析");
         setSetting("pentagon_title_5", "安全规范");
         
+        // 平台标题和按钮文本设置
+        setSetting("platform_title", "智能体平台");
+        setSetting("daily_course_text", "日课");
+        setSetting("special_training_text", "特训");
+        setSetting("tuanwei_button_text", "智能体");
+        
         qDebug() << "初始化默认设置完成";
     }
 }

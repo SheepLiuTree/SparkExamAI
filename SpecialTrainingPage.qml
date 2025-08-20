@@ -247,7 +247,7 @@ Rectangle {
         
         // 标题文本，放在中央
         Text {
-            text: "团委特训 - " + (userData ? userData.name : "用户")
+            text: dbManager.getSetting("special_training_text", "特训") + " - " + (userData ? userData.name : "用户")
             font.family: "阿里妈妈数黑体"
             font.pixelSize: 24
             color: "white"
@@ -290,7 +290,6 @@ Rectangle {
                     font.pixelSize: 26
                     color: "white"
                     anchors.centerIn: parent
-                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }
@@ -529,4 +528,4 @@ Rectangle {
             }
         }
     }
-} 
+}

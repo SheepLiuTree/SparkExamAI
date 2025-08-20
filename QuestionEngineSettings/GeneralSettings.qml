@@ -591,7 +591,7 @@ Rectangle {
                             spacing: 10
                             
                             Text {
-                                text: "团委按钮:"
+                                text: "智能体按钮:"
                                 font.family: "阿里妈妈数黑体"
                                 font.pixelSize: 18
                                 color: "white"
