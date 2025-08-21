@@ -12,6 +12,7 @@ Rectangle {
     
     // 从数据库加载今日题目
     Component.onCompleted: {
+        console.log("进入DailyCourseContent页面，userData:", JSON.stringify(userData))
         loadTodayQuestions()
     }
     
@@ -782,6 +783,16 @@ Rectangle {
         }
         
         // 保存到数据库
+        console.log("执行saveUserAnswerRecord，参数:")
+        console.log("工号:", userData.workId)
+        console.log("姓名:", userData.name)
+        console.log("课程类型:", dbManager.getSetting("daily_course_text", "日课"))
+        console.log("总题数:", total)
+        console.log("得分:", score)
+        console.log("答题数据:", answerData)
+        console.log("题库分布:", questionBankInfoStr)
+        console.log("能力分布:", pentagonTypeInfoStr)
+        
         var success = dbManager.saveUserAnswerRecord(
             userData.workId,
             userData.name,
@@ -792,6 +803,8 @@ Rectangle {
             questionBankInfoStr,
             pentagonTypeInfoStr
         )
+        
+        console.log("saveUserAnswerRecord执行结果:", success)
         
         if (success) {
             console.log("答题记录已保存到数据库")

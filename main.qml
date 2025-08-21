@@ -3277,6 +3277,7 @@ PasswordDialog {
                 
                 // 跳转到对应页面
                 if (targetPage !== "") {
+                    userData = dbManager.getFaceDataByWorkId(enteredWorkId)
                     var component = Qt.createComponent(targetPage)
                     if (component.status === Component.Ready) {
                         var pageObject = component.createObject(stackView, {"userData": userData})
