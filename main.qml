@@ -78,7 +78,7 @@ Window {
                 id: headline_text
                 anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: dbManager.getSetting("platform_title", "团委智能体平台")
+                text: dbManager.getSetting("platform_title", "智能体平台")
                 font.family: "阿里妈妈数黑体"
                 font.pixelSize: 48
                 color: "white"
@@ -243,7 +243,7 @@ Window {
                     }
                     contentItem: Text {
                         id: daily_course_button
-                        text: dbManager.getSetting("daily_course_text", "团委日课")
+                        text: dbManager.getSetting("daily_course_text", "日课")
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 24
                         color: "white"
@@ -253,7 +253,7 @@ Window {
                     onClicked: {
                         console.log("团委日课 clicked")
                         passwordDialog.targetPage = "DailyCourseContent.qml"
-                        passwordDialog.titleText = "团委日课"
+                        passwordDialog.titleText = dbManager.getSetting("daily_course_text", "日课")
                         passwordDialog.mode = "name_workid_password"  // 姓名+工号+密码验证
                         passwordDialog.open()
                     }
@@ -268,7 +268,7 @@ Window {
                     }
                     contentItem: Text {
                         id: special_training_button
-                        text: dbManager.getSetting("special_training_text", "团委特训")
+                        text: dbManager.getSetting("special_training_text", "特训")
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 24
                         color: "white"
@@ -278,7 +278,7 @@ Window {
                     onClicked: {
                         console.log("团委特训 clicked")
                         passwordDialog.targetPage = "SpecialTrainingPage.qml"
-                        passwordDialog.titleText = "团委特训"
+                        passwordDialog.titleText = dbManager.getSetting("special_training_text", "特训")
                         passwordDialog.mode = "name_workid_password"  // 姓名+工号+密码验证
                         passwordDialog.open()
                     }
