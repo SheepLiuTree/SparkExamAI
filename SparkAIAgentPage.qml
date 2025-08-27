@@ -81,6 +81,7 @@ Rectangle {
                 console.log("检测到'继续对话...'，停止监测")
                 updateDebugInfo("监测完成", "检测到'继续对话...'，用户已登录，停止监测")
                 sourceMonitorTimer.stop()
+                loadingTimeoutTimer.stop() // 停止超时定时器
                 isMonitoring = false
                 if (!isBackgroundMode) {
                     loadingOverlay.visible = false
@@ -93,6 +94,7 @@ Rectangle {
                 console.log("检测到注册提示，开始自动登录流程")
                 updateDebugInfo("触发自动登录", "检测到需要登录的页面，开始自动登录流程")
                 sourceMonitorTimer.stop()
+                loadingTimeoutTimer.stop() // 停止超时定时器
                 isMonitoring = false
                 startAutoLogin()
             } else {
@@ -715,16 +717,18 @@ Rectangle {
             if (currentSourceCode.indexOf("继续对话...") !== -1) {
                 console.log("自动登录成功！检测到'继续对话...'")
                 updateDebugInfo("登录成功", "检测到'继续对话...'，自动登录成功完成！")
+                loadingTimeoutTimer.stop() // 停止超时定时器
                 isAutoLoginInProgress = false
                 if (!isBackgroundMode) {
                     loadingOverlay.visible = false
                 }
                 // 登录成功，直接关闭加载遮罩，不显示成功对话框
-            } else if (currentSourceCode.indexOf("用户名或密码错误") !== -1 || 
+            } else if (currentSourceCode.indexOf("用户名或密码错误") !== -1 ||
                       currentSourceCode.indexOf("登录失败") !== -1 ||
                       currentSourceCode.indexOf("账号或密码错误") !== -1) {
                 console.error("登录失败：用户名或密码错误")
                 updateDebugInfo("登录失败", "检测到用户名或密码错误提示")
+                loadingTimeoutTimer.stop() // 停止超时定时器
                 isAutoLoginInProgress = false
                 if (!isBackgroundMode) {
                     loadingOverlay.visible = false
@@ -753,6 +757,7 @@ Rectangle {
                                              document.querySelector('button[data-monitor-click-id="d585165"]');
                         !hasLoginElements; // 如果没有登录元素，返回true表示可能已登录
                     `, function(possiblyLoggedIn) {
+                        loadingTimeoutTimer.stop() // 停止超时定时器
                         if (possiblyLoggedIn) {
                             console.log("未检测到登录元素，可能已经成功登录")
                             updateDebugInfo("登录结果", "未检测到登录元素，可能已成功登录")
@@ -873,13 +878,11 @@ Rectangle {
                 // 停止定时器和自动登录流程
                 sourceMonitorTimer.stop()
                 autoLoginTimer.stop()
+                loadingTimeoutTimer.stop() // 停止超时定时器
                 isAutoLoginInProgress = false
                 isMonitoring = false
                 isLoadingComplete = false
-                if (!isBackgroundMode) {
-                    loadingOverlay.visible = true
-                    loadingText.text = "正在刷新页面..."
-                }
+                // 不显示加载遮罩，直接刷新页面
                 // 重新加载网页
                 webView.url = "" // 先清空，确保强制刷新
                 Qt.callLater(function() {
@@ -954,19 +957,13 @@ Rectangle {
                         console.log("网页开始加载...")
                         updateDebugInfo("网页加载", "开始加载智能体页面")
                         isLoadingComplete = false
-                        if (!isBackgroundMode) {
-                            loadingOverlay.visible = true
-                            loadingText.text = "正在加载智能体..."
-                        }
+                        // 不显示加载遮罩，只进行后台监测
                         break
                         
                     case WebView.LoadSucceededStatus:
                         console.log("网页加载成功!")
                         updateDebugInfo("网页加载", "页面加载成功，准备开始源码监测")
                         isLoadingComplete = true
-                        if (!isBackgroundMode) {
-                            loadingText.text = "正在检测页面状态..."
-                        }
                         
                         // 延迟一秒后开始监测源码
                         Qt.callLater(function() {
@@ -974,6 +971,10 @@ Rectangle {
                             sourceMonitorTimer.start()
                             isMonitoring = true
                             updateDebugInfo("源码监测", "开始定时监测页面状态，每2秒检查一次")
+                            
+                            // 设置加载超时保护，避免无限期显示加载遮罩
+                            loadingTimeoutTimer.interval = 30000 // 30秒超时
+                            loadingTimeoutTimer.restart()
                         })
                         break
                         
@@ -1084,6 +1085,28 @@ Rectangle {
         onTriggered: {
             if (isMonitoring) {
                 monitorSourceCode()
+            }
+        }
+    }
+    
+    // 加载超时保护定时器
+    Timer {
+        id: loadingTimeoutTimer
+        interval: 30000 // 30秒超时
+        repeat: false
+        running: false
+        
+        onTriggered: {
+            console.log("页面加载超时，自动隐藏加载遮罩")
+            updateDebugInfo("加载超时", "页面加载完成但未检测到目标内容，超时后自动隐藏加载遮罩")
+            
+            // 停止监测
+            sourceMonitorTimer.stop()
+            isMonitoring = false
+            
+            // 隐藏加载遮罩
+            if (!isBackgroundMode) {
+                loadingOverlay.visible = false
             }
         }
     }
