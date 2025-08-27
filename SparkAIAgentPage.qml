@@ -1,6 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtWebView
+import QtWebEngine
 import QtQuick.Layouts 1.15
 
 Rectangle {
@@ -930,11 +930,22 @@ Rectangle {
         color: "#44ffffff"
         radius: 10
         
-        WebView {
+        WebEngineView {
             id: webView
             anchors.fill: parent
             anchors.topMargin: 10
             url: ""
+            
+            // 添加永久登录配置
+            profile: WebEngineProfile {
+                id: webProfile
+                storageName: "CozeProfile"
+                persistentCookiesPolicy: WebEngineProfile.AllowPersistentCookies
+                offTheRecord: false
+                httpCacheType: WebEngineProfile.DiskHttpCache
+            }
+            
+            settings.localStorageEnabled: true
             
             // 显式声明参数并判断加载状态
             onLoadingChanged: function(loadRequest) {
