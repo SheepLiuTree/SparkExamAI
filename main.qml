@@ -209,7 +209,7 @@ Window {
 
             Column {
                 anchors.centerIn: parent
-                spacing: 25
+                spacing: 15
 
                 Button {
                     width: 200
@@ -254,7 +254,7 @@ Window {
                         console.log("团委日课 clicked")
                         passwordDialog.targetPage = "DailyCourseContent.qml"
                         passwordDialog.titleText = dbManager.getSetting("daily_course_text", "日课")
-                        passwordDialog.mode = "name_workid_password"  // 姓名+工号+密码验证
+                        passwordDialog.mode = "workid_password"  // 姓名+工号+密码验证
                         passwordDialog.open()
                     }
                 }
@@ -279,7 +279,7 @@ Window {
                         console.log("团委特训 clicked")
                         passwordDialog.targetPage = "SpecialTrainingPage.qml"
                         passwordDialog.titleText = dbManager.getSetting("special_training_text", "特训")
-                        passwordDialog.mode = "name_workid_password"  // 姓名+工号+密码验证
+                        passwordDialog.mode = "workid_password"  // 姓名+工号+密码验证
                         passwordDialog.open()
                     }
                 }
@@ -417,6 +417,99 @@ Window {
                             // 显示提示对话框
                             errorDialog.title = "功能不可用"
                             errorDialog.text = "团委智能体需要QtWebEngine支持。请确保已安装Qt WebEngine模块。"
+                            errorDialog.open()
+                        }
+                    }
+                }
+                Button {
+                    width: 200
+                    height: 70
+                    background: Image {
+                        source: "qrc:/images/button_bg.png"
+                        fillMode: Image.Stretch
+                    }
+                    contentItem: Text {
+                        id: personal_page_button2
+                        text: dbManager.getSetting("tuanwei_button2_text", "智能体2")
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 24
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("智能体2 clicked")
+                        try {
+                            // 直接打开团委智能体页面，不需要人脸识别
+                            stackView.push("SparkAIAgentPage2.qml")
+                        } catch (e) {
+                            // 显示错误信息
+                            console.error("打开智能体2页面失败: " + e.message)
+                            // 显示提示对话框
+                            errorDialog.title = "功能不可用"
+                            errorDialog.text = "智能体2需要QtWebEngine支持。请确保已安装Qt WebEngine模块。"
+                            errorDialog.open()
+                        }
+                    }
+                }
+                Button {
+                    width: 200
+                    height: 70
+                    background: Image {
+                        source: "qrc:/images/button_bg.png"
+                        fillMode: Image.Stretch
+                    }
+                    contentItem: Text {
+                        id: personal_page_button3
+                        text: dbManager.getSetting("tuanwei_button3_text", "智能体3")
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 24
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("智能体3 clicked")
+                        try {
+                            // 直接打委智能体3页面，不需要人脸识别
+                            stackView.push("SparkAIAgentPage3.qml")
+                        } catch (e) {
+                            // 显示错误信息
+                            console.error("打开智能体3页面失败: " + e.message)
+                            // 显示提示对话框
+                            errorDialog.title = "功能不可用"
+                            errorDialog.text = "智能体3需要QtWebEngine支持。请确保已安装Qt WebEngine模块。"
+                            errorDialog.open()
+                        }
+                    }
+                }
+                Button {
+                    width: 200
+                    height: 70
+                    background: Image {
+                        source: "qrc:/images/button_bg.png"
+                        fillMode: Image.Stretch
+                    }
+                    contentItem: Text {
+                        id: personal_page_button4
+                        text: dbManager.getSetting("tuanwei_button4_text", "智能体4")
+                        font.family: "阿里妈妈数黑体"
+                        font.pixelSize: 24
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: {
+                        console.log("智能体4 clicked")
+                        try {
+                            // 直接打委智能体3页面，不需要人脸识别
+                            stackView.push("SparkAIAgentPage4.qml")
+                        } catch (e) {
+                            // 显示错误信息
+                            console.error("打开智能体4页面失败: " + e.message)
+                            // 显示提示对话框
+                            errorDialog.title = "功能不可用"
+                            errorDialog.text = "智能体3需要QtWebEngine支持。请确保已安装Qt WebEngine模块。"
                             errorDialog.open()
                         }
                     }
@@ -3249,12 +3342,27 @@ PasswordDialog {
                     workId: "admin",
                     isAdmin: true  // 密码验证通过的用户默认为管理员
                 }
+            }else {
+                console.log("验证失败，请检查用户名和密码")
+                showError("验证失败，请检查密码")
             }
         } else if (mode === "name_workid_password") {
             // 姓名+工号+密码验证
             userData = dbManager.verifyUserCredentials(enteredName, enteredWorkId, enteredPassword)
             if (userData) {
                 isValid = true
+            }else {
+                console.log("验证失败，请检查用户名和密码")
+                showError("验证失败，请检查用户名和密码")
+            }
+        }else if (mode === "workid_password") {
+            // 工号+密码验证
+            userData = dbManager.verifyUserCredentials("name", enteredWorkId, enteredPassword)
+            if (userData) {
+                isValid = true
+            }else {
+                console.log("验证失败，请检查用户名和密码")
+                showError("验证失败，请检查用户名和密码")
             }
         }
             
@@ -3287,12 +3395,18 @@ PasswordDialog {
                         stackView.push(targetPage)
                     }
                 }
+                passwordDialog.close()
             } else {
                 console.log("验证失败")
                 // 显示错误信息
-                errorDialog.title = "验证失败"
-                errorDialog.text = "密码错误或用户信息不匹配"
-                errorDialog.open()
+                // errorDialog.title = "验证失败"
+                // errorDialog.text = "密码错误或用户信息不匹配"
+                // errorDialog.open()
+                if (mode === "password"){
+                    showError("管理员密码错误")
+                }else {
+                    showError("密码错误或用户信息不匹配")
+                }
             }
         }
         

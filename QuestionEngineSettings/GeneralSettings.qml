@@ -15,10 +15,16 @@ Rectangle {
     property bool showPassword: false
     property int homeSortOption: 1
     property string aiAgentAddress: ""
+    property string aiAgent2Address: ""
+    property string aiAgent3Address: ""
+    property string aiAgent4Address: ""
     property string platformTitle: ""
     property string dailyCourseText: ""
     property string specialTrainingText: ""
     property string tuanweiButtonText: ""
+    property string tuanweiButton2Text: ""
+    property string tuanweiButton3Text: ""
+    property string tuanweiButton4Text: ""
     
     // 定义信号
     signal sortOptionUpdated()
@@ -83,6 +89,24 @@ Rectangle {
         agentAddressField.text = savedAgentAddress
         console.log("从数据库载入AI智能体地址: " + (savedAgentAddress ? savedAgentAddress : "未设置，使用默认值"))
 
+        // 载入AI智能体2地址设置
+        var savedAgent2Address = dbManager.getSetting("ai_agent2_address", "https://www.coze.cn/store/agent/7485277516954271795?bot_id=true")
+        aiAgent2Address = savedAgent2Address
+        agent2AddressField.text = savedAgent2Address
+        console.log("从数据库载入AI智能体2地址: " + (savedAgent2Address ? savedAgent2Address : "未设置"))
+
+        // 载入AI智能体3地址设置
+        var savedAgent3Address = dbManager.getSetting("ai_agent3_address", "https://www.coze.cn/store/agent/7485277516954271795?bot_id=true")
+        aiAgent3Address = savedAgent3Address
+        agent3AddressField.text = savedAgent3Address
+        console.log("从数据库载入AI智能体3地址: " + (savedAgent3Address ? savedAgent3Address : "未设置"))
+
+        // 载入AI智能体4地址设置
+        var savedAgent4Address = dbManager.getSetting("ai_agent4_address", "https://www.coze.cn/store/agent/7485277516954271795?bot_id=true")
+        aiAgent4Address = savedAgent4Address
+        agent4AddressField.text = savedAgent4Address
+        console.log("从数据库载入AI智能体4地址: " + (savedAgent4Address ? savedAgent4Address : "未设置"))
+
         // 载入平台标题设置
         var savedPlatformTitle = dbManager.getSetting("platform_title", "智能体平台")
         platformTitle = savedPlatformTitle
@@ -104,6 +128,24 @@ Rectangle {
         tuanweiButtonText = savedTuanweiButtonText
         tuanweiButtonField.text = savedTuanweiButtonText
         console.log("从数据库载入团委按钮文本: " + (savedTuanweiButtonText ? savedTuanweiButtonText : "未设置，使用默认值"))
+
+        // 载入团委按钮2文本设置
+        var savedTuanweiButton2Text = dbManager.getSetting("tuanwei_button2_text", "智能体2")
+        tuanweiButton2Text = savedTuanweiButton2Text
+        tuanweiButton2Field.text = savedTuanweiButton2Text
+        console.log("从数据库载入团委按钮2文本: " + (savedTuanweiButton2Text ? savedTuanweiButton2Text : "未设置，使用默认值"))
+
+        // 载入团委按钮3文本设置
+        var savedTuanweiButton3Text = dbManager.getSetting("tuanwei_button3_text", "智能体3")
+        tuanweiButton3Text = savedTuanweiButton3Text
+        tuanweiButton3Field.text = savedTuanweiButton3Text
+        console.log("从数据库载入团委按钮3文本: " + (savedTuanweiButton3Text ? savedTuanweiButton3Text : "未设置，使用默认值"))
+
+        // 载入团委按钮4文本设置
+        var savedTuanweiButton4Text = dbManager.getSetting("tuanwei_button4_text", "智能体4")
+        tuanweiButton4Text = savedTuanweiButton4Text
+        tuanweiButton4Field.text = savedTuanweiButton4Text
+        console.log("从数据库载入团委按钮4文本: " + (savedTuanweiButton4Text ? savedTuanweiButton4Text : "未设置，使用默认值"))
     }
     
     ColumnLayout {
@@ -124,7 +166,7 @@ Rectangle {
                 
                 Rectangle {
                     Layout.fillWidth: true
-                    height: 650  // 增加高度以容纳新增的设置项
+                    height: 980  // 增加高度以容纳新增的设置项
                     color: "#44ffffff"
                     radius: 10
                     
@@ -442,6 +484,138 @@ Rectangle {
                             }
                         }
                         
+                        // AI智能体2地址设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "智能体2地址:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                TextField {
+                                    id: agent2AddressField
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    text: aiAgent2Address
+                                    placeholderText: "请输入AI智能体2地址"
+                                    placeholderTextColor: "#cccccc"
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
+                                    
+                                    onTextChanged: {
+                                        aiAgent2Address = text
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // AI智能体3地址设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "智能体3地址:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                TextField {
+                                    id: agent3AddressField
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    text: aiAgent3Address
+                                    placeholderText: "请输入AI智能体3地址"
+                                    placeholderTextColor: "#cccccc"
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
+                                    
+                                    onTextChanged: {
+                                        aiAgent3Address = text
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // AI智能体4地址设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "智能体4地址:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                TextField {
+                                    id: agent4AddressField
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    text: aiAgent4Address
+                                    placeholderText: "请输入AI智能体4地址"
+                                    placeholderTextColor: "#cccccc"
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
+                                    
+                                    onTextChanged: {
+                                        aiAgent4Address = text
+                                    }
+                                }
+                            }
+                        }
+                        
                         Text {
                                 text: "注意：以下内容设置后需重启软件生效！！！"
                                 font.family: "阿里妈妈数黑体"
@@ -628,6 +802,138 @@ Rectangle {
                             }
                         }
 
+                        // 团委按钮2文本设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "智能体2按钮:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                TextField {
+                                    id: tuanweiButton2Field
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    text: tuanweiButton2Text
+                                    placeholderText: "请输入智能体2按钮文本"
+                                    placeholderTextColor: "#cccccc"
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
+                                    
+                                    onTextChanged: {
+                                        tuanweiButton2Text = text
+                                    }
+                                }
+                            }
+                        }
+
+                        // 团委按钮3文本设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "智能体3按钮:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                TextField {
+                                    id: tuanweiButton3Field
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    text: tuanweiButton3Text
+                                    placeholderText: "请输入智能体3按钮文本"
+                                    placeholderTextColor: "#cccccc"
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
+                                    
+                                    onTextChanged: {
+                                        tuanweiButton3Text = text
+                                    }
+                                }
+                            }
+                        }
+
+                        // 团委按钮4文本设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 40
+                            spacing: 10
+                            
+                            Text {
+                                text: "智能体4按钮:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 40
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                TextField {
+                                    id: tuanweiButton4Field
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    font.family: "阿里妈妈数黑体"
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    text: tuanweiButton4Text
+                                    placeholderText: "请输入智能体4按钮文本"
+                                    placeholderTextColor: "#cccccc"
+                                    
+                                    background: Rectangle {
+                                        color: "transparent"
+                                    }
+                                    
+                                    onTextChanged: {
+                                        tuanweiButton4Text = text
+                                    }
+                                }
+                            }
+                        }
+
                         // 保存按钮
                         Item {
                             Layout.fillWidth: true
@@ -723,6 +1029,18 @@ Rectangle {
         var agentAddressSuccess = dbManager.setSetting("ai_agent_address", agentAddressField.text)
         console.log("AI智能体地址已保存: " + agentAddressField.text)
         
+        // 保存AI智能体2地址
+        var agent2AddressSuccess = dbManager.setSetting("ai_agent2_address", agent2AddressField.text)
+        console.log("AI智能体2地址已保存: " + agent2AddressField.text)
+        
+        // 保存AI智能体3地址
+        var agent3AddressSuccess = dbManager.setSetting("ai_agent3_address", agent3AddressField.text)
+        console.log("AI智能体3地址已保存: " + agent3AddressField.text)
+        
+        // 保存AI智能体4地址
+        var agent4AddressSuccess = dbManager.setSetting("ai_agent4_address", agent4AddressField.text)
+        console.log("AI智能体4地址已保存: " + agent4AddressField.text)
+        
         // 保存平台标题
         var platformTitleSuccess = dbManager.setSetting("platform_title", platformTitleField.text)
         console.log("平台标题已保存: " + platformTitleField.text)
@@ -737,6 +1055,15 @@ Rectangle {
         var tuanweiButtonSuccess = dbManager.setSetting("tuanwei_button_text", tuanweiButtonField.text)
         console.log("团委按钮文本已保存: " + tuanweiButtonField.text)
         
+        var tuanweiButton2Success = dbManager.setSetting("tuanwei_button2_text", tuanweiButton2Field.text)
+        console.log("智能体2按钮文本已保存: " + tuanweiButton2Field.text)
+        
+        var tuanweiButton3Success = dbManager.setSetting("tuanwei_button3_text", tuanweiButton3Field.text)
+        console.log("智能体3按钮文本已保存: " + tuanweiButton3Field.text)
+        
+        var tuanweiButton4Success = dbManager.setSetting("tuanwei_button4_text", tuanweiButton4Field.text)
+        console.log("智能体4按钮文本已保存: " + tuanweiButton4Field.text)
+        
         // 使用延迟调用确保数据库操作完成后再更新UI
         Qt.callLater(function() {
             // 再次从数据库读取设置确保保存成功
@@ -749,8 +1076,10 @@ Rectangle {
         })
         
         // 显示结果消息
-        if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess && platformTitleSuccess &&
-            dailyCourseSuccess && specialTrainingSuccess && tuanweiButtonSuccess) {
+        if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess && agent2AddressSuccess &&
+            agent3AddressSuccess && agent4AddressSuccess && platformTitleSuccess &&
+            dailyCourseSuccess && specialTrainingSuccess && tuanweiButtonSuccess &&
+            tuanweiButton2Success && tuanweiButton3Success && tuanweiButton4Success) {
             statusMessage = "所有设置已保存成功"
             isSuccess = true
         } else {
@@ -759,10 +1088,16 @@ Rectangle {
             if (!cameraSuccess) failedSettings.push("摄像头");
             if (!sortSuccess) failedSettings.push("首页排序");
             if (!agentAddressSuccess) failedSettings.push("智能体地址");
+            if (!agent2AddressSuccess) failedSettings.push("智能体2地址");
+            if (!agent3AddressSuccess) failedSettings.push("智能体3地址");
+            if (!agent4AddressSuccess) failedSettings.push("智能体4地址");
             if (!platformTitleSuccess) failedSettings.push("平台标题");
             if (!dailyCourseSuccess) failedSettings.push("日课按钮");
             if (!specialTrainingSuccess) failedSettings.push("特训按钮");
             if (!tuanweiButtonSuccess) failedSettings.push("团委按钮");
+            if (!tuanweiButton2Success) failedSettings.push("智能体2按钮");
+            if (!tuanweiButton3Success) failedSettings.push("智能体3按钮");
+            if (!tuanweiButton4Success) failedSettings.push("智能体4按钮");
             
             statusMessage = "保存失败的设置: " + failedSettings.join(", ") + "，请重试"
             isSuccess = false

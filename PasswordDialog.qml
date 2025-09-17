@@ -14,7 +14,7 @@ Dialog {
     property bool requireWorkId: false
     
     // 支持多种验证模式
-    property string mode: "password"  // "password", "name_password", "workid_password", "name_workid_password"
+    property string mode: "workid_password"  // "password", "name_password", "workid_password", "name_workid_password"
     
     property string enteredName: ""
     property string enteredWorkId: ""
@@ -30,7 +30,8 @@ Dialog {
     width: 400
     height: {
         if (mode === "name_workid_password") return 320
-        else if (requireName || requireWorkId) return 280
+        else if (mode === "workid_password" || requireWorkId) return 280
+        else if (requireName) return 280
         else return 180
     }
     padding: 20
@@ -54,7 +55,7 @@ Dialog {
             id: nameField
             Layout.fillWidth: true
             placeholderText: passwordDialog.nameLabel
-            visible: mode === "name_workid_password" || requireName
+            visible: mode === "name_workid_password" && requireName
             text: passwordDialog.enteredName
             onTextChanged: passwordDialog.enteredName = text
         }
@@ -64,7 +65,7 @@ Dialog {
             id: workIdField
             Layout.fillWidth: true
             placeholderText: passwordDialog.workIdLabel
-            visible: mode === "name_workid_password" || requireWorkId
+            visible: mode === "name_workid_password" || mode === "workid_password" || requireWorkId
             text: passwordDialog.enteredWorkId
             onTextChanged: passwordDialog.enteredWorkId = text
         }
@@ -107,7 +108,7 @@ Dialog {
                         passwordDialog.accepted(passwordDialog.enteredName,
                                               passwordDialog.enteredWorkId,
                                               passwordDialog.enteredPassword)
-                        passwordDialog.close()
+                        //passwordDialog.close()
                     }
                 }
             }
@@ -125,14 +126,14 @@ Dialog {
     }
     
     function validateInput() {
-        if (mode === "name_workid_password" || requireName) {
+        if (mode === "name_workid_password" && requireName) {
             if (enteredName.trim() === "") {
                 showError("请输入姓名")
                 return false
             }
         }
         
-        if (mode === "name_workid_password" || requireWorkId) {
+        if (mode === "name_workid_password" || mode === "workid_password" || requireWorkId) {
             if (enteredWorkId.trim() === "") {
                 showError("请输入工号")
                 return false
@@ -164,12 +165,12 @@ Dialog {
     
     onOpened: {
         clear()
-        if (mode === "name_workid_password") {
+        if (mode === "name_workid_password" && requireName) {
             nameField.forceActiveFocus()
+        } else if (mode === "workid_password" || requireWorkId) {
+            workIdField.forceActiveFocus()
         } else if (requireName) {
             nameField.forceActiveFocus()
-        } else if (requireWorkId) {
-            workIdField.forceActiveFocus()
         } else {
             passwordField.forceActiveFocus()
         }

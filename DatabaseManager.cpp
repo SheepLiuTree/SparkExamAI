@@ -1029,6 +1029,9 @@ void DatabaseManager::initDefaultSettings()
         
         // AI智能体地址设置
         setSetting("ai_agent_address", "https://www.coze.cn/s/hn97Tsa7-fw/");
+        setSetting("ai_agent2_address", "https://www.coze.cn/s/hn97Tsa7-fw/");
+        setSetting("ai_agent3_address", "https://www.coze.cn/s/hn97Tsa7-fw/");
+        setSetting("ai_agent4_address", "https://www.coze.cn/s/hn97Tsa7-fw/");
         
         // 五芒图默认标题设置
         setSetting("pentagon_title_1", "基础认知");
@@ -1042,6 +1045,9 @@ void DatabaseManager::initDefaultSettings()
         setSetting("daily_course_text", "日课");
         setSetting("special_training_text", "特训");
         setSetting("tuanwei_button_text", "智能体");
+        setSetting("tuanwei_button2_text", "智能体2");
+        setSetting("tuanwei_button3_text", "智能体3");
+        setSetting("tuanwei_button4_text", "智能体4");
         
         qDebug() << "初始化默认设置完成";
     }
@@ -1857,13 +1863,23 @@ bool DatabaseManager::verifyPassword(const QString &workId, const QString &passw
 bool DatabaseManager::verifyUserCredentials(const QString &name, const QString &workId, const QString &password)
 {
     QSqlQuery query;
-    query.prepare("SELECT password FROM users WHERE work_id = :work_id AND name = :name");
-    query.bindValue(":work_id", workId);
-    query.bindValue(":name", name);
-    
-    if (query.exec() && query.next()) {
-        QString storedPassword = query.value("password").toString();
-        return storedPassword == password;
+    if (name=="name") {
+        query.prepare("SELECT password FROM users WHERE work_id = :work_id");
+        query.bindValue(":work_id", workId);
+        
+        if (query.exec() && query.next()) {
+            QString storedPassword = query.value("password").toString();
+            return storedPassword == password;
+        }
+    }else{                   
+        query.prepare("SELECT password FROM users WHERE work_id = :work_id AND name = :name");
+        query.bindValue(":work_id", workId);
+        query.bindValue(":name", name);
+        
+        if (query.exec() && query.next()) {
+            QString storedPassword = query.value("password").toString();
+            return storedPassword == password;
+        }
     }
     
     return false;
