@@ -123,7 +123,7 @@ Rectangle {
         RowLayout {
             anchors.fill: parent
             anchors.margins: 8
-            spacing: 10
+            spacing: 20
             
             Text {
                 id: downloadStatusText
