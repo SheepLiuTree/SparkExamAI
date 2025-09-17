@@ -980,7 +980,7 @@ Rectangle {
     
     // 组件初始化时，确保WebEngine模块可用
     Component.onCompleted: {
-        console.log(dbManager.getSetting("tuanwei_button2_text", "智能体") + "页面加载")
+        console.log(dbManager.getSetting("tuanwei_button2_text", "智能体2") + "页面加载")
         
         // 从数据库加载智能体地址设置
         var savedAgentAddress = dbManager.getSetting("ai_agent2_address", "https://www.coze.cn/s/hn97Tsa7-fw/")

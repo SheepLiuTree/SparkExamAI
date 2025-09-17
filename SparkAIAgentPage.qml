@@ -10,6 +10,34 @@ Rectangle {
     // 智能体地址属性
     property string aiAgentUrl: "https://www.coze.cn/s/hn97Tsa7-fw/" // 默认值
     
+    // 下载目录属性
+    property string downloadPath: "C:/Users/15504/Desktop/" // 默认下载目录为桌面，可根据需要修改
+    
+    // 生成带时间戳的文件名
+    function getTimestampedFileName(originalFileName) {
+        // 获取当前时间
+        var now = new Date();
+        var timestamp = now.getFullYear() +
+                      ("0" + (now.getMonth() + 1)).slice(-2) +
+                      ("0" + now.getDate()).slice(-2) +
+                      ("0" + now.getHours()).slice(-2) +
+                      ("0" + now.getMinutes()).slice(-2) +
+                      ("0" + now.getSeconds()).slice(-2);
+        
+        // 分离文件名和扩展名
+        var dotIndex = originalFileName.lastIndexOf(".");
+        var nameWithoutExt = originalFileName;
+        var extension = "";
+        
+        if (dotIndex !== -1) {
+            nameWithoutExt = originalFileName.substring(0, dotIndex);
+            extension = originalFileName.substring(dotIndex);
+        }
+        
+        // 返回带时间戳的文件名
+        return nameWithoutExt + "_" + timestamp + extension;
+    }
+    
     // 返回按钮
     Button {
         id: backButton
@@ -79,13 +107,80 @@ Rectangle {
         }
     }
     
+    // 下载进度显示
+    Rectangle {
+        id: downloadProgressContainer
+        anchors.left: contentContainer.left
+        anchors.right: welcomeText.left
+        anchors.rightMargin: 20
+        anchors.bottom: contentContainer.top
+        anchors.bottomMargin: 10
+        height: 40
+        color: "#33000000"
+        radius: 5
+        visible: false
+        
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: 8
+            spacing: 10
+            
+            Text {
+                id: downloadStatusText
+                text: "下载中..."
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 14
+                color: "white"
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+            }
+            
+            Rectangle {
+                id: downloadProgressBar
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                height: 20
+                color: "#44000000"
+                radius: 10
+                
+                Rectangle {
+                    id: downloadProgressFill
+                    anchors.left: parent.left
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    width: 0
+                    color: "#4285f4"
+                    radius: 10
+                }
+            }
+            
+            Text {
+                id: downloadPercentText
+                text: "0%"
+                font.family: "阿里妈妈数黑体"
+                font.pixelSize: 14
+                color: "white"
+                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+            }
+        }
+    }
+    
+    // 下载完成隐藏定时器
+    Timer {
+        id: downloadHideTimer
+        interval: 3000
+        repeat: false
+        onTriggered: {
+            downloadProgressContainer.visible = false
+        }
+    }
+    
     // 页面标题
     Text {
         id: pageTitle
         anchors.top: parent.top
         anchors.topMargin: 25
         anchors.horizontalCenter: parent.horizontalCenter
-        text: dbManager.getSetting("ai_agent_text", "智能体")
+        text: dbManager.getSetting("tuanwei_button_text", "智能体")
         font.family: "阿里妈妈数黑体"
         font.pixelSize: 36
         color: "white"
@@ -98,7 +193,7 @@ Rectangle {
         anchors.top: pageTitle.bottom
         anchors.topMargin: 15
         anchors.horizontalCenter: parent.horizontalCenter
-        text: "欢迎使用" + dbManager.getSetting("ai_agent_text", "智能体") + "!"
+        text: "欢迎使用" + dbManager.getSetting("tuanwei_button_text", "智能体") + "!"
         font.family: "阿里妈妈数黑体"
         font.pixelSize: 20
         color: "white"
@@ -106,6 +201,7 @@ Rectangle {
     
     // 内容区域
     Rectangle {
+        id: contentContainer
         anchors.top: welcomeText.bottom
         anchors.topMargin: 25
         anchors.bottom: parent.bottom
@@ -217,6 +313,69 @@ Rectangle {
                         offTheRecord: false
                         storageName: "CozeProfile"
                         persistentStoragePath: ""
+                        
+                        // 下载请求处理
+                        onDownloadRequested: function(download) {
+                            console.log("下载请求: " + download.url)
+                            console.log("下载到: " + sparkAIAgentPage.downloadPath)
+                            
+                            // 生成带时间戳的文件名
+                            var timestampedFileName = sparkAIAgentPage.getTimestampedFileName(download.suggestedFileName)
+                            
+                            // 设置下载路径
+                            download.path = sparkAIAgentPage.downloadPath + timestampedFileName
+                            
+                            // 显示下载进度条
+                            downloadProgressContainer.visible = true
+                            downloadStatusText.text = "下载中: " + download.suggestedFileName
+                            downloadPercentText.text = "0%"
+                            downloadProgressFill.width = 0
+                            
+                            // 接受下载
+                            download.accept()
+                            
+                            // 使用定时器来更新下载进度
+                            var progressTimer = Qt.createQmlObject('import QtQuick 2.15; Timer { interval: 100; repeat: true }', sparkAIAgentPage);
+                            
+                            // 更新下载进度
+                            progressTimer.triggered.connect(function() {
+                                if (download.totalBytes > 0) {
+                                    var percent = (download.receivedBytes / download.totalBytes) * 100;
+                                    console.log("下载进度: " + percent + "%")
+                                    downloadPercentText.text = Math.round(percent) + "%"
+                                    downloadProgressFill.width = (percent / 100) * downloadProgressBar.width
+                                }
+                                
+                                // 检查下载状态
+                                if (download.state === WebEngineDownloadItem.DownloadCompleted) {
+                                    console.log("下载完成: " + download.path)
+                                    downloadStatusText.text = "下载完成: " + download.suggestedFileName
+                                    downloadPercentText.text = "100%"
+                                    downloadProgressFill.width = downloadProgressBar.width
+                                    
+                                    // 停止定时器
+                                    progressTimer.stop()
+                                    
+                                    // 3秒后隐藏下载进度条
+                                    downloadHideTimer.start()
+                                    
+                                    // 清理定时器
+                                    progressTimer.destroy()
+                                } else if (download.state === WebEngineDownloadItem.DownloadInterrupted) {
+                                    console.log("下载中断: " + download.interruptReasonString)
+                                    downloadStatusText.text = "下载中断: " + download.interruptReasonString
+                                    
+                                    // 停止定时器
+                                    progressTimer.stop()
+                                    
+                                    // 清理定时器
+                                    progressTimer.destroy()
+                                }
+                            })
+                            
+                            // 启动定时器
+                            progressTimer.start()
+                        }
                     }
                     
                     // 设置WebEngineView属性
@@ -821,7 +980,7 @@ Rectangle {
     
     // 组件初始化时，确保WebEngine模块可用
     Component.onCompleted: {
-        console.log(dbManager.getSetting("ai_agent_text", "智能体") + "页面加载")
+        console.log(dbManager.getSetting("tuanwei_button_text", "智能体") + "页面加载")
         
         // 从数据库加载智能体地址设置
         var savedAgentAddress = dbManager.getSetting("ai_agent_address", "https://www.coze.cn/s/hn97Tsa7-fw/")
@@ -830,6 +989,15 @@ Rectangle {
             console.log("从数据库加载智能体地址: " + aiAgentUrl)
         } else {
             console.log("使用默认智能体地址: " + aiAgentUrl)
+        }
+        
+        // 从数据库加载下载目录设置
+        var savedDownloadPath = dbManager.getSetting("download_path", "C:/Users/15504/Desktop/")
+        if (savedDownloadPath && savedDownloadPath.trim() !== "") {
+            downloadPath = savedDownloadPath
+            console.log("从数据库加载下载目录: " + downloadPath)
+        } else {
+            console.log("使用默认下载目录: " + downloadPath)
         }
     }
 }
