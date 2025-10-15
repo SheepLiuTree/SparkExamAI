@@ -43,5 +43,6 @@
         <file>images/FaceTracking.png</file>
         <file>PasswordDialog.qml</file>
         <file>QuestionCollectionContent.qml</file>
+         <file>images/qcxf.png</file>
     </qresource>
 </RCC>

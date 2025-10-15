@@ -66,6 +66,16 @@ Window {
     //     color: "white"
     //     z: 100 // 确保显示在最上层
     // }
+    Image{
+        id:qcxfLogo
+        anchors.top: parent.top
+        anchors.topMargin: 25
+        anchors.left: parent.left
+        anchors.leftMargin: 10
+        source: "qrc:/images/qcxf.png"
+        width: 100
+        height: 100
+    }
 
     Image {
         id: headline_background
@@ -399,7 +409,7 @@ Window {
                     }
                     contentItem: Text {
                         id: personal_page_button
-                        text: dbManager.getSetting("tuanwei_button_text", "团委智能体")
+                        text: dbManager.getSetting("tuanwei_button_text", "智能体1")
                         font.family: "阿里妈妈数黑体"
                         font.pixelSize: 24
                         color: "white"
@@ -407,7 +417,12 @@ Window {
                         verticalAlignment: Text.AlignVCenter
                     }
                     onClicked: {
-                        console.log("团委智能体 clicked")
+                        console.log("智能体1 clicked--"+ dbManager.getSetting("ai_agent_address"))
+                        if(dbManager.getSetting("ai_agent_address").includes("coze")){
+                            console.log("智能体1地址: " + dbManager.getSetting("ai_agent_address"))
+                            Qt.openUrlExternally(dbManager.getSetting("ai_agent_address"))
+                            return
+                        }                        
                         try {
                             // 直接打开团委智能体页面，不需要人脸识别
                             stackView.push("SparkAIAgentPage.qml")
@@ -416,7 +431,7 @@ Window {
                             console.error("打开团委智能体页面失败: " + e.message)
                             // 显示提示对话框
                             errorDialog.title = "功能不可用"
-                            errorDialog.text = "团委智能体需要QtWebEngine支持。请确保已安装Qt WebEngine模块。"
+                            errorDialog.text = "智能体1需要QtWebEngine支持。请确保已安装Qt WebEngine模块。"
                             errorDialog.open()
                         }
                     }
@@ -438,7 +453,12 @@ Window {
                         verticalAlignment: Text.AlignVCenter
                     }
                     onClicked: {
-                        console.log("智能体2 clicked")
+                        console.log("智能体2 clicked--"+ dbManager.getSetting("ai_agent2_address"))
+                        if(dbManager.getSetting("ai_agent2_address").includes("coze")){
+                            console.log("智能体2地址: " + dbManager.getSetting("ai_agent2_address"))
+                            Qt.openUrlExternally(dbManager.getSetting("ai_agent2_address"))
+                            return
+                        }                        
                         try {
                             // 直接打开团委智能体页面，不需要人脸识别
                             stackView.push("SparkAIAgentPage2.qml")
@@ -469,7 +489,12 @@ Window {
                         verticalAlignment: Text.AlignVCenter
                     }
                     onClicked: {
-                        console.log("智能体3 clicked")
+                        console.log("智能体3 clicked--"+ dbManager.getSetting("ai_agent3_address"))
+                        if(dbManager.getSetting("ai_agent3_address").includes("coze")){
+                            console.log("智能体3地址: " + dbManager.getSetting("ai_agent3_address"))
+                            Qt.openUrlExternally(dbManager.getSetting("ai_agent3_address"))
+                            return
+                        }                        
                         try {
                             // 直接打委智能体3页面，不需要人脸识别
                             stackView.push("SparkAIAgentPage3.qml")
@@ -500,7 +525,12 @@ Window {
                         verticalAlignment: Text.AlignVCenter
                     }
                     onClicked: {
-                        console.log("智能体4 clicked")
+                        console.log("智能体4 clicked--"+ dbManager.getSetting("ai_agent4_address"))
+                        if(dbManager.getSetting("ai_agent4_address").includes("coze")){
+                            console.log("智能体4地址: " + dbManager.getSetting("ai_agent4_address"))
+                            Qt.openUrlExternally(dbManager.getSetting("ai_agent4_address"))
+                            return
+                        }                        
                         try {
                             // 直接打委智能体3页面，不需要人脸识别
                             stackView.push("SparkAIAgentPage4.qml")
