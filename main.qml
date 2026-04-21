@@ -262,10 +262,31 @@ Window {
                     }
                     onClicked: {
                         console.log("团委日课 clicked")
-                        passwordDialog.targetPage = "DailyCourseContent.qml"
-                        passwordDialog.titleText = dbManager.getSetting("daily_course_text", "日课")
-                        passwordDialog.mode = "workid_password"  // 姓名+工号+密码验证
-                        passwordDialog.open()
+                        var demoMode = dbManager.getSetting("demo_mode", "0")
+                        if (demoMode === "1") {
+                            console.log("演示模式：直接进入日课页面")
+                            var userData = dbManager.getFaceDataByWorkId("06001831")
+                            if (!userData || Object.keys(userData).length === 0) {
+                                userData = {
+                                    name: "演示用户",
+                                    workId: "06001831",
+                                    isAdmin: false
+                                }
+                            }
+                            var component = Qt.createComponent("DailyCourseContent.qml")
+                            if (component.status === Component.Ready) {
+                                var pageObject = component.createObject(stackView, {"userData": userData})
+                                stackView.push(pageObject)
+                            } else {
+                                console.error("组件加载失败:", component.errorString())
+                                stackView.push("DailyCourseContent.qml")
+                            }
+                        } else {
+                            passwordDialog.targetPage = "DailyCourseContent.qml"
+                            passwordDialog.titleText = dbManager.getSetting("daily_course_text", "日课")
+                            passwordDialog.mode = "workid_password"
+                            passwordDialog.open()
+                        }
                     }
                 }
 
@@ -287,10 +308,31 @@ Window {
                     }
                     onClicked: {
                         console.log("团委特训 clicked")
-                        passwordDialog.targetPage = "SpecialTrainingPage.qml"
-                        passwordDialog.titleText = dbManager.getSetting("special_training_text", "特训")
-                        passwordDialog.mode = "workid_password"  // 姓名+工号+密码验证
-                        passwordDialog.open()
+                        var demoMode = dbManager.getSetting("demo_mode", "0")
+                        if (demoMode === "1") {
+                            console.log("演示模式：直接进入特训页面")
+                            var userData = dbManager.getFaceDataByWorkId("06001831")
+                            if (!userData || Object.keys(userData).length === 0) {
+                                userData = {
+                                    name: "演示用户",
+                                    workId: "06001831",
+                                    isAdmin: false
+                                }
+                            }
+                            var component = Qt.createComponent("SpecialTrainingPage.qml")
+                            if (component.status === Component.Ready) {
+                                var pageObject = component.createObject(stackView, {"userData": userData})
+                                stackView.push(pageObject)
+                            } else {
+                                console.error("组件加载失败:", component.errorString())
+                                stackView.push("SpecialTrainingPage.qml")
+                            }
+                        } else {
+                            passwordDialog.targetPage = "SpecialTrainingPage.qml"
+                            passwordDialog.titleText = dbManager.getSetting("special_training_text", "特训")
+                            passwordDialog.mode = "workid_password"
+                            passwordDialog.open()
+                        }
                     }
                 }
 
@@ -369,10 +411,28 @@ Window {
                     }
                     onClicked: {
                         console.log("题集速录 clicked")
-                        passwordDialog.targetPage = "QuestionCollectionPage.qml"
-                        passwordDialog.titleText = "题集速录"
-                        passwordDialog.mode = "password"  // 仅密码验证
-                        passwordDialog.open()
+                        var demoMode = dbManager.getSetting("demo_mode", "0")
+                        if (demoMode === "1") {
+                            console.log("演示模式：直接进入题集速录页面")
+                            var userData = {
+                                name: "演示用户",
+                                workId: "06001831",
+                                isAdmin: true
+                            }
+                            var component = Qt.createComponent("QuestionCollectionPage.qml")
+                            if (component.status === Component.Ready) {
+                                var pageObject = component.createObject(stackView, {"userData": userData})
+                                stackView.push(pageObject)
+                            } else {
+                                console.error("组件加载失败:", component.errorString())
+                                stackView.push("QuestionCollectionPage.qml")
+                            }
+                        } else {
+                            passwordDialog.targetPage = "QuestionCollectionPage.qml"
+                            passwordDialog.titleText = "题集速录"
+                            passwordDialog.mode = "password"
+                            passwordDialog.open()
+                        }
                     }
                 }
 
@@ -393,10 +453,28 @@ Window {
                     }
                     onClicked: {
                         console.log("题策引擎 clicked")
-                        passwordDialog.targetPage = "QuestionEnginePage.qml"
-                        passwordDialog.titleText = "题策引擎"
-                        passwordDialog.mode = "password"  // 使用密码验证，管理员权限在验证后检查
-                        passwordDialog.open()
+                        var demoMode = dbManager.getSetting("demo_mode", "0")
+                        if (demoMode === "1") {
+                            console.log("演示模式：直接进入题策引擎页面")
+                            var userData = {
+                                name: "演示用户",
+                                workId: "06001831",
+                                isAdmin: true
+                            }
+                            var component = Qt.createComponent("QuestionEnginePage.qml")
+                            if (component.status === Component.Ready) {
+                                var pageObject = component.createObject(stackView, {"userData": userData})
+                                stackView.push(pageObject)
+                            } else {
+                                console.error("组件加载失败:", component.errorString())
+                                stackView.push("QuestionEnginePage.qml")
+                            }
+                        } else {
+                            passwordDialog.targetPage = "QuestionEnginePage.qml"
+                            passwordDialog.titleText = "题策引擎"
+                            passwordDialog.mode = "password"
+                            passwordDialog.open()
+                        }
                     }
                 }
 

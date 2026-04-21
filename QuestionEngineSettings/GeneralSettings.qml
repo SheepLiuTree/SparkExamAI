@@ -25,6 +25,7 @@ Rectangle {
     property string tuanweiButton2Text: ""
     property string tuanweiButton3Text: ""
     property string tuanweiButton4Text: ""
+    property bool demoMode: false
     
     // 定义信号
     signal sortOptionUpdated()
@@ -146,6 +147,11 @@ Rectangle {
         tuanweiButton4Text = savedTuanweiButton4Text
         tuanweiButton4Field.text = savedTuanweiButton4Text
         console.log("从数据库载入团委按钮4文本: " + (savedTuanweiButton4Text ? savedTuanweiButton4Text : "未设置，使用默认值"))
+
+        var savedDemoMode = dbManager.getSetting("demo_mode", "0")
+        demoMode = (savedDemoMode === "1")
+        demoModeSwitch.checked = demoMode
+        console.log("从数据库载入演示模式: " + (demoMode ? "开启" : "关闭"))
     }
     
     ColumnLayout {
@@ -435,6 +441,71 @@ Rectangle {
                                             verticalAlignment: Text.AlignVCenter
                                             leftPadding: sortOption2.indicator.width + 8
                                         }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // 演示模式设置
+                        RowLayout {
+                            Layout.fillWidth: true
+                            height: 50
+                            spacing: 10
+                            
+                            Text {
+                                text: "演示模式:"
+                                font.family: "阿里妈妈数黑体"
+                                font.pixelSize: 18
+                                color: "white"
+                                Layout.preferredWidth: 120
+                                Layout.preferredHeight: 50
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 50
+                                color: "#22ffffff"
+                                radius: 5
+                                
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 10
+                                    spacing: 10
+                                    
+                                    Switch {
+                                        id: demoModeSwitch
+                                        checked: demoMode
+                                        font.family: "阿里妈妈数黑体"
+                                        
+                                        indicator: Rectangle {
+                                            implicitWidth: 50
+                                            implicitHeight: 28
+                                            x: demoModeSwitch.leftPadding
+                                            y: parent.height / 2 - height / 2
+                                            radius: height / 2
+                                            color: demoModeSwitch.checked ? "#4CAF50" : "#cccccc"
+                                            
+                                            Rectangle {
+                                                x: demoModeSwitch.checked ? parent.width - width - 2 : 2
+                                                width: 24
+                                                height: 24
+                                                radius: 12
+                                                color: "white"
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                        }
+                                        
+                                        onCheckedChanged: {
+                                            demoMode = checked
+                                        }
+                                    }
+                                    
+                                    Text {
+                                        text: demoMode ? "已开启" : "已关闭"
+                                        font.family: "阿里妈妈数黑体"
+                                        font.pixelSize: 16
+                                        color: demoMode ? "#4CAF50" : "#cccccc"
                                     }
                                 }
                             }
@@ -1064,6 +1135,9 @@ Rectangle {
         var tuanweiButton4Success = dbManager.setSetting("tuanwei_button4_text", tuanweiButton4Field.text)
         console.log("智能体4按钮文本已保存: " + tuanweiButton4Field.text)
         
+        var demoModeSuccess = dbManager.setSetting("demo_mode", demoMode ? "1" : "0")
+        console.log("演示模式已保存: " + (demoMode ? "开启" : "关闭"))
+        
         // 使用延迟调用确保数据库操作完成后再更新UI
         Qt.callLater(function() {
             // 再次从数据库读取设置确保保存成功
@@ -1079,7 +1153,7 @@ Rectangle {
         if (passwordSuccess && cameraSuccess && sortSuccess && agentAddressSuccess && agent2AddressSuccess &&
             agent3AddressSuccess && agent4AddressSuccess && platformTitleSuccess &&
             dailyCourseSuccess && specialTrainingSuccess && tuanweiButtonSuccess &&
-            tuanweiButton2Success && tuanweiButton3Success && tuanweiButton4Success) {
+            tuanweiButton2Success && tuanweiButton3Success && tuanweiButton4Success && demoModeSuccess) {
             statusMessage = "所有设置已保存成功"
             isSuccess = true
         } else {
@@ -1098,6 +1172,7 @@ Rectangle {
             if (!tuanweiButton2Success) failedSettings.push("智能体2按钮");
             if (!tuanweiButton3Success) failedSettings.push("智能体3按钮");
             if (!tuanweiButton4Success) failedSettings.push("智能体4按钮");
+            if (!demoModeSuccess) failedSettings.push("演示模式");
             
             statusMessage = "保存失败的设置: " + failedSettings.join(", ") + "，请重试"
             isSuccess = false
